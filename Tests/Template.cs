@@ -1,7 +1,6 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using Mono.Cecil;
 using NUnit.Framework;
 
@@ -21,22 +20,8 @@ public class Template
 
     public void NoWeaving()
     {
-        Console.WriteLine("sdlkmflskdmf");
-    }
-
-    bool x;
-    [MethodImpl(MethodImplOptions.NoOptimization)]
-    public void Throw()
-    {
-        try
-        {
-            var dateTime = DateTime.Now;
-        }
-        catch (Exception)
-        {
-            Console.WriteLine("sdf");
-            throw;
-        }
+        //Some code u are curious how long it takes
+        Console.WriteLine("Hello");
     }
 
     public void WithWeaving()
@@ -44,7 +29,8 @@ public class Template
         var stopwatch = Stopwatch.StartNew();
         try
         {
-            Console.WriteLine("sdlkmflskdmf");
+            //Some code u are curious how long it takes
+            Console.WriteLine("Hello");
         }
         finally
         {
@@ -52,6 +38,7 @@ public class Template
             Console.WriteLine(string.Concat("Template.WithWeaving", stopwatch.ElapsedMilliseconds));
         }
     }
+
     public string NoWeavingAndReturn()
     {
         Console.WriteLine("sdlkmflskdmf");

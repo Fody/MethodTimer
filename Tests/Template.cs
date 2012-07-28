@@ -9,6 +9,7 @@ using NUnit.Framework;
 public class Template
 {
     [Test]
+    [Ignore]
     public void LookAtIL()
     {
         var moduleDefinition = ModuleDefinition.ReadModule(GetType().Assembly.Location);

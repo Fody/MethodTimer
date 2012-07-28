@@ -1,5 +1,5 @@
 using System;
-using System.Reflection;
+using System.Diagnostics;
 using Mono.Cecil;
 
 public class MockAssemblyResolver : IAssemblyResolver
@@ -16,9 +16,17 @@ public class MockAssemblyResolver : IAssemblyResolver
 
     public AssemblyDefinition Resolve(string fullName)
     {
-        var codeBase = Assembly.Load(fullName).CodeBase.Replace("file:///","");
+        if (fullName == "System")
+        {
+            var codeBase = typeof(Debug).Assembly.CodeBase.Replace("file:///", "");
+            return AssemblyDefinition.ReadAssembly(codeBase);
+        }
+        else
+        {
+            var codeBase = typeof(string).Assembly.CodeBase.Replace("file:///", "");
+            return AssemblyDefinition.ReadAssembly(codeBase);   
+        }
 
-        return AssemblyDefinition.ReadAssembly(codeBase);
     }
 
     public AssemblyDefinition Resolve(string fullName, ReaderParameters parameters)

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using Mono.Cecil;
 using NUnit.Framework;
@@ -38,165 +37,27 @@ public class IntegrationTests
     }
 
     [Test]
-    public void Class()
+    public void ClassWithAttribute()
     {
-        var type = assembly.GetType("ClassToMark");
-        ValidateMessage(type);
-        ValidateIsNotError(type);
+        var type = assembly.GetType("ClassWithAttribute");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        instance.Method();
     }
     [Test]
-    public void Warnings()
+    public void ClassWithMethod()
     {
-        Assert.Contains("The member 'ClassWithObsoleteAttribute' has an ObsoleteAttribute. You should consider replacing it with an ObsoleteExAttribute.", warnings);
-    }
-    [Test]
-    public void Interface()
-    {
-        var type = assembly.GetType("InterfaceToMark");
-        ValidateMessage(type);
-        ValidateIsNotError(type);
+        var type = assembly.GetType("ClassWithMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        instance.Method();
     }
 
     [Test]
-    public void ClassWithIsError()
+    public void MethodWithReturn()
     {
-        var type = assembly.GetType("ClassWithIsError");
-        ValidateIsError(type);
+        var type = assembly.GetType("ClassWithMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        instance.MethodWithReturn();
     }
-
-    [Test]
-    public void Enum()
-    {
-        var type = assembly.GetType("EnumToMark");
-        ValidateIsNotError(type);
-    }
-    [Test]
-    public void Struct()
-    {
-        var type = assembly.GetType("StructToMark");
-        ValidateIsNotError(type);
-    }
-    
-    [Test]
-    public void EnumField()
-    {
-        var type = assembly.GetType("EnumToMark");
-        var info = type.GetField("Foo");
-        ValidateMessage(info);
-        ValidateIsNotError(info);
-    }
-
-    [Test]
-    public void ClassMethod()
-    {
-        var type = assembly.GetType("ClassToMark");
-        var info = type.GetMethod("MethodToMark");
-        ValidateMessage(info);
-        ValidateIsNotError(info);
-    }
-    [Test]
-    public void InterfaceMethod()
-    {
-        var type = assembly.GetType("InterfaceToMark");
-        var info = type.GetMethod("MethodToMark");
-        ValidateMessage(info);
-        ValidateIsNotError(info);
-    }
-    [Test]
-    public void StructMethod()
-    {
-        var type = assembly.GetType("StructToMark");
-        var info = type.GetMethod("MethodToMark");
-        ValidateMessage(info);
-        ValidateIsNotError(info);
-    }
-    
-    [Test]
-    public void ClassProperty()
-    {
-        var type = assembly.GetType("ClassToMark");
-        var info = type.GetProperty("PropertyToMark");
-        ValidateMessage(info);
-        ValidateIsNotError(info);
-    }
-    [Test]
-    public void ClassField()
-    {
-        var type = assembly.GetType("ClassToMark");
-        var info = type.GetField("FieldToMark");
-        ValidateMessage(info);
-        ValidateIsNotError(info);
-    }
-    [Test]
-    public void InterfaceEvent()
-    {
-        var type = assembly.GetType("InterfaceToMark");
-        var info = type.GetMember("EventToMark").First();
-        ValidateMessage(info);
-        ValidateIsNotError(info);
-    }
-    [Test]
-    public void ClassEvent()
-    {
-        var type = assembly.GetType("ClassToMark");
-        var info = type.GetEvent("EventToMark");
-        ValidateMessage(info);
-        ValidateIsNotError(info);
-    }
-    [Test]
-    public void StructEvent()
-    {
-        var type = assembly.GetType("StructToMark");
-        var info = type.GetMember("EventToMark").First();
-        ValidateMessage(info);
-        ValidateIsNotError(info);
-    }
-    [Test]
-    public void InterfaceProperty()
-    {
-        var type = assembly.GetType("InterfaceToMark");
-        var info = type.GetProperty("PropertyToMark");
-        ValidateMessage(info);
-        ValidateIsNotError(info);
-    }
-    [Test]
-    public void StructProperty()
-    {
-        var type = assembly.GetType("StructToMark");
-        var info = type.GetProperty("PropertyToMark");
-        ValidateMessage(info);
-        ValidateIsNotError(info);
-    }
-    [Test]
-    public void StructField()
-    {
-        var type = assembly.GetType("StructToMark");
-        var info = type.GetField("FieldToMark");
-        ValidateMessage(info);
-        ValidateIsNotError(info);
-    }
-
-    static void ValidateMessage(System.Reflection.ICustomAttributeProvider attributeProvider)
-    {
-        var customAttributes = attributeProvider.GetCustomAttributes(typeof (ObsoleteAttribute), false);
-        var obsoleteAttribute = (ObsoleteAttribute) customAttributes.First();
-        Assert.AreEqual("Custom message. Please use 'NewThing' instead. Will be treated as an error from version '2.0'. Will be removed in version '3.0'.", obsoleteAttribute.Message);
-    }
-    
-    static void ValidateIsError(System.Reflection.ICustomAttributeProvider attributeProvider)
-    {
-        var customAttributes = attributeProvider.GetCustomAttributes(typeof (ObsoleteAttribute), false);
-        var obsoleteAttribute = (ObsoleteAttribute) customAttributes.First();
-        Assert.IsTrue(obsoleteAttribute.IsError);
-    }
-
-    static void ValidateIsNotError(System.Reflection.ICustomAttributeProvider attributeProvider)
-    {
-        var customAttributes = attributeProvider.GetCustomAttributes(typeof (ObsoleteAttribute), false);
-        var obsoleteAttribute = (ObsoleteAttribute) customAttributes.First();
-        Assert.IsFalse(obsoleteAttribute.IsError);
-    }
-
 
 #if(DEBUG)
     [Test]

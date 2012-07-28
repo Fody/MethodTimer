@@ -1,13 +1,16 @@
 ﻿using System.Threading;
 
-namespace AssemblyToProcess
+public class ClassWithMethod
 {
-    public class ClassWithMethod
+    [Time]
+    public void Method()
     {
-        [Time]
-        public void Method()
-        {
-          Thread.Sleep(1000);  
-        }
+        Thread.Sleep(10);
+    }
+    [Time]
+    public string MethodWithReturn()
+    {
+        Thread.Sleep(10);
+        return "sd";
     }
 }

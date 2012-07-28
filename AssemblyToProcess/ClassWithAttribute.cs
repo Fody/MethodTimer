@@ -1,14 +1,12 @@
 using System.Threading;
 
-namespace AssemblyToProcess
+[Time]
+public class ClassWithAttribute
 {
-    [Time]
-    public class ClassWithAttribute
+    public void Method()
     {
-        public void Method()
-        {
-
-            Thread.Sleep(1000);
-        }
+        Thread.Sleep(10);
     }
 }
+//TODO: recursive
+//TODO: single return

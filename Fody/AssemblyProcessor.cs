@@ -1,3 +1,5 @@
+using System.Linq;
+
 public class AssemblyProcessor
 {
     AllTypesFinder typesFinder;
@@ -13,10 +15,22 @@ public class AssemblyProcessor
     {
         foreach (var typeDefinition in typesFinder.AllTypes)
         {
-            methodProcessor.ProcessAttributes(typeDefinition);
+            if (typeDefinition.ContainsTimeAttribute())
+            {
+                methodProcessor.Process(typeDefinition.Methods.Where(x => x.IsMethodWithBody()));
+                continue;
+            }
             foreach (var method in typeDefinition.Methods)
             {
-                methodProcessor.ProcessAttributes(method);
+                if (!method.IsMethodWithBody())
+                {
+                    continue;
+                }
+                if (!method.ContainsTimeAttribute())
+                {
+                    continue;
+                }
+                methodProcessor.Process(method);
             }
         }
     }

@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MockAssemblyResolver.cs" />
+    <Compile Include="Template.cs" />
     <Compile Include="Verifier.cs" />
     <Compile Include="IntegrationTests.cs" />
     <Compile Include="AssemblyExtensions.cs" />

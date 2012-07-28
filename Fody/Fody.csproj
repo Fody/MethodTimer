@@ -63,9 +63,13 @@
   <ItemGroup>
     <Compile Include="AllTypesFinder.cs" />
     <Compile Include="AssemblyProcessor.cs" />
+    <Compile Include="AttributeChecker.cs" />
+    <Compile Include="CecilExstensions.cs" />
     <Compile Include="MethodProcessor.cs" />
     <Compile Include="ModuleWeaver.cs" />
     <Compile Include="..\CommonAssemblyInfo.cs" />
+    <Compile Include="ReferenceFinder.cs" />
+    <Compile Include="ReturnFixer.cs" />
     <Compile Include="WeavingException.cs" />
   </ItemGroup>
   <ItemGroup>

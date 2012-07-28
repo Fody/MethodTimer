@@ -1,8 +1,5 @@
 using System;
 
-namespace AssemblyToProcess
+public class TimeAttribute : Attribute
 {
-    public class TimeAttribute : Attribute
-    {
-    }
 }

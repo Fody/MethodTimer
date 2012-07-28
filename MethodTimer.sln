@@ -10,11 +10,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NugetProject", "NuGet\Nuget
 		{C3578A7B-09A6-4444-9383-0DEAFA4958BD} = {C3578A7B-09A6-4444-9383-0DEAFA4958BD}
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{AF3B9586-2244-486A-90F1-AF2512922C0E}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\packages.config = .nuget\packages.config
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyToProcess", "AssemblyToProcess\AssemblyToProcess.csproj", "{DFE56C18-3504-4265-A3FE-7F434B1FD38D}"
 EndProject
 Global

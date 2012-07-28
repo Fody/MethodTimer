@@ -21,8 +21,10 @@ public class ModuleWeaver
         var allTypesFinder = new AllTypesFinder(ModuleDefinition);
         allTypesFinder.Execute();
 
-        var attributeFixer = new MethodProcessor(ModuleDefinition);
-        var assemblyProcessor = new AssemblyProcessor(allTypesFinder, attributeFixer);
+        var msCoreReferenceFinder = new ReferenceFinder(this);
+        msCoreReferenceFinder.Execute();
+        var methodProcessor = new MethodProcessor(ModuleDefinition, msCoreReferenceFinder);
+        var assemblyProcessor = new AssemblyProcessor(allTypesFinder, methodProcessor);
         assemblyProcessor.Execute();
 
     }

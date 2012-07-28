@@ -34,7 +34,7 @@ Injects some very basic method timing code.
 			finally
 			{
 				stopwatch.Stop();
-				Debug.WriteLine(string.Concat("MyClass.MyMethod", stopwatch.ElapsedMilliseconds));
+				Debug.WriteLine("MyClass.MyMethod " + stopwatch.ElapsedMilliseconds + "ms");
 			}
 		}
 	}

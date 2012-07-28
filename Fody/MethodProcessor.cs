@@ -30,15 +30,7 @@ public class MethodProcessor
     {
         try
         {
-            if (method.ReturnType == typeSystem.Void)
-            {
-                InnerProcessVoid(method);
-            }
-            else
-            {
-
-                InnerProcessNonVoid(method);
-            }
+            InnerProcessNonVoid(method);
         }
         catch (Exception exception)
         {
@@ -46,68 +38,15 @@ public class MethodProcessor
         }
     }
 
-    void InnerProcessVoid(MethodDefinition method)
-    {
-        var body = method.Body;
-        body.SimplifyMacros();
-        var ilProcessor = body.GetILProcessor();
-        
-
-        var instructions = body.Instructions;
-
-        var lastRet = Instruction.Create(OpCodes.Ret);
-        instructions.Add(lastRet);
-
-        ForwardRetToLeave(instructions, lastRet);
-
-        var tryStart = instructions.First();
-
-        var stopwatchVar = InjectStopwatch(body); 
-        
-        
-        var writeTimeIl = GetWriteTimeIL(method, stopwatchVar);
-        
-        InjectWriteIl(writeTimeIl, ilProcessor, lastRet);
-
-        var handler = new ExceptionHandler(ExceptionHandlerType.Finally)
-        {
-            TryStart = tryStart,
-            TryEnd = writeTimeIl.First(),
-            HandlerStart = writeTimeIl.First(),
-            HandlerEnd = lastRet,
-        };
-
-        body.ExceptionHandlers.Add(handler);
-        body.InitLocals = true;
-        body.OptimizeMacros();
-    }
     void InnerProcessNonVoid(MethodDefinition method)
     {
         var body = method.Body;
         body.SimplifyMacros();
         var ilProcessor = body.GetILProcessor();
 
-        var returnVariable = new VariableDefinition(method.ReturnType);
-        body.Variables.Add(returnVariable);
-
         var instructions = body.Instructions;
 
-        var lastLd = Instruction.Create(OpCodes.Ldloc, returnVariable);
-        instructions.Add(lastLd);
-        instructions.Add(Instruction.Create(OpCodes.Ret));
-
-        for (var index = 0; index < instructions.Count - 2; index++)
-        {
-            var instruction = instructions[index];
-            if (instruction.OpCode == OpCodes.Ret)
-            {
-                instructions[index] = Instruction.Create(OpCodes.Leave, lastLd);
-                instructions.Insert(index,Instruction.Create(OpCodes.Stloc, returnVariable));
-                index++;
-            }
-        }
-
-        var handlerEnd = lastLd;
+        var handlerEnd = FixReturns(method);
         var tryStart = instructions.First();
 
         var stopwatchVar = InjectStopwatch(body); 
@@ -127,6 +66,48 @@ public class MethodProcessor
         body.ExceptionHandlers.Add(handler);
         body.InitLocals = true;
         body.OptimizeMacros();
+    }
+
+    Instruction FixReturns(MethodDefinition method)
+    {
+        if (method.ReturnType == typeSystem.Void)
+        {
+            var instructions = method.Body.Instructions;
+            var lastRet = Instruction.Create(OpCodes.Ret);
+            instructions.Add(lastRet);
+
+            for (var index = 0; index < instructions.Count - 1; index++)
+            {
+                var instruction = instructions[index];
+                if (instruction.OpCode == OpCodes.Ret)
+                {
+                    instructions[index] = Instruction.Create(OpCodes.Leave, lastRet);
+                }
+            }
+            return lastRet;
+        }
+        else
+        {
+            var instructions = method.Body.Instructions;
+            var returnVariable = new VariableDefinition(method.ReturnType);
+            method.Body.Variables.Add(returnVariable);
+            var lastLd = Instruction.Create(OpCodes.Ldloc, returnVariable);
+            instructions.Add(lastLd);
+            instructions.Add(Instruction.Create(OpCodes.Ret));
+
+            for (var index = 0; index < instructions.Count - 2; index++)
+            {
+                var instruction = instructions[index];
+                if (instruction.OpCode == OpCodes.Ret)
+                {
+                    instructions[index] = Instruction.Create(OpCodes.Leave, lastLd);
+                    instructions.Insert(index, Instruction.Create(OpCodes.Stloc, returnVariable));
+                    index++;
+                }
+            }
+
+            return lastLd;
+        }
     }
 
     static void InjectWriteIl(List<Instruction> writeTimeIl, ILProcessor ilProcessor, Instruction beforeThis)

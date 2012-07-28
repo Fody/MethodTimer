@@ -54,7 +54,7 @@ public class IntegrationTests
     [Test]
     public void MethodWithReturn()
     {
-        var type = assembly.GetType("ClassWithMethod");
+        var type = assembly.GetType("MiscMethods");
         var instance = (dynamic)Activator.CreateInstance(type);
         instance.MethodWithReturn();
     }

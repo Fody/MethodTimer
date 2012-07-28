@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="ClassWithMethod.cs" />
     <Compile Include="ClassWithAttribute.cs" />
+    <Compile Include="MiscMethods.cs" />
     <Compile Include="TimeAttribute.cs" />
   </ItemGroup>
   <ItemGroup>

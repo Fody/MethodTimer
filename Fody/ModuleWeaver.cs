@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Xml.Linq;
 using Mono.Cecil;
 
@@ -18,14 +19,30 @@ public class ModuleWeaver
 
     public void Execute()
     {
-        var allTypesFinder = new AllTypesFinder(ModuleDefinition);
-        allTypesFinder.Execute();
-
+        
         var msCoreReferenceFinder = new ReferenceFinder(this);
         msCoreReferenceFinder.Execute();
         var methodProcessor = new MethodProcessor(ModuleDefinition, msCoreReferenceFinder);
-        var assemblyProcessor = new AssemblyProcessor(allTypesFinder, methodProcessor);
-        assemblyProcessor.Execute();
-
+        foreach (var typeDefinition in ModuleDefinition.GetTypes())
+        {
+            if (typeDefinition.ContainsTimeAttribute())
+            {
+                methodProcessor.Process(typeDefinition.Methods.Where(x => x.IsMethodWithBody()));
+                continue;
+            }
+            foreach (var method in typeDefinition.Methods)
+            {
+                if (!method.IsMethodWithBody())
+                {
+                    continue;
+                }
+                if (!method.ContainsTimeAttribute())
+                {
+                    continue;
+                }
+                methodProcessor.Process(method);
+            }
+        }
     }
+
 }

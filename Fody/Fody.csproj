@@ -61,8 +61,6 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AllTypesFinder.cs" />
-    <Compile Include="AssemblyProcessor.cs" />
     <Compile Include="AttributeChecker.cs" />
     <Compile Include="CecilExstensions.cs" />
     <Compile Include="MethodProcessor.cs" />

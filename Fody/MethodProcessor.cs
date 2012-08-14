@@ -88,8 +88,8 @@ public class MethodProcessor
         }
         else
         {
-            var instructions = method.Body.Instructions;
-            var returnVariable = new VariableDefinition(method.ReturnType);
+            var instructions = method.Body.Instructions; 
+            var returnVariable = new VariableDefinition("methodTimerReturn", method.ReturnType);
             method.Body.Variables.Add(returnVariable);
             var lastLd = Instruction.Create(OpCodes.Ldloc, returnVariable);
             instructions.Add(lastLd);
@@ -150,7 +150,7 @@ public class MethodProcessor
 
     VariableDefinition InjectStopwatch(MethodBody body)
     {
-        var stopwatchVar = new VariableDefinition(referenceFinder.StopwatchType);
+        var stopwatchVar = new VariableDefinition("methodTimerStopwatch", referenceFinder.StopwatchType);
         body.Variables.Add(stopwatchVar);
 
 

@@ -3,43 +3,54 @@ using Mono.Cecil;
 
 public class ReferenceFinder
 {
-    ModuleWeaver moduleWeaver;
-    IAssemblyResolver assemblyResolver;
-    public MethodReference WriteLineMethod;
+    public ModuleDefinition ModuleDefinition;
+    public IAssemblyResolver AssemblyResolver;
+    public MethodReference DebugWriteLineMethod;
     public MethodReference StartNewMethod;
     public MethodReference StopMethod;
     public TypeReference StopwatchType;
     public MethodReference ConcatMethod;
     public MethodReference ElapsedMilliseconds;
+    public TypeReference MethodInfoType;
+
+    public MethodReference GetMethodFromHandle;
     
 
-    public ReferenceFinder(ModuleWeaver moduleWeaver)
-    {
-        this.moduleWeaver = moduleWeaver;
-        assemblyResolver = moduleWeaver.AssemblyResolver;
-    }
-
+    
     public void Execute()
     {
-        var systemDefinition = assemblyResolver.Resolve("System");
+        var systemDefinition = AssemblyResolver.Resolve("System");
         var systemTypes = systemDefinition.MainModule.Types;
 
-        var module = moduleWeaver.ModuleDefinition;
-
+        
         var debugType = systemTypes.First(x => x.Name == "Debug");
-        WriteLineMethod = module.Import(debugType.Methods.First(x => 
+        DebugWriteLineMethod = ModuleDefinition.Import(debugType.Methods.First(x => 
             x.Name == "WriteLine" && 
             x.Parameters.Count == 1 && 
             x.Parameters[0].ParameterType.Name == "String"));
 
-        var stopwatchType = systemTypes.First(x => x.Name == "Stopwatch");
-        StopwatchType = module.Import(stopwatchType);
-        StartNewMethod = module.Import(stopwatchType.Methods.First(x => x.Name == "StartNew"));
-        StopMethod = module.Import(stopwatchType.Methods.First(x => x.Name == "Stop"));
-        ElapsedMilliseconds = module.Import(stopwatchType.Methods.First(x => x.Name == "get_ElapsedMilliseconds"));
 
-        var stringType = module.TypeSystem.String;
-        ConcatMethod = module.Import(stringType.Resolve().Methods.First(x => x.Name == "Concat" && x.Parameters.Count == 3));
+
+        var mscorlib = AssemblyResolver.Resolve("mscorlib");
+        var mscorlibTypes = mscorlib.MainModule.Types;
+        var methodBaseType = mscorlibTypes.First(x => x.Name == "MethodBase");
+        GetMethodFromHandle = ModuleDefinition.Import(methodBaseType.Methods.First(x =>
+            x.Name == "GetMethodFromHandle" &&
+            x.Parameters.Count == 1 &&
+            x.Parameters[0].ParameterType.Name == "RuntimeMethodHandle"));
+
+        var methodInfoType = mscorlibTypes.First(x => x.Name == "MethodInfo");
+        MethodInfoType = ModuleDefinition.Import(methodInfoType);
+
+
+        var stopwatchType = systemTypes.First(x => x.Name == "Stopwatch");
+        StopwatchType = ModuleDefinition.Import(stopwatchType);
+        StartNewMethod = ModuleDefinition.Import(stopwatchType.Methods.First(x => x.Name == "StartNew"));
+        StopMethod = ModuleDefinition.Import(stopwatchType.Methods.First(x => x.Name == "Stop"));
+        ElapsedMilliseconds = ModuleDefinition.Import(stopwatchType.Methods.First(x => x.Name == "get_ElapsedMilliseconds"));
+
+        var stringType = ModuleDefinition.TypeSystem.String;
+        ConcatMethod = ModuleDefinition.Import(stringType.Resolve().Methods.First(x => x.Name == "Concat" && x.Parameters.Count == 3));
 
 
     }

@@ -60,10 +60,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssemblyWeaver.cs" />
+    <Compile Include="WithInterceptorTests.cs" />
+    <Compile Include="DebugRunner.cs" />
     <Compile Include="MockAssemblyResolver.cs" />
+    <Compile Include="MyTraceListener.cs" />
     <Compile Include="Template.cs" />
     <Compile Include="Verifier.cs" />
-    <Compile Include="IntegrationTests.cs" />
+    <Compile Include="WithoutInterceptorTests.cs" />
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="XmlExtensions.cs" />
   </ItemGroup>

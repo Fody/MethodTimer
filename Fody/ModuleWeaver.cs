@@ -19,10 +19,24 @@ public class ModuleWeaver
 
     public void Execute()
     {
-        
-        var msCoreReferenceFinder = new ReferenceFinder(this);
+        var msCoreReferenceFinder = new ReferenceFinder
+            {
+                ModuleDefinition = ModuleDefinition,
+                AssemblyResolver = AssemblyResolver
+            };
         msCoreReferenceFinder.Execute();
-        var methodProcessor = new MethodProcessor(ModuleDefinition, msCoreReferenceFinder);
+
+        var interceptorFinder = new InterceptorFinder
+            {
+                ModuleDefinition = ModuleDefinition
+            };
+        interceptorFinder.Execute();
+
+        var methodProcessor = new MethodProcessor
+            {
+                referenceFinder = msCoreReferenceFinder,
+                typeSystem = ModuleDefinition.TypeSystem, InterceptorFinder = interceptorFinder,
+            };
         foreach (var typeDefinition in ModuleDefinition.GetTypes())
         {
             if (typeDefinition.ContainsTimeAttribute())

@@ -4,21 +4,16 @@ using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
-using Mono.Collections.Generic;
-
 
 public class MethodProcessor
 {
-    ReferenceFinder referenceFinder;
-    TypeSystem typeSystem;
+   public  ReferenceFinder referenceFinder;
+   public TypeSystem typeSystem;
 
-    public MethodProcessor(ModuleDefinition moduleDefinition, ReferenceFinder referenceFinder)
-    {
-        this.referenceFinder = referenceFinder;
-        typeSystem = moduleDefinition.TypeSystem;
-    }
+    public InterceptorFinder InterceptorFinder;
 
-    public void Process(IEnumerable< MethodDefinition> methods)
+
+    public void Process(IEnumerable<MethodDefinition> methods)
     {
         foreach (var method in methods)
         {
@@ -49,19 +44,19 @@ public class MethodProcessor
         var handlerEnd = FixReturns(method);
         var tryStart = instructions.First();
 
-        var stopwatchVar = InjectStopwatch(body); 
-        
+        var stopwatchVar = InjectStopwatch(body);
+
         var writeTimeIl = GetWriteTimeIL(method, stopwatchVar);
 
         InjectWriteIl(writeTimeIl, ilProcessor, handlerEnd);
 
         var handler = new ExceptionHandler(ExceptionHandlerType.Finally)
-        {
-            TryStart = tryStart,
-            TryEnd = writeTimeIl.First(),
-            HandlerStart = writeTimeIl.First(),
-            HandlerEnd = handlerEnd,
-        };
+            {
+                TryStart = tryStart,
+                TryEnd = writeTimeIl.First(),
+                HandlerStart = writeTimeIl.First(),
+                HandlerEnd = handlerEnd,
+            };
 
         body.ExceptionHandlers.Add(handler);
         body.InitLocals = true;
@@ -88,7 +83,7 @@ public class MethodProcessor
         }
         else
         {
-            var instructions = method.Body.Instructions; 
+            var instructions = method.Body.Instructions;
             var returnVariable = new VariableDefinition("methodTimerReturn", method.ReturnType);
             method.Body.Variables.Add(returnVariable);
             var lastLd = Instruction.Create(OpCodes.Ldloc, returnVariable);
@@ -119,32 +114,38 @@ public class MethodProcessor
         ilProcessor.InsertBefore(beforeThis, Instruction.Create(OpCodes.Endfinally));
     }
 
-    static void ForwardRetToLeave(Collection<Instruction> instructions, Instruction forwardToThis)
-    {
-        for (var index = 0; index < instructions.Count - 1; index++)
-        {
-            var instruction = instructions[index];
-            if (instruction.OpCode == OpCodes.Ret)
-            {
-                instructions[index] = Instruction.Create(OpCodes.Leave, forwardToThis);
-            }
-        }
-    }
-
-
     List<Instruction> GetWriteTimeIL(MethodDefinition method, VariableDefinition stopwatchVar)
     {
+        if (InterceptorFinder.LogMethod == null)
+        {
+            return new List<Instruction>
+                {
+                    Instruction.Create(OpCodes.Ldloc, stopwatchVar),
+                    Instruction.Create(OpCodes.Call, referenceFinder.StopMethod),
+                    Instruction.Create(OpCodes.Ldstr, string.Format("{0}.{1} ", method.DeclaringType.Name, method.Name)),
+                    Instruction.Create(OpCodes.Ldloc, stopwatchVar),
+                    Instruction.Create(OpCodes.Call, referenceFinder.ElapsedMilliseconds),
+                    Instruction.Create(OpCodes.Box, typeSystem.Int64),
+                    Instruction.Create(OpCodes.Ldstr, "ms"),
+                    Instruction.Create(OpCodes.Call, referenceFinder.ConcatMethod),
+                    Instruction.Create(OpCodes.Call, referenceFinder.DebugWriteLineMethod),
+                };
+        }
         return new List<Instruction>
             {
                 Instruction.Create(OpCodes.Ldloc, stopwatchVar),
                 Instruction.Create(OpCodes.Call, referenceFinder.StopMethod),
-                Instruction.Create(OpCodes.Ldstr, string.Format("{0}.{1} ", method.DeclaringType.Name, method.Name)),
+
+                //ldtoken method int32 Program::Foo()  
+                //call class [mscorlib]System.Reflection.MethodBase [mscorlib]System.Reflection.MethodBase::GetMethodFromHandle(valuetype [mscorlib]System.RuntimeMethodHandle)  
+                //castclass  [mscorlib]System.Reflection.MethodInfo  
+                Instruction.Create(OpCodes.Ldtoken, method),
+                Instruction.Create(OpCodes.Call, referenceFinder.GetMethodFromHandle),
+                Instruction.Create(OpCodes.Castclass, referenceFinder.MethodInfoType),
+
                 Instruction.Create(OpCodes.Ldloc, stopwatchVar),
-                Instruction.Create(OpCodes.Call, referenceFinder.ElapsedMilliseconds),
-                Instruction.Create(OpCodes.Box, typeSystem.Int64),
-                Instruction.Create(OpCodes.Ldstr, "ms"),
-                Instruction.Create(OpCodes.Call, referenceFinder.ConcatMethod),
-                Instruction.Create(OpCodes.Call, referenceFinder.WriteLineMethod),
+                Instruction.Create(OpCodes.Call, referenceFinder.ElapsedMilliseconds),   
+                Instruction.Create(OpCodes.Call, InterceptorFinder.LogMethod),   
             };
     }
 

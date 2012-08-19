@@ -7,7 +7,6 @@ public static class AssemblyWeaver
     public static Assembly Weave(string assemblyPath)
     {
 #if (!DEBUG)
-
         assemblyPath = assemblyPath.Replace("Debug", "Release");
 #endif
 

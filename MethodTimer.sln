@@ -4,6 +4,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fody", "Fody\Fody.csproj", "{C3578A7B-09A6-4444-9383-0DEAFA4958BD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{5A86453B-96FB-4B6E-A283-225BB9F753D3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DFE56C18-3504-4265-A3FE-7F434B1FD38D} = {DFE56C18-3504-4265-A3FE-7F434B1FD38D}
+		{23C29B37-221D-473E-967B-DC423F5F4AB2} = {23C29B37-221D-473E-967B-DC423F5F4AB2}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NugetProject", "NuGet\NugetProject.csproj", "{63786CE5-D899-43DF-AD4E-C2CA3BAC3FC2}"
 	ProjectSection(ProjectDependencies) = postProject

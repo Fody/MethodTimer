@@ -12,6 +12,7 @@ public class WithInterceptorTests
     {
         var assemblyPath = Path.GetFullPath(@"..\..\..\AssemblyToProcess\bin\DebugWithInterceptor\AssemblyToProcess.dll");
         assembly = AssemblyWeaver.Weave(assemblyPath);
+        var types = assembly.GetTypes();
         var methodTimeLogger = assembly.GetType("MethodTimeLogger");
         methodInfoField = methodTimeLogger.GetField("MethodInfo");
     }

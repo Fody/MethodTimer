@@ -30,15 +30,15 @@ public class InterceptorFinder
         var parameters = LogMethod.Parameters;
         if (parameters.Count != 2)
         {
-            throw new WeavingException("Method 'MethodTimeLogger.Log' must have 2 parameters of type 'System.Reflection.MethodInfo' and 'System.Int64'.");
+            throw new WeavingException("Method 'MethodTimeLogger.Log' must have 2 parameters of type 'System.Reflection.MethodBase' and 'System.Int64'.");
         }
-        if (parameters[0].ParameterType.FullName != "System.Reflection.MethodInfo")
+        if (parameters[0].ParameterType.FullName != "System.Reflection.MethodBase")
         {
-            throw new WeavingException("Method 'MethodTimeLogger.Log' must have 2 parameters of type 'System.Reflection.MethodInfo' and 'System.Int64'.");
+            throw new WeavingException("Method 'MethodTimeLogger.Log' must have 2 parameters of type 'System.Reflection.MethodBase' and 'System.Int64'.");
         }
         if (parameters[1].ParameterType.FullName != "System.Int64")
         {
-            throw new WeavingException("Method 'MethodTimeLogger.Log' must have 2 parameters of type 'System.Reflection.MethodInfo' and 'System.Int64'.");
+            throw new WeavingException("Method 'MethodTimeLogger.Log' must have 2 parameters of type 'System.Reflection.MethodBase' and 'System.Int64'.");
         }
 
     }

@@ -1,10 +1,13 @@
 using System.Reflection;
 
-public static class MethodTimeLogger
-{
-    public static MethodInfo MethodInfo;
-    public static void Log(MethodInfo methodInfo, long milliseconds)
+    public static class MethodTimeLogger
     {
-        MethodInfo = methodInfo;
+
+        public static MethodBase MethodBase;
+
+        public static void Log(MethodBase methodBase, long milliseconds)
+        {
+            MethodBase = methodBase;
+        }
+
     }
-}

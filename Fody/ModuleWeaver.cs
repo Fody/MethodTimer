@@ -41,12 +41,12 @@ public class ModuleWeaver
         {
             if (typeDefinition.ContainsTimeAttribute())
             {
-                methodProcessor.Process(typeDefinition.Methods.Where(x => x.IsMethodWithBody()));
+                methodProcessor.Process(typeDefinition.Methods.Where(x => !x.IsAbstract));
                 continue;
             }
             foreach (var method in typeDefinition.Methods)
             {
-                if (!method.IsMethodWithBody())
+                if (method.IsAbstract)
                 {
                     continue;
                 }

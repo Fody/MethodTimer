@@ -11,7 +11,6 @@ public class ReferenceFinder
     public TypeReference StopwatchType;
     public MethodReference ConcatMethod;
     public MethodReference ElapsedMilliseconds;
-    public TypeReference MethodInfoType;
 
     public MethodReference GetMethodFromHandle;
     
@@ -38,10 +37,6 @@ public class ReferenceFinder
             x.Name == "GetMethodFromHandle" &&
             x.Parameters.Count == 1 &&
             x.Parameters[0].ParameterType.Name == "RuntimeMethodHandle"));
-
-        var methodInfoType = mscorlibTypes.First(x => x.Name == "MethodInfo");
-        MethodInfoType = ModuleDefinition.Import(methodInfoType);
-
 
         var stopwatchType = systemTypes.First(x => x.Name == "Stopwatch");
         StopwatchType = ModuleDefinition.Import(stopwatchType);

@@ -18,10 +18,4 @@ public static class CecilExstensions
             collection.Add(instruction);
         }
     }
-
-    public static bool IsMethodWithBody(this MethodDefinition x)
-    {
-        //TODO: check compiler generated
-        return !x.IsAbstract && !x.IsConstructor;
-    }
 }

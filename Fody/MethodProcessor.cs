@@ -118,11 +118,20 @@ public class MethodProcessor
     {
         if (InterceptorFinder.LogMethod == null)
         {
+            string methodName;
+            if (method.IsConstructor)
+            {
+                methodName = string.Format("{0}{1} ", method.DeclaringType.Name, method.Name);
+            }
+            else
+            {
+                methodName = string.Format("{0}.{1} ", method.DeclaringType.Name, method.Name);
+            }
             return new List<Instruction>
                 {
                     Instruction.Create(OpCodes.Ldloc, stopwatchVar),
                     Instruction.Create(OpCodes.Call, referenceFinder.StopMethod),
-                    Instruction.Create(OpCodes.Ldstr, string.Format("{0}.{1} ", method.DeclaringType.Name, method.Name)),
+                    Instruction.Create(OpCodes.Ldstr, methodName),
                     Instruction.Create(OpCodes.Ldloc, stopwatchVar),
                     Instruction.Create(OpCodes.Call, referenceFinder.ElapsedMilliseconds),
                     Instruction.Create(OpCodes.Box, typeSystem.Int64),
@@ -135,14 +144,8 @@ public class MethodProcessor
             {
                 Instruction.Create(OpCodes.Ldloc, stopwatchVar),
                 Instruction.Create(OpCodes.Call, referenceFinder.StopMethod),
-
-                //ldtoken method int32 Program::Foo()  
-                //call class [mscorlib]System.Reflection.MethodBase [mscorlib]System.Reflection.MethodBase::GetMethodFromHandle(valuetype [mscorlib]System.RuntimeMethodHandle)  
-                //castclass  [mscorlib]System.Reflection.MethodInfo  
                 Instruction.Create(OpCodes.Ldtoken, method),
                 Instruction.Create(OpCodes.Call, referenceFinder.GetMethodFromHandle),
-                Instruction.Create(OpCodes.Castclass, referenceFinder.MethodInfoType),
-
                 Instruction.Create(OpCodes.Ldloc, stopwatchVar),
                 Instruction.Create(OpCodes.Call, referenceFinder.ElapsedMilliseconds),   
                 Instruction.Create(OpCodes.Call, InterceptorFinder.LogMethod),   

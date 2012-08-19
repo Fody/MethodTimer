@@ -14,6 +14,19 @@ public class WithoutInterceptorTests
         assembly = AssemblyWeaver.Weave(assemblyPath);
     }
 
+    
+
+    [Test]
+    public void 
+        ClassWithConstructor()
+    {
+        var message = DebugRunner.CaptureDebug(() =>
+            {
+                var type = assembly.GetType("ClassWithConstructor");
+                Activator.CreateInstance(type);
+            });
+        Assert.IsTrue(message.StartsWith("ClassWithConstructor.ctor "));
+    }
     [Test]
     public void ClassWithAttribute()
     {

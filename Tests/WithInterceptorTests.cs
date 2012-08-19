@@ -7,17 +7,15 @@ using NUnit.Framework;
 public class WithInterceptorTests
 {
     Assembly assembly;
+    FieldInfo methodBaseField;
 
     public WithInterceptorTests()
     {
         var assemblyPath = Path.GetFullPath(@"..\..\..\AssemblyToProcess\bin\DebugWithInterceptor\AssemblyToProcess.dll");
         assembly = AssemblyWeaver.Weave(assemblyPath);
-        var types = assembly.GetTypes();
         var methodTimeLogger = assembly.GetType("MethodTimeLogger");
-        methodInfoField = methodTimeLogger.GetField("MethodInfo");
+        methodBaseField = methodTimeLogger.GetField("MethodBase");
     }
-
-    FieldInfo methodInfoField;
 
     [Test]
     public void ClassWithAttribute()
@@ -27,6 +25,15 @@ public class WithInterceptorTests
         var instance = (dynamic) Activator.CreateInstance(type);
         instance.Method();
         Assert.AreEqual(GetMethodInfoField().Name, "Method");
+        Assert.AreEqual(GetMethodInfoField().DeclaringType, type);
+    }
+    [Test]
+    public void ClassWithConstructor()
+    {
+        ClearMessage();
+        var type = assembly.GetType("ClassWithConstructor");
+        Activator.CreateInstance(type);
+        Assert.AreEqual(GetMethodInfoField().Name, ".ctor");
         Assert.AreEqual(GetMethodInfoField().DeclaringType, type);
     }
 
@@ -56,12 +63,12 @@ public class WithInterceptorTests
 
     void ClearMessage()
     {
-        methodInfoField.SetValue(null, null);
+        methodBaseField.SetValue(null, null);
     }
 
-    MethodInfo GetMethodInfoField()
+    MethodBase GetMethodInfoField()
     {
-        return (MethodInfo)methodInfoField.GetValue(null);
+        return (MethodBase)methodBaseField.GetValue(null);
     }
 
 #if(DEBUG)

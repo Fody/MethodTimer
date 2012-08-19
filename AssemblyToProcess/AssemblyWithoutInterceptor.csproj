@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClassWithConstructor.cs" />
     <Compile Include="ClassWithMethod.cs" />
     <Compile Include="ClassWithAttribute.cs" />
     <Compile Include="MiscMethods.cs" />

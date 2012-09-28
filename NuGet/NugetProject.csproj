@@ -13,18 +13,21 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="MethodTimer.nuspec">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </None>
+    <None Include="install.ps1" />
+    <None Include="uninstall.ps1" />
+    <Content Include="Fody_ToBeDeleted.txt" />
   </ItemGroup>
   <Target Name="Clean">
     <RemoveDir Directories="$(SolutionDir)NuGetBuild" />
   </Target>
   <Target Name="Build" DependsOnTargets="NuGetBuild" />
   <Target Name="ReBuild" DependsOnTargets="NuGetBuild" />
-  <UsingTask TaskName="PepitaPackage.WeavingTask" AssemblyFile="$(SolutionDir)Tools\PepitaPackage.dll" />
+  <UsingTask TaskName="PepitaPackage.WeavingTask" AssemblyFile="$(SolutionDir)Tools\Pepita\PepitaPackage.dll" />
   <Target Name="NuGetBuild" DependsOnTargets="Clean">
     <MakeDir Directories="$(SolutionDir)NuGetBuild" />
+    <Copy SourceFiles="$(SolutionDir)NuGet\Fody_ToBeDeleted.txt" DestinationFolder="$(SolutionDir)NuGetBuild\Content" />
     <Copy SourceFiles="$(SolutionDir)NuGet\MethodTimer.nuspec" DestinationFolder="$(SolutionDir)NuGetBuild" />
     <Copy SourceFiles="$(SolutionDir)Fody\bin\$(ConfigurationName)\MethodTimer.Fody.dll" DestinationFolder="$(SolutionDir)NuGetBuild" />
     <PepitaPackage.WeavingTask NuGetBuildDirectory="$(SolutionDir)NuGetBuild" MetadataAssembly="$(SolutionDir)Fody\bin\$(ConfigurationName)\MethodTimer.Fody.dll" />

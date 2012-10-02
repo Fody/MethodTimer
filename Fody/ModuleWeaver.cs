@@ -35,9 +35,11 @@ public class ModuleWeaver
         var methodProcessor = new MethodProcessor
             {
                 referenceFinder = msCoreReferenceFinder,
-                typeSystem = ModuleDefinition.TypeSystem, InterceptorFinder = interceptorFinder,
+                typeSystem = ModuleDefinition.TypeSystem,
+                InterceptorFinder = interceptorFinder,
             };
-        foreach (var typeDefinition in ModuleDefinition.GetTypes())
+        var types = ModuleDefinition.GetTypes().ToList();
+        foreach (var typeDefinition in types)
         {
             if (typeDefinition.ContainsTimeAttribute())
             {
@@ -56,6 +58,13 @@ public class ModuleWeaver
                 }
                 methodProcessor.Process(method);
             }
+        }
+
+        foreach (var timeAttribute in ModuleDefinition.Types
+            .Where(x => !x.IsPublic && x.Name == "TimeAttribute")
+            .ToList())
+        {
+            ModuleDefinition.Types.Remove(timeAttribute);
         }
     }
 

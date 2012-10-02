@@ -1,8 +1,6 @@
 ﻿param($installPath, $toolsPath, $package, $project)
 $addinName = "MethodTimer"
 
-$project.ProjectItems.Item("Fody_ToBeDeleted.txt").Delete()
-
 $fodyWeaversPath = [System.IO.Path]::Combine([System.IO.Path]::GetDirectoryName($project.FullName), "FodyWeavers.xml")
 
 if (!(Test-Path ($fodyWeaversPath)))

@@ -14,11 +14,16 @@ public class WithoutInterceptorTests
         assembly = AssemblyWeaver.Weave(assemblyPath);
     }
 
-    
-
     [Test]
-    public void 
-        ClassWithConstructor()
+    public void AssertAttributeIsRemoved()
+    {
+        var type = assembly.GetType("TimeAttribute");
+        Assert.IsNull(type);
+    }
+
+
+[Test]
+    public void ClassWithConstructor()
     {
         var message = DebugRunner.CaptureDebug(() =>
             {

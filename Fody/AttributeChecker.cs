@@ -5,7 +5,15 @@ public static class AttributeChecker
 {
     public static bool ContainsTimeAttribute(this ICustomAttributeProvider definition)
     {
-        return definition.CustomAttributes
-            .Any(x => x.AttributeType.Name == "TimeAttribute");
+        var customAttributes = definition.CustomAttributes;
+
+        var timeAttributes = customAttributes
+            .Where(x => x.AttributeType.Name == "TimeAttribute")
+            .ToList();
+        foreach (var attribute in timeAttributes)
+        {
+            customAttributes.Remove(attribute);
+        }
+        return timeAttributes.Any();
     }
 }

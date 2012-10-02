@@ -71,4 +71,14 @@ Then this will be compiled
             }
         }
     }
+    
+## Whats in the nuget
 
+In addition to the actual weaving assembly the nuget package will also add a file `TimeAttribute.cs` to the target project.
+
+	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Constructor)]
+	internal class TimeAttribute : Attribute
+	{
+	}
+
+At compile time this attribute and all usages to it will be removed from the target assembly. If you want to re-use the class in a common assembly change the class from `internal` to `public`. This will result in the class not being removed at compile time.

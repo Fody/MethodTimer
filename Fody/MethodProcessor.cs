@@ -9,9 +9,7 @@ public class MethodProcessor
 {
    public  ReferenceFinder ReferenceFinder;
    public TypeSystem TypeSystem;
-
     public InterceptorFinder InterceptorFinder;
-
     public MethodDefinition Method;
     MethodBody body;
     ILProcessor ilProcessor;
@@ -20,7 +18,7 @@ public class MethodProcessor
     {
         try
         {
-            InnerProcessNonVoid();
+            InnerProcess();
         }
         catch (Exception exception)
         {
@@ -28,34 +26,20 @@ public class MethodProcessor
         }
     }
 
-    void InnerProcessNonVoid()
+    void InnerProcess()
     {
         body = Method.Body;
         body.SimplifyMacros();
         ilProcessor = body.GetILProcessor();
-
-        var instructions = body.Instructions;
-
+        
         var returnInstruction = FixReturns();
 
-        Instruction firstInstruction;
-        if (Method.IsConstructor)
-        {
-            firstInstruction = instructions.Skip(2).First();
-        }
-        else
-        {
-            firstInstruction = instructions.First();
-        }
-        
+        var firstInstruction = FirstInstructionSkipCtor();
+
         var beforeReturn = Instruction.Create(OpCodes.Nop);
         ilProcessor.InsertBefore(returnInstruction, beforeReturn);
 
-        var stopwatchVar = InjectStopwatch();
-
-        var writeTimeIl = GetWriteTimeIL(stopwatchVar);
-
-        InjectWriteIl(writeTimeIl, returnInstruction);
+        InjectIlForFinaly(returnInstruction);
 
         var handler = new ExceptionHandler(ExceptionHandlerType.Finally)
             {
@@ -68,6 +52,15 @@ public class MethodProcessor
         body.ExceptionHandlers.Add(handler);
         body.InitLocals = true;
         body.OptimizeMacros();
+    }
+
+    Instruction FirstInstructionSkipCtor()
+    {
+        if (Method.IsConstructor)
+        {
+            return body.Instructions.Skip(2).First();
+        }
+        return body.Instructions.First();
     }
 
     Instruction FixReturns()
@@ -112,8 +105,14 @@ public class MethodProcessor
         }
     }
 
-    void InjectWriteIl(List<Instruction> writeTimeIl, Instruction beforeThis)
+    void InjectIlForFinaly(Instruction beforeThis)
     {
+
+        var stopwatchVar = InjectStopwatch();
+
+        var writeTimeIl = GetWriteTimeIL(stopwatchVar);
+
+
         foreach (var instruction in writeTimeIl)
         {
             ilProcessor.InsertBefore(beforeThis, instruction);

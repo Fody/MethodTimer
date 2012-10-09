@@ -56,7 +56,7 @@ public class MethodProcessor
 
     Instruction FirstInstructionSkipCtor()
     {
-        if (Method.IsConstructor)
+        if (Method.IsConstructor && !Method.IsStatic)
         {
             return body.Instructions.Skip(2).First();
         }

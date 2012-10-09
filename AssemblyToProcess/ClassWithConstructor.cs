@@ -7,4 +7,9 @@ public class ClassWithConstructor
     {
         Thread.Sleep(10);
     }
+    [Time]
+    static ClassWithConstructor()
+    {
+        Thread.Sleep(10);
+    }
 }

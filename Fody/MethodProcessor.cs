@@ -7,8 +7,8 @@ using Mono.Cecil.Rocks;
 
 public class MethodProcessor
 {
-   public  ReferenceFinder ReferenceFinder;
-   public TypeSystem TypeSystem;
+    public ReferenceFinder ReferenceFinder;
+    public TypeSystem TypeSystem;
     public InterceptorFinder InterceptorFinder;
     public MethodDefinition Method;
     MethodBody body;
@@ -31,7 +31,7 @@ public class MethodProcessor
         body = Method.Body;
         body.SimplifyMacros();
         ilProcessor = body.GetILProcessor();
-        
+
         var returnInstruction = FixReturns();
 
         var firstInstruction = FirstInstructionSkipCtor();
@@ -65,9 +65,9 @@ public class MethodProcessor
 
     Instruction FixReturns()
     {
+        var instructions = body.Instructions;
         if (Method.ReturnType == TypeSystem.Void)
         {
-            var instructions = body.Instructions;
             var lastRet = Instruction.Create(OpCodes.Ret);
             instructions.Add(lastRet);
 
@@ -83,7 +83,6 @@ public class MethodProcessor
         }
         else
         {
-            var instructions = body.Instructions;
             var returnVariable = new VariableDefinition("methodTimerReturn", Method.ReturnType);
             body.Variables.Add(returnVariable);
             var lastLd = Instruction.Create(OpCodes.Ldloc, returnVariable);
@@ -100,28 +99,23 @@ public class MethodProcessor
                     index++;
                 }
             }
-
             return lastLd;
         }
     }
 
     void InjectIlForFinaly(Instruction beforeThis)
     {
-
-        var stopwatchVar = InjectStopwatch();
-
-        var writeTimeIl = GetWriteTimeIL(stopwatchVar);
-
-
-        foreach (var instruction in writeTimeIl)
+        foreach (var instruction in GetWriteTimeIL())
         {
             ilProcessor.InsertBefore(beforeThis, instruction);
         }
         ilProcessor.InsertBefore(beforeThis, Instruction.Create(OpCodes.Endfinally));
     }
 
-    List<Instruction> GetWriteTimeIL(VariableDefinition stopwatchVar)
+    List<Instruction> GetWriteTimeIL()
     {
+        var stopwatchVar = InjectStopwatch();
+        
         if (InterceptorFinder.LogMethod == null)
         {
             string methodName;
@@ -153,8 +147,8 @@ public class MethodProcessor
                 Instruction.Create(OpCodes.Ldtoken, Method),
                 Instruction.Create(OpCodes.Call, ReferenceFinder.GetMethodFromHandle),
                 Instruction.Create(OpCodes.Ldloc, stopwatchVar),
-                Instruction.Create(OpCodes.Call, ReferenceFinder.ElapsedMilliseconds),   
-                Instruction.Create(OpCodes.Call, InterceptorFinder.LogMethod),   
+                Instruction.Create(OpCodes.Call, ReferenceFinder.ElapsedMilliseconds),
+                Instruction.Create(OpCodes.Call, InterceptorFinder.LogMethod),
             };
     }
 

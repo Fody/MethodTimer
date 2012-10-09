@@ -10,6 +10,8 @@ public class ModuleWeaver
     public ModuleDefinition ModuleDefinition { get; set; }
     public IAssemblyResolver AssemblyResolver { get; set; }
     public XElement Config { get; set; }
+    ReferenceFinder msCoreReferenceFinder;
+    InterceptorFinder interceptorFinder;
 
     public ModuleWeaver()
     {
@@ -19,31 +21,28 @@ public class ModuleWeaver
 
     public void Execute()
     {
-        var msCoreReferenceFinder = new ReferenceFinder
+        msCoreReferenceFinder = new ReferenceFinder
             {
                 ModuleDefinition = ModuleDefinition,
                 AssemblyResolver = AssemblyResolver
             };
         msCoreReferenceFinder.Execute();
 
-        var interceptorFinder = new InterceptorFinder
+        interceptorFinder = new InterceptorFinder
             {
                 ModuleDefinition = ModuleDefinition
             };
         interceptorFinder.Execute();
 
-        var methodProcessor = new MethodProcessor
-            {
-                referenceFinder = msCoreReferenceFinder,
-                typeSystem = ModuleDefinition.TypeSystem,
-                InterceptorFinder = interceptorFinder,
-            };
         var types = ModuleDefinition.GetTypes().ToList();
         foreach (var typeDefinition in types)
         {
             if (typeDefinition.ContainsTimeAttribute())
             {
-                methodProcessor.Process(typeDefinition.Methods.Where(x => !x.IsAbstract));
+                foreach (var method in typeDefinition.Methods.Where(x => !x.IsAbstract))
+                {
+                    ProcessMethod(method);
+                }
                 continue;
             }
             foreach (var method in typeDefinition.Methods)
@@ -56,7 +55,7 @@ public class ModuleWeaver
                 {
                     continue;
                 }
-                methodProcessor.Process(method);
+                ProcessMethod(method);
             }
         }
 
@@ -68,4 +67,15 @@ public class ModuleWeaver
         }
     }
 
+    void ProcessMethod(MethodDefinition method)
+    {
+        var methodProcessor = new MethodProcessor
+            {
+                ReferenceFinder = msCoreReferenceFinder,
+                TypeSystem = ModuleDefinition.TypeSystem,
+                InterceptorFinder = interceptorFinder,
+                Method = method,
+            };
+        methodProcessor.Process();
+    }
 }

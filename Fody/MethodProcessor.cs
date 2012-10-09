@@ -7,55 +7,62 @@ using Mono.Cecil.Rocks;
 
 public class MethodProcessor
 {
-   public  ReferenceFinder referenceFinder;
-   public TypeSystem typeSystem;
+   public  ReferenceFinder ReferenceFinder;
+   public TypeSystem TypeSystem;
 
     public InterceptorFinder InterceptorFinder;
 
+    public MethodDefinition Method;
+    MethodBody body;
+    ILProcessor ilProcessor;
 
-    public void Process(IEnumerable<MethodDefinition> methods)
-    {
-        foreach (var method in methods)
-        {
-            Process(method);
-        }
-    }
-
-    public void Process(MethodDefinition method)
+    public void Process()
     {
         try
         {
-            InnerProcessNonVoid(method);
+            InnerProcessNonVoid();
         }
         catch (Exception exception)
         {
-            throw new WeavingException(string.Format("An error occurred processing '{0}'. Error: {1}", method.FullName, exception.Message));
+            throw new WeavingException(string.Format("An error occurred processing '{0}'. Error: {1}", Method.FullName, exception.Message));
         }
     }
 
-    void InnerProcessNonVoid(MethodDefinition method)
+    void InnerProcessNonVoid()
     {
-        var body = method.Body;
+        body = Method.Body;
         body.SimplifyMacros();
-        var ilProcessor = body.GetILProcessor();
+        ilProcessor = body.GetILProcessor();
 
         var instructions = body.Instructions;
 
-        var handlerEnd = FixReturns(method);
-        var tryStart = instructions.First();
+        var returnInstruction = FixReturns();
 
-        var stopwatchVar = InjectStopwatch(body);
+        Instruction firstInstruction;
+        if (Method.IsConstructor)
+        {
+            firstInstruction = instructions.Skip(2).First();
+        }
+        else
+        {
+            firstInstruction = instructions.First();
+        }
+        
+        var beforeReturn = Instruction.Create(OpCodes.Nop);
+        ilProcessor.InsertBefore(returnInstruction, beforeReturn);
 
-        var writeTimeIl = GetWriteTimeIL(method, stopwatchVar);
+        var stopwatchVar = InjectStopwatch();
 
-        InjectWriteIl(writeTimeIl, ilProcessor, handlerEnd);
+        var writeTimeIl = GetWriteTimeIL(stopwatchVar);
+
+        InjectWriteIl(writeTimeIl, returnInstruction);
 
         var handler = new ExceptionHandler(ExceptionHandlerType.Finally)
             {
-                TryStart = tryStart,
-                TryEnd = writeTimeIl.First(),
-                HandlerStart = writeTimeIl.First(),
-                HandlerEnd = handlerEnd,
+                TryStart = firstInstruction,
+                TryEnd = beforeReturn,
+                HandlerStart = beforeReturn,
+                HandlerEnd = returnInstruction,
             };
 
         body.ExceptionHandlers.Add(handler);
@@ -63,11 +70,11 @@ public class MethodProcessor
         body.OptimizeMacros();
     }
 
-    Instruction FixReturns(MethodDefinition method)
+    Instruction FixReturns()
     {
-        if (method.ReturnType == typeSystem.Void)
+        if (Method.ReturnType == TypeSystem.Void)
         {
-            var instructions = method.Body.Instructions;
+            var instructions = body.Instructions;
             var lastRet = Instruction.Create(OpCodes.Ret);
             instructions.Add(lastRet);
 
@@ -83,9 +90,9 @@ public class MethodProcessor
         }
         else
         {
-            var instructions = method.Body.Instructions;
-            var returnVariable = new VariableDefinition("methodTimerReturn", method.ReturnType);
-            method.Body.Variables.Add(returnVariable);
+            var instructions = body.Instructions;
+            var returnVariable = new VariableDefinition("methodTimerReturn", Method.ReturnType);
+            body.Variables.Add(returnVariable);
             var lastLd = Instruction.Create(OpCodes.Ldloc, returnVariable);
             instructions.Add(lastLd);
             instructions.Add(Instruction.Create(OpCodes.Ret));
@@ -105,7 +112,7 @@ public class MethodProcessor
         }
     }
 
-    static void InjectWriteIl(List<Instruction> writeTimeIl, ILProcessor ilProcessor, Instruction beforeThis)
+    void InjectWriteIl(List<Instruction> writeTimeIl, Instruction beforeThis)
     {
         foreach (var instruction in writeTimeIl)
         {
@@ -114,51 +121,51 @@ public class MethodProcessor
         ilProcessor.InsertBefore(beforeThis, Instruction.Create(OpCodes.Endfinally));
     }
 
-    List<Instruction> GetWriteTimeIL(MethodDefinition method, VariableDefinition stopwatchVar)
+    List<Instruction> GetWriteTimeIL(VariableDefinition stopwatchVar)
     {
         if (InterceptorFinder.LogMethod == null)
         {
             string methodName;
-            if (method.IsConstructor)
+            if (Method.IsConstructor)
             {
-                methodName = string.Format("{0}{1} ", method.DeclaringType.Name, method.Name);
+                methodName = string.Format("{0}{1} ", Method.DeclaringType.Name, Method.Name);
             }
             else
             {
-                methodName = string.Format("{0}.{1} ", method.DeclaringType.Name, method.Name);
+                methodName = string.Format("{0}.{1} ", Method.DeclaringType.Name, Method.Name);
             }
             return new List<Instruction>
                 {
                     Instruction.Create(OpCodes.Ldloc, stopwatchVar),
-                    Instruction.Create(OpCodes.Call, referenceFinder.StopMethod),
+                    Instruction.Create(OpCodes.Call, ReferenceFinder.StopMethod),
                     Instruction.Create(OpCodes.Ldstr, methodName),
                     Instruction.Create(OpCodes.Ldloc, stopwatchVar),
-                    Instruction.Create(OpCodes.Call, referenceFinder.ElapsedMilliseconds),
-                    Instruction.Create(OpCodes.Box, typeSystem.Int64),
+                    Instruction.Create(OpCodes.Call, ReferenceFinder.ElapsedMilliseconds),
+                    Instruction.Create(OpCodes.Box, TypeSystem.Int64),
                     Instruction.Create(OpCodes.Ldstr, "ms"),
-                    Instruction.Create(OpCodes.Call, referenceFinder.ConcatMethod),
-                    Instruction.Create(OpCodes.Call, referenceFinder.DebugWriteLineMethod),
+                    Instruction.Create(OpCodes.Call, ReferenceFinder.ConcatMethod),
+                    Instruction.Create(OpCodes.Call, ReferenceFinder.DebugWriteLineMethod),
                 };
         }
         return new List<Instruction>
             {
                 Instruction.Create(OpCodes.Ldloc, stopwatchVar),
-                Instruction.Create(OpCodes.Call, referenceFinder.StopMethod),
-                Instruction.Create(OpCodes.Ldtoken, method),
-                Instruction.Create(OpCodes.Call, referenceFinder.GetMethodFromHandle),
+                Instruction.Create(OpCodes.Call, ReferenceFinder.StopMethod),
+                Instruction.Create(OpCodes.Ldtoken, Method),
+                Instruction.Create(OpCodes.Call, ReferenceFinder.GetMethodFromHandle),
                 Instruction.Create(OpCodes.Ldloc, stopwatchVar),
-                Instruction.Create(OpCodes.Call, referenceFinder.ElapsedMilliseconds),   
+                Instruction.Create(OpCodes.Call, ReferenceFinder.ElapsedMilliseconds),   
                 Instruction.Create(OpCodes.Call, InterceptorFinder.LogMethod),   
             };
     }
 
-    VariableDefinition InjectStopwatch(MethodBody body)
+    VariableDefinition InjectStopwatch()
     {
-        var stopwatchVar = new VariableDefinition("methodTimerStopwatch", referenceFinder.StopwatchType);
+        var stopwatchVar = new VariableDefinition("methodTimerStopwatch", ReferenceFinder.StopwatchType);
         body.Variables.Add(stopwatchVar);
 
 
-        body.Instructions.Insert(0, Instruction.Create(OpCodes.Call, referenceFinder.StartNewMethod));
+        body.Instructions.Insert(0, Instruction.Create(OpCodes.Call, ReferenceFinder.StartNewMethod));
         body.Instructions.Insert(1, Instruction.Create(OpCodes.Stloc, stopwatchVar));
         return stopwatchVar;
     }

@@ -1,33 +1,38 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
 using NUnit.Framework;
 
 [TestFixture]
 public class WithoutInterceptorTests
 {
-    Assembly assembly;
+    AssemblyWeaver assemblyWeaver;
 
     public WithoutInterceptorTests()
     {
         var assemblyPath = Path.GetFullPath(@"..\..\..\AssemblyToProcess\bin\DebugWithoutInterceptor\AssemblyToProcess.dll");
-        assembly = AssemblyWeaver.Weave(assemblyPath);
+        assemblyWeaver = new AssemblyWeaver(assemblyPath);
     }
 
     [Test]
     public void AssertAttributeIsRemoved()
     {
-        var type = assembly.GetType("TimeAttribute");
+        var type = assemblyWeaver.Assembly.GetType("TimeAttribute");
         Assert.IsNull(type);
     }
 
+    [Test]
+    public void CheckErrors()
+    {
+        Assert.Contains("Method 'System.Void ClassWithAbstract::Method()' is abstract but has a [TimeAttribute]. Remove this attribute.", assemblyWeaver.Errors);
+        Assert.Contains("Method 'System.Void MyInterface::MyMethod()' is abstract but has a [TimeAttribute]. Remove this attribute.", assemblyWeaver.Errors);
+    }
 
 [Test]
     public void ClassWithConstructor()
     {
         var message = DebugRunner.CaptureDebug(() =>
             {
-                var type = assembly.GetType("ClassWithConstructor");
+                var type = assemblyWeaver.Assembly.GetType("ClassWithConstructor");
                 Activator.CreateInstance(type);
             });
         Assert.IsTrue(message.StartsWith("ClassWithConstructor.ctor "));
@@ -37,7 +42,7 @@ public class WithoutInterceptorTests
     {
         var message = DebugRunner.CaptureDebug(() =>
             {
-                var type = assembly.GetType("ClassWithAttribute");
+                var type = assemblyWeaver.Assembly.GetType("ClassWithAttribute");
                 var instance = (dynamic) Activator.CreateInstance(type);
                 instance.Method();
             });
@@ -49,7 +54,7 @@ public class WithoutInterceptorTests
     {
         var message = DebugRunner.CaptureDebug(() =>
             {
-                var type = assembly.GetType("ClassWithMethod");
+                var type = assemblyWeaver.Assembly.GetType("ClassWithMethod");
                 var instance = (dynamic) Activator.CreateInstance(type);
                 instance.Method();
             });
@@ -62,7 +67,7 @@ public class WithoutInterceptorTests
     {
         var message = DebugRunner.CaptureDebug(() =>
             {
-                var type = assembly.GetType("MiscMethods");
+                var type = assemblyWeaver.Assembly.GetType("MiscMethods");
                 var instance = (dynamic) Activator.CreateInstance(type);
                 instance.MethodWithReturn();
             });
@@ -74,7 +79,7 @@ public class WithoutInterceptorTests
     [Test]
     public void PeVerify()
     {
-        Verifier.Verify(assembly.CodeBase.Remove(0, 8));
+        Verifier.Verify(assemblyWeaver.Assembly.CodeBase.Remove(0, 8));
     }
 #endif
 

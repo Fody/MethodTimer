@@ -6,6 +6,7 @@ using Mono.Cecil;
 public class ModuleWeaver
 {
     public Action<string> LogInfo { get; set; }
+    public Action<string> LogError { get; set; }
     public Action<string> LogWarning { get; set; }
     public ModuleDefinition ModuleDefinition { get; set; }
     public IAssemblyResolver AssemblyResolver { get; set; }
@@ -16,6 +17,7 @@ public class ModuleWeaver
     public ModuleWeaver()
     {
         LogInfo = s => { };
+        LogError = s => { };
         LogWarning = s => { };
     }
 
@@ -49,6 +51,10 @@ public class ModuleWeaver
             {
                 if (method.IsAbstract)
                 {
+                    if (method.ContainsTimeAttribute())
+                    {
+                        LogError(string.Format("Method '{0}' is abstract but has a [TimeAttribute]. Remove this attribute.", method.FullName));
+                    }
                     continue;
                 }
                 if (!method.ContainsTimeAttribute())

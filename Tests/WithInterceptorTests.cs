@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using NUnit.Framework;
@@ -6,14 +7,14 @@ using NUnit.Framework;
 [TestFixture]
 public class WithInterceptorTests
 {
-    Assembly assembly;
+    AssemblyWeaver assemblyWeaver;
     FieldInfo methodBaseField;
 
     public WithInterceptorTests()
     {
         var assemblyPath = Path.GetFullPath(@"..\..\..\AssemblyToProcess\bin\DebugWithInterceptor\AssemblyToProcess.dll");
-        assembly = AssemblyWeaver.Weave(assemblyPath);
-        var methodTimeLogger = assembly.GetType("MethodTimeLogger");
+        assemblyWeaver = new AssemblyWeaver(assemblyPath);
+        var methodTimeLogger = assemblyWeaver.Assembly.GetType("MethodTimeLogger");
         methodBaseField = methodTimeLogger.GetField("MethodBase");
     }
 
@@ -21,17 +22,24 @@ public class WithInterceptorTests
     public void ClassWithAttribute()
     {
         ClearMessage();
-        var type = assembly.GetType("ClassWithAttribute");
+        var type = assemblyWeaver.Assembly.GetType("ClassWithAttribute");
         var instance = (dynamic) Activator.CreateInstance(type);
         instance.Method();
         Assert.AreEqual(GetMethodInfoField().Name, "Method");
         Assert.AreEqual(GetMethodInfoField().DeclaringType, type);
     }
     [Test]
+    public void CheckErrors()
+    {
+        Assert.Contains("Method 'System.Void ClassWithAbstract::Method()' is abstract but has a [TimeAttribute]. Remove this attribute.", assemblyWeaver.Errors);
+        Assert.Contains("Method 'System.Void MyInterface::MyMethod()' is abstract but has a [TimeAttribute]. Remove this attribute.", assemblyWeaver.Errors);
+    }
+
+    [Test]
     public void ClassWithConstructor()
     {
         ClearMessage();
-        var type = assembly.GetType("ClassWithConstructor");
+        var type = assemblyWeaver.Assembly.GetType("ClassWithConstructor");
         Activator.CreateInstance(type);
         Assert.AreEqual(GetMethodInfoField().Name, ".ctor");
         Assert.AreEqual(GetMethodInfoField().DeclaringType, type);
@@ -41,7 +49,7 @@ public class WithInterceptorTests
     public void ClassWithMethod()
     {
         ClearMessage();
-        var type = assembly.GetType("ClassWithMethod");
+        var type = assemblyWeaver.Assembly.GetType("ClassWithMethod");
         var instance = (dynamic) Activator.CreateInstance(type);
         instance.Method();
         Assert.AreEqual(GetMethodInfoField().Name, "Method");
@@ -53,7 +61,7 @@ public class WithInterceptorTests
     public void MethodWithReturn()
     {
         ClearMessage();
-        var type = assembly.GetType("MiscMethods");
+        var type = assemblyWeaver.Assembly.GetType("MiscMethods");
         var instance = (dynamic) Activator.CreateInstance(type);
         instance.MethodWithReturn();
         Assert.AreEqual(GetMethodInfoField().Name, "MethodWithReturn");
@@ -75,7 +83,7 @@ public class WithInterceptorTests
     [Test]
     public void PeVerify()
     {
-        Verifier.Verify(assembly.CodeBase.Remove(0, 8));
+        Verifier.Verify(assemblyWeaver.Assembly.CodeBase.Remove(0, 8));
     }
 #endif
 

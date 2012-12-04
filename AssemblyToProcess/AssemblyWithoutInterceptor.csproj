@@ -40,10 +40,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClassWithAbstract.cs" />
     <Compile Include="ClassWithConstructor.cs" />
     <Compile Include="ClassWithMethod.cs" />
     <Compile Include="ClassWithAttribute.cs" />
     <Compile Include="MiscMethods.cs" />
+    <Compile Include="MyDelegate.cs" />
+    <Compile Include="MyEnum.cs" />
+    <Compile Include="MyInterface.cs" />
     <Compile Include="TimeAttribute.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

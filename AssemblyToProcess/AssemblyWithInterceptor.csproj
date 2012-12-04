@@ -40,7 +40,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ClassWithAbstract.cs" />
+    <Compile Include="AbstractClassWithAttributeOnType.cs" />
+    <Compile Include="AbstractClassWithAttributeOnMethod.cs" />
     <Compile Include="ClassWithConstructor.cs" />
     <Compile Include="ClassWithMethod.cs" />
     <Compile Include="ClassWithAttribute.cs" />

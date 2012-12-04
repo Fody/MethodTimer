@@ -31,7 +31,7 @@ public class WithInterceptorTests
     [Test]
     public void CheckErrors()
     {
-        Assert.Contains("Method 'System.Void ClassWithAbstract::Method()' is abstract but has a [TimeAttribute]. Remove this attribute.", assemblyWeaver.Errors);
+        Assert.Contains("Method 'System.Void AbstractClassWithAttributeOnMethod::Method()' is abstract but has a [TimeAttribute]. Remove this attribute.", assemblyWeaver.Errors);
         Assert.Contains("Method 'System.Void MyInterface::MyMethod()' is abstract but has a [TimeAttribute]. Remove this attribute.", assemblyWeaver.Errors);
     }
 

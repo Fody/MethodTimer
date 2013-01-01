@@ -1,5 +1,7 @@
+using MethodTimer;
+
 interface MyInterface
 {
-    [TimeAttribute]
+    [Time]
     void MyMethod();
 }

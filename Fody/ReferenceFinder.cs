@@ -1,10 +1,8 @@
 using System.Linq;
 using Mono.Cecil;
 
-public class ReferenceFinder
+public partial class ModuleWeaver
 {
-    public ModuleDefinition ModuleDefinition;
-    public IAssemblyResolver AssemblyResolver;
     public MethodReference DebugWriteLineMethod;
     public MethodReference StartNewMethod;
     public MethodReference StopMethod;
@@ -16,7 +14,7 @@ public class ReferenceFinder
     
 
     
-    public void Execute()
+    public void FindReferences()
     {
         var systemDefinition = AssemblyResolver.Resolve("System");
         var systemTypes = systemDefinition.MainModule.Types;

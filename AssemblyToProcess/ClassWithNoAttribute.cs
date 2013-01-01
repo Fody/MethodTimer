@@ -1,9 +1,7 @@
 ﻿using System.Threading;
-using MethodTimer;
 
-public class ClassWithMethod
+public class ClassWsithNoAttribute
 {
-    [Time]
     public void Method()
     {
         Thread.Sleep(10);

@@ -1,3 +1,5 @@
+using MethodTimer;
+
 [Time]
 public abstract class AbstractClassWithAttributeOnType
 {

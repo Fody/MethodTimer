@@ -1,4 +1,5 @@
 using System.Threading;
+using MethodTimer;
 
 [Time]
 public class ClassWithAttribute
@@ -8,5 +9,6 @@ public class ClassWithAttribute
         Thread.Sleep(10);
     }
 }
+
 //TODO: recursive
 //TODO: single return

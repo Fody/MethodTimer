@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Threading;
+using MethodTimer;
 
 [Time]
 public class MiscMethods

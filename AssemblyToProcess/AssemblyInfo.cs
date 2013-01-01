@@ -1,0 +1,3 @@
+﻿using MethodTimer;
+
+[assembly: Time]

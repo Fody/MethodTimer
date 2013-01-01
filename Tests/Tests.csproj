@@ -58,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyWeaver.cs" />
+    <Compile Include="WithAttributeTests.cs" />
     <Compile Include="WithInterceptorTests.cs" />
     <Compile Include="DebugRunner.cs" />
     <Compile Include="MockAssemblyResolver.cs" />

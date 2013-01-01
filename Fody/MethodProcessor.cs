@@ -7,9 +7,8 @@ using Mono.Cecil.Rocks;
 
 public class MethodProcessor
 {
-    public ReferenceFinder ReferenceFinder;
+    public ModuleWeaver ModuleWeaver;
     public TypeSystem TypeSystem;
-    public InterceptorFinder InterceptorFinder;
     public MethodDefinition Method;
     MethodBody body;
     ILProcessor ilProcessor;
@@ -115,8 +114,8 @@ public class MethodProcessor
     List<Instruction> GetWriteTimeIL()
     {
         var stopwatchVar = InjectStopwatch();
-        
-        if (InterceptorFinder.LogMethod == null)
+
+        if (ModuleWeaver.LogMethod == null)
         {
             string methodName;
             if (Method.IsConstructor)
@@ -130,35 +129,35 @@ public class MethodProcessor
             return new List<Instruction>
                 {
                     Instruction.Create(OpCodes.Ldloc, stopwatchVar),
-                    Instruction.Create(OpCodes.Call, ReferenceFinder.StopMethod),
+                    Instruction.Create(OpCodes.Call, ModuleWeaver.StopMethod),
                     Instruction.Create(OpCodes.Ldstr, methodName),
                     Instruction.Create(OpCodes.Ldloc, stopwatchVar),
-                    Instruction.Create(OpCodes.Call, ReferenceFinder.ElapsedMilliseconds),
+                    Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds),
                     Instruction.Create(OpCodes.Box, TypeSystem.Int64),
                     Instruction.Create(OpCodes.Ldstr, "ms"),
-                    Instruction.Create(OpCodes.Call, ReferenceFinder.ConcatMethod),
-                    Instruction.Create(OpCodes.Call, ReferenceFinder.DebugWriteLineMethod),
+                    Instruction.Create(OpCodes.Call, ModuleWeaver.ConcatMethod),
+                    Instruction.Create(OpCodes.Call, ModuleWeaver.DebugWriteLineMethod),
                 };
         }
         return new List<Instruction>
             {
                 Instruction.Create(OpCodes.Ldloc, stopwatchVar),
-                Instruction.Create(OpCodes.Call, ReferenceFinder.StopMethod),
+                Instruction.Create(OpCodes.Call, ModuleWeaver.StopMethod),
                 Instruction.Create(OpCodes.Ldtoken, Method),
-                Instruction.Create(OpCodes.Call, ReferenceFinder.GetMethodFromHandle),
+                Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle),
                 Instruction.Create(OpCodes.Ldloc, stopwatchVar),
-                Instruction.Create(OpCodes.Call, ReferenceFinder.ElapsedMilliseconds),
-                Instruction.Create(OpCodes.Call, InterceptorFinder.LogMethod),
+                Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds),
+                Instruction.Create(OpCodes.Call, ModuleWeaver.LogMethod),
             };
     }
 
     VariableDefinition InjectStopwatch()
     {
-        var stopwatchVar = new VariableDefinition("methodTimerStopwatch", ReferenceFinder.StopwatchType);
+        var stopwatchVar = new VariableDefinition("methodTimerStopwatch", ModuleWeaver.StopwatchType);
         body.Variables.Add(stopwatchVar);
 
 
-        body.Instructions.Insert(0, Instruction.Create(OpCodes.Call, ReferenceFinder.StartNewMethod));
+        body.Instructions.Insert(0, Instruction.Create(OpCodes.Call, ModuleWeaver.StartNewMethod));
         body.Instructions.Insert(1, Instruction.Create(OpCodes.Stloc, stopwatchVar));
         return stopwatchVar;
     }

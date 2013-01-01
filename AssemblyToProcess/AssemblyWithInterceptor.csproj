@@ -47,10 +47,13 @@
     <Compile Include="ClassWithAttribute.cs" />
     <Compile Include="MethodTimeLogger.cs" />
     <Compile Include="MiscMethods.cs" />
-    <Compile Include="MyDelegate.cs" />
-    <Compile Include="MyEnum.cs" />
     <Compile Include="MyInterface.cs" />
-    <Compile Include="TimeAttribute.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ReferenceAssembly\ReferenceAssembly.csproj">
+      <Project>{B5AEB0E8-28F4-4955-A055-9C200F7113F0}</Project>
+      <Name>ReferenceAssembly</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

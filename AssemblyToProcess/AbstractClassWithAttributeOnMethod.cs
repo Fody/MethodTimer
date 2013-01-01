@@ -1,5 +1,7 @@
+using MethodTimer;
+
 public abstract class AbstractClassWithAttributeOnMethod
 {
-    [TimeAttribute]
+    [Time]
     public abstract void Method();
 }

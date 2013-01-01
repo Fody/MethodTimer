@@ -1,15 +1,13 @@
 using System.Linq;
 using Mono.Cecil;
 
-public class InterceptorFinder
+public partial class ModuleWeaver
 {
-    public ModuleDefinition ModuleDefinition;
     public MethodDefinition LogMethod;
 
-
-    public void Execute()
+    public void FindInterceptor()
     {
-        var errorHandler = ModuleDefinition.Types.FirstOrDefault(x => x.Name == "MethodTimeLogger");
+        var errorHandler = types.FirstOrDefault(x => x.Name == "MethodTimeLogger");
         if (errorHandler == null)
         {
             return;

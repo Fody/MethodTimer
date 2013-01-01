@@ -7,13 +7,19 @@ public static class AttributeChecker
     {
         var customAttributes = definition.CustomAttributes;
 
-        var timeAttributes = customAttributes
-            .Where(x => x.AttributeType.Name == "TimeAttribute")
-            .ToList();
-        foreach (var attribute in timeAttributes)
+        return customAttributes.Any(x => x.AttributeType.Name == "TimeAttribute");
+    }
+
+    public static void RemoveTimeAttribute(this ICustomAttributeProvider definition)
+    {
+        var customAttributes = definition.CustomAttributes;
+
+        var timeAttribute = customAttributes.FirstOrDefault(x => x.AttributeType.Name == "TimeAttribute");
+
+        if (timeAttribute != null)
         {
-            customAttributes.Remove(attribute);
+            customAttributes.Remove(timeAttribute);
         }
-        return timeAttributes.Any();
+
     }
 }

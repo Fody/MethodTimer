@@ -1,4 +1,5 @@
 using System.Threading;
+using MethodTimer;
 
 public class ClassWithConstructor
 {

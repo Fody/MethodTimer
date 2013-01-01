@@ -64,10 +64,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AttributeChecker.cs" />
+    <Compile Include="BadAttributeChecker.cs" />
+    <Compile Include="AttributeRemover.cs" />
+    <Compile Include="AssemblyProcessor.cs" />
+    <Compile Include="CecilExtensions.cs" />
     <Compile Include="InterceptorFinder.cs" />
     <Compile Include="MethodProcessor.cs" />
     <Compile Include="ModuleWeaver.cs" />
     <Compile Include="..\CommonAssemblyInfo.cs" />
+    <Compile Include="ReferenceCleaner.cs" />
     <Compile Include="ReferenceFinder.cs" />
     <Compile Include="WeavingException.cs" />
   </ItemGroup>

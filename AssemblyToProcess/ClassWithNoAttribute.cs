@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 
-public class ClassWsithNoAttribute
+public class ClassWithNoAttribute
 {
     public void Method()
     {

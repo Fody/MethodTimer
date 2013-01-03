@@ -20,7 +20,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyWithInterceptor", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReferenceAssembly", "ReferenceAssembly\ReferenceAssembly.csproj", "{B5AEB0E8-28F4-4955-A055-9C200F7113F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyWithAttribute", "AssemblyToProcess\AssemblyWithAttribute.csproj", "{54D8A3FC-E7DF-4FF1-8D3F-1CCAF7169CBE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyWithAttributeOnAssembly", "AssemblyToProcess\AssemblyWithAttributeOnAssembly.csproj", "{54D8A3FC-E7DF-4FF1-8D3F-1CCAF7169CBE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyWithAttributeOnModule", "AssemblyToProcess\AssemblyWithAttributeOnModule.csproj", "{7B07AE87-F53D-4952-A7DB-8A5113A224A7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -72,6 +74,12 @@ Global
 		{54D8A3FC-E7DF-4FF1-8D3F-1CCAF7169CBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{54D8A3FC-E7DF-4FF1-8D3F-1CCAF7169CBE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{54D8A3FC-E7DF-4FF1-8D3F-1CCAF7169CBE}.Release|x86.ActiveCfg = Release|Any CPU
+		{7B07AE87-F53D-4952-A7DB-8A5113A224A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B07AE87-F53D-4952-A7DB-8A5113A224A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B07AE87-F53D-4952-A7DB-8A5113A224A7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7B07AE87-F53D-4952-A7DB-8A5113A224A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B07AE87-F53D-4952-A7DB-8A5113A224A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B07AE87-F53D-4952-A7DB-8A5113A224A7}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

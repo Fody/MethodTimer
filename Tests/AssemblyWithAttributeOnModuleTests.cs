@@ -3,13 +3,13 @@ using System.IO;
 using NUnit.Framework;
 
 [TestFixture]
-public class WithAttributeTests
+public class AssemblyWithAttributeOnModuleTests
 {
     AssemblyWeaver assemblyWeaver;
 
-    public WithAttributeTests()
+    public AssemblyWithAttributeOnModuleTests()
     {
-        var assemblyPath = Path.GetFullPath(@"..\..\..\AssemblyToProcess\bin\DebugWithAttribute\AssemblyToProcess.dll");
+		var assemblyPath = Path.GetFullPath(@"..\..\..\AssemblyToProcess\bin\DebugWithAttributeOnModule\AssemblyToProcess.dll");
         assemblyWeaver = new AssemblyWeaver(assemblyPath);
     }
 

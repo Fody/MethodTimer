@@ -7,7 +7,7 @@ public partial class ModuleWeaver
     void ProcessAssembly()
     {
 
-        if (ModuleDefinition.ContainsTimeAttribute())
+		if (ModuleDefinition.Assembly.ContainsTimeAttribute() || ModuleDefinition.ContainsTimeAttribute())
         {
             foreach (var method in types.SelectMany(type => type.ConcreteMethods()))
             {
@@ -15,6 +15,7 @@ public partial class ModuleWeaver
             }
             return;
         }
+
         foreach (var type in types)
         {
             if (type.ContainsTimeAttribute())

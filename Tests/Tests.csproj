@@ -73,6 +73,22 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AssemblyToProcess\AssemblyWithAttributeOnAssembly.csproj">
+      <Project>{54d8a3fc-e7df-4ff1-8d3f-1ccaf7169cbe}</Project>
+      <Name>AssemblyWithAttributeOnAssembly</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AssemblyToProcess\AssemblyWithAttributeOnModule.csproj">
+      <Project>{7b07ae87-f53d-4952-a7db-8a5113a224a7}</Project>
+      <Name>AssemblyWithAttributeOnModule</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AssemblyToProcess\AssemblyWithInterceptor.csproj">
+      <Project>{23c29b37-221d-473e-967b-dc423f5f4ab2}</Project>
+      <Name>AssemblyWithInterceptor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AssemblyToProcess\AssemblyWithoutInterceptor.csproj">
+      <Project>{dfe56c18-3504-4265-a3fe-7f434b1fd38d}</Project>
+      <Name>AssemblyWithoutInterceptor</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Fody\Fody.csproj">
       <Project>{C3578A7B-09A6-4444-9383-0DEAFA4958BD}</Project>
       <Name>Fody</Name>

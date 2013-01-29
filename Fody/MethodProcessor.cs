@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -12,6 +13,7 @@ public class MethodProcessor
     public MethodDefinition Method;
     MethodBody body;
     ILProcessor ilProcessor;
+    MethodDefinition originalMethod;
 
     public void Process()
     {
@@ -27,6 +29,22 @@ public class MethodProcessor
 
     void InnerProcess()
     {
+        originalMethod = Method;
+        var asyncAttribute = Method.CustomAttributes.FirstOrDefault(_ => _.AttributeType.Name == "AsyncStateMachineAttribute");
+        if (asyncAttribute != null)
+        {
+            var fullName = Method.FullName;
+            var customAttributeArgument = asyncAttribute.ConstructorArguments.First();
+            var typeReference = (TypeReference) customAttributeArgument.Value;
+            var typeDefinition = typeReference.Resolve();
+            Method = typeDefinition.Methods.FirstOrDefault(_ => _.Name == "MoveNext");
+            if (Method == null)
+            {
+                var format = string.Format("Could not weave '{0}' it is possible you are using a newver version of .net that has not been catered for. Please raise an issue.", fullName);
+                ModuleWeaver.LogWarning(format);
+                return;
+            }
+        }
         body = Method.Body;
         body.SimplifyMacros();
         ilProcessor = body.GetILProcessor();
@@ -120,11 +138,11 @@ public class MethodProcessor
             string methodName;
             if (Method.IsConstructor)
             {
-                methodName = string.Format("{0}{1} ", Method.DeclaringType.Name, Method.Name);
+                methodName = string.Format("{0}{1} ", originalMethod.DeclaringType.Name, originalMethod.Name);
             }
             else
             {
-                methodName = string.Format("{0}.{1} ", Method.DeclaringType.Name, Method.Name);
+                methodName = string.Format("{0}.{1} ", originalMethod.DeclaringType.Name, originalMethod.Name);
             }
             return new List<Instruction>
                 {
@@ -143,7 +161,7 @@ public class MethodProcessor
             {
                 Instruction.Create(OpCodes.Ldloc, stopwatchVar),
                 Instruction.Create(OpCodes.Call, ModuleWeaver.StopMethod),
-                Instruction.Create(OpCodes.Ldtoken, Method),
+                Instruction.Create(OpCodes.Ldtoken, originalMethod),
                 Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle),
                 Instruction.Create(OpCodes.Ldloc, stopwatchVar),
                 Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds),

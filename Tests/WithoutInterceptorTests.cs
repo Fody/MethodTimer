@@ -61,6 +61,18 @@ public class WithoutInterceptorTests
         Assert.IsTrue(message.StartsWith("ClassWithMethod.Method "));
 
     }
+    [Test]
+    public void ClassWithAsyncMethod()
+    {
+        var message = DebugRunner.CaptureDebug(() =>
+            {
+                var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+                var instance = (dynamic) Activator.CreateInstance(type);
+                instance.Method();
+            });
+        Assert.IsTrue(message.StartsWith("ClassWithAsyncMethod.Method "));
+
+    }
 
     [Test]
     public void MethodWithReturn()
@@ -74,6 +86,21 @@ public class WithoutInterceptorTests
         Assert.IsTrue(message.StartsWith("MiscMethods.MethodWithReturn "));
 
     }
+    [Test]
+    public void MethodWithAsyncReturn()
+    {
+        var message = DebugRunner.CaptureDebug(() =>
+            {
+                var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+                var instance = (dynamic) Activator.CreateInstance(type);
+                instance.MethodWithReturn();
+            });
+        Assert.IsTrue(message.StartsWith("ClassWithAsyncMethod.MethodWithReturn "));
+
+    }
+
+
+
 
 #if(DEBUG)
     [Test]

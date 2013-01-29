@@ -38,6 +38,20 @@ public class Template
             Console.WriteLine(string.Concat("Template.WithWeaving", stopwatch.ElapsedMilliseconds));
         }
     }
+    public async void AsyncWithWeaving()
+    {
+        //var stopwatch = Stopwatch.StartNew();
+        //try
+        //{
+            //Some code u are curious how long it takes
+            Console.WriteLine("Hello");
+        //}
+        //finally
+        //{
+        //    stopwatch.Stop();
+        //    Console.WriteLine(string.Concat("Template.WithWeaving", stopwatch.ElapsedMilliseconds));
+        //}
+    }
     public void WithWeavingInterceptor()
     {
         var stopwatch = Stopwatch.StartNew();

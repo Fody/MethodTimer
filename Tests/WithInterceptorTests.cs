@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using NUnit.Framework;
 
 [TestFixture]
@@ -70,6 +71,28 @@ public class WithInterceptorTests
         var type = assemblyWeaver.Assembly.GetType("MiscMethods");
         var instance = (dynamic) Activator.CreateInstance(type);
         instance.MethodWithReturn();
+        Assert.AreEqual(GetMethodInfoField().Name, "MethodWithReturn");
+        Assert.AreEqual(GetMethodInfoField().DeclaringType, type);
+    }
+    [Test]
+    public void MethodWithAsync()
+    {
+        ClearMessage();
+        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic) Activator.CreateInstance(type);
+        instance.Method();
+        Thread.Sleep(100);
+        Assert.AreEqual(GetMethodInfoField().Name, "Method");
+        Assert.AreEqual(GetMethodInfoField().DeclaringType, type);
+    }
+    [Test]
+    public void MethodWithAsyncReturn()
+    {
+        ClearMessage();
+        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic) Activator.CreateInstance(type);
+        instance.MethodWithReturn();
+        Thread.Sleep(100);
         Assert.AreEqual(GetMethodInfoField().Name, "MethodWithReturn");
         Assert.AreEqual(GetMethodInfoField().DeclaringType, type);
     }

@@ -74,6 +74,7 @@ public class WithInterceptorTests
         Assert.AreEqual(GetMethodInfoField().Name, "MethodWithReturn");
         Assert.AreEqual(GetMethodInfoField().DeclaringType, type);
     }
+#if(DEBUG)
     [Test]
     public void MethodWithAsync()
     {
@@ -96,7 +97,7 @@ public class WithInterceptorTests
         Assert.AreEqual(GetMethodInfoField().Name, "MethodWithReturn");
         Assert.AreEqual(GetMethodInfoField().DeclaringType, type);
     }
-
+#endif
 
     void ClearMessage()
     {

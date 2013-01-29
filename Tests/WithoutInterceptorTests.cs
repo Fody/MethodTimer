@@ -61,6 +61,7 @@ public class WithoutInterceptorTests
         Assert.IsTrue(message.StartsWith("ClassWithMethod.Method "));
 
     }
+#if(DEBUG)
     [Test]
     public void ClassWithAsyncMethod()
     {
@@ -73,6 +74,7 @@ public class WithoutInterceptorTests
         Assert.IsTrue(message.StartsWith("ClassWithAsyncMethod.Method "));
 
     }
+#endif
 
     [Test]
     public void MethodWithReturn()
@@ -86,6 +88,7 @@ public class WithoutInterceptorTests
         Assert.IsTrue(message.StartsWith("MiscMethods.MethodWithReturn "));
 
     }
+#if(DEBUG)
     [Test]
     public void MethodWithAsyncReturn()
     {
@@ -98,7 +101,7 @@ public class WithoutInterceptorTests
         Assert.IsTrue(message.StartsWith("ClassWithAsyncMethod.MethodWithReturn "));
 
     }
-
+#endif
 
 
 

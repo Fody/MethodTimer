@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MethodTimer;
 
+#if(DEBUG)
 public class ClassWithAsyncMethod
 {
     [Time]
@@ -17,3 +18,4 @@ public class ClassWithAsyncMethod
         return DateTime.Now;
     }
 }
+#endif

@@ -76,7 +76,7 @@ Then this will be compiled
 
 In addition to the actual weaving assembly the nuget package will also add a file `TimeAttribute.cs` to the target project.
 
-	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Constructor)]
+	[AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Module | AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Constructor,AllowMultiple = false)]
 	internal class TimeAttribute : Attribute
 	{
 	}

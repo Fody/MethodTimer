@@ -94,7 +94,6 @@ public class WithInterceptorTests
         Assert.AreEqual(methodBase.DeclaringType, type);
     }
 
-#if(DEBUG)
     [Test]
     public void MethodWithAsync()
     {
@@ -141,7 +140,6 @@ public class WithInterceptorTests
         Assert.AreEqual(methodBase.Name, "MethodWithReturn");
         Assert.AreEqual(methodBase.DeclaringType, type);
     }
-#endif
 
     void ClearMessage()
     {
@@ -153,12 +151,10 @@ public class WithInterceptorTests
         return (List<MethodBase>)methodBaseField.GetValue(null);
     }
 
-#if(DEBUG)
     [Test]
     public void PeVerify()
     {
         Verifier.Verify(assemblyWeaver.Assembly.CodeBase.Remove(0, 8));
     }
-#endif
 
 }

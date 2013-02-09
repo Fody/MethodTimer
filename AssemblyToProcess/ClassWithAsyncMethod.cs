@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using MethodTimer;
 
-#if(DEBUG)
 public class ClassWithAsyncMethod
 {
     [Time]
@@ -24,4 +23,3 @@ public class ClassWithAsyncMethod
             await Task.Delay(2000);
     }
 }
-#endif

@@ -27,13 +27,10 @@ public class AssemblyWithAttributeOnModuleTests
         Assert.IsTrue(message.First().StartsWith("ClassWithNoAttribute.Method "));
     }
 
-
-#if(DEBUG)
     [Test]
     public void PeVerify()
     {
         Verifier.Verify(assemblyWeaver.Assembly.CodeBase.Remove(0, 8));
     }
-#endif
 
 }

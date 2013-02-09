@@ -28,7 +28,7 @@ public class WithoutInterceptorTests
         Assert.Contains("Method 'System.Void MyInterface::MyMethod()' is abstract but has a [TimeAttribute]. Remove this attribute.", assemblyWeaver.Errors);
     }
 
-[Test]
+    [Test]
     public void ClassWithConstructor()
     {
         var message = DebugRunner.CaptureDebug(() =>
@@ -36,10 +36,11 @@ public class WithoutInterceptorTests
                 var type = assemblyWeaver.Assembly.GetType("ClassWithConstructor");
                 Activator.CreateInstance(type);
             });
-        Assert.AreEqual(2,message.Count);
+        Assert.AreEqual(2, message.Count);
         Assert.IsTrue(message[0].StartsWith("ClassWithConstructor.cctor "));
         Assert.IsTrue(message[1].StartsWith("ClassWithConstructor.ctor "));
     }
+
     [Test]
     public void ClassWithAttribute()
     {
@@ -49,7 +50,7 @@ public class WithoutInterceptorTests
                 var instance = (dynamic) Activator.CreateInstance(type);
                 instance.Method();
             });
-        Assert.AreEqual(1,message.Count);
+        Assert.AreEqual(1, message.Count);
         Assert.IsTrue(message.First().StartsWith("ClassWithAttribute.Method "));
     }
 
@@ -66,7 +67,7 @@ public class WithoutInterceptorTests
         Assert.IsTrue(message.First().StartsWith("ClassWithMethod.Method "));
 
     }
-#if(DEBUG)
+
     [Test]
     public void ClassWithAsyncMethod()
     {
@@ -80,7 +81,6 @@ public class WithoutInterceptorTests
         Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.Method "));
 
     }
-#endif
 
     [Test]
     public void MethodWithReturn()
@@ -95,7 +95,7 @@ public class WithoutInterceptorTests
         Assert.IsTrue(message.First().StartsWith("MiscMethods.MethodWithReturn "));
 
     }
-#if(DEBUG)
+
     [Test]
     public void MethodWithAsyncReturn()
     {
@@ -109,16 +109,11 @@ public class WithoutInterceptorTests
         Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.MethodWithReturn "));
 
     }
-#endif
 
-
-
-#if(DEBUG)
     [Test]
     public void PeVerify()
     {
         Verifier.Verify(assemblyWeaver.Assembly.CodeBase.Remove(0, 8));
     }
-#endif
 
 }

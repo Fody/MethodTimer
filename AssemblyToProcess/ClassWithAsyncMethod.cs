@@ -17,5 +17,11 @@ public class ClassWithAsyncMethod
         Thread.Sleep(10);
         return DateTime.Now;
     }
+
+    [Time]
+    public async void MethodWithAwait()
+    {
+            await Task.Delay(2000);
+    }
 }
 #endif

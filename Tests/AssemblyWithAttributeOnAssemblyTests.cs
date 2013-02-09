@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using NUnit.Framework;
 
 [TestFixture]
@@ -21,8 +22,9 @@ public class AssemblyWithAttributeOnAssemblyTests
 				var type = assemblyWeaver.Assembly.GetType("ClassWithNoAttribute");
 				var instance = (dynamic) Activator.CreateInstance(type);
 				instance.Method();
-			});
-		Assert.IsTrue(message.StartsWith("ClassWithNoAttribute.Method "));
+            });
+        Assert.AreEqual(1, message.Count);
+        Assert.IsTrue(message.First().StartsWith("ClassWithNoAttribute.Method "));
 	}
 
 

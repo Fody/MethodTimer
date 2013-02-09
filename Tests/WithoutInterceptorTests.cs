@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using NUnit.Framework;
 
 [TestFixture]
@@ -35,7 +36,9 @@ public class WithoutInterceptorTests
                 var type = assemblyWeaver.Assembly.GetType("ClassWithConstructor");
                 Activator.CreateInstance(type);
             });
-        Assert.IsTrue(message.StartsWith("ClassWithConstructor.ctor "));
+        Assert.AreEqual(2,message.Count);
+        Assert.IsTrue(message[0].StartsWith("ClassWithConstructor.cctor "));
+        Assert.IsTrue(message[1].StartsWith("ClassWithConstructor.ctor "));
     }
     [Test]
     public void ClassWithAttribute()
@@ -46,7 +49,8 @@ public class WithoutInterceptorTests
                 var instance = (dynamic) Activator.CreateInstance(type);
                 instance.Method();
             });
-        Assert.IsTrue(message.StartsWith("ClassWithAttribute.Method "));
+        Assert.AreEqual(1,message.Count);
+        Assert.IsTrue(message.First().StartsWith("ClassWithAttribute.Method "));
     }
 
     [Test]
@@ -58,7 +62,8 @@ public class WithoutInterceptorTests
                 var instance = (dynamic) Activator.CreateInstance(type);
                 instance.Method();
             });
-        Assert.IsTrue(message.StartsWith("ClassWithMethod.Method "));
+        Assert.AreEqual(1, message.Count);
+        Assert.IsTrue(message.First().StartsWith("ClassWithMethod.Method "));
 
     }
 #if(DEBUG)
@@ -71,7 +76,8 @@ public class WithoutInterceptorTests
                 var instance = (dynamic) Activator.CreateInstance(type);
                 instance.Method();
             });
-        Assert.IsTrue(message.StartsWith("ClassWithAsyncMethod.Method "));
+        Assert.AreEqual(1, message.Count);
+        Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.Method "));
 
     }
 #endif
@@ -85,7 +91,8 @@ public class WithoutInterceptorTests
                 var instance = (dynamic) Activator.CreateInstance(type);
                 instance.MethodWithReturn();
             });
-        Assert.IsTrue(message.StartsWith("MiscMethods.MethodWithReturn "));
+        Assert.AreEqual(1, message.Count);
+        Assert.IsTrue(message.First().StartsWith("MiscMethods.MethodWithReturn "));
 
     }
 #if(DEBUG)
@@ -98,7 +105,8 @@ public class WithoutInterceptorTests
                 var instance = (dynamic) Activator.CreateInstance(type);
                 instance.MethodWithReturn();
             });
-        Assert.IsTrue(message.StartsWith("ClassWithAsyncMethod.MethodWithReturn "));
+        Assert.AreEqual(1, message.Count);
+        Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.MethodWithReturn "));
 
     }
 #endif

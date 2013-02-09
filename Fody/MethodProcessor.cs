@@ -28,6 +28,10 @@ public class MethodProcessor
 
     void InnerProcess()
     {
+        if ((Method.Name == ".ctor") && (Method.HasBody) && (Method.Body.Instructions.Count == 3))
+        {
+            return;
+        }
         originalMethod = Method;
         var asyncAttribute = Method.CustomAttributes.FirstOrDefault(_ => _.AttributeType.Name == "AsyncStateMachineAttribute");
         if (asyncAttribute != null)

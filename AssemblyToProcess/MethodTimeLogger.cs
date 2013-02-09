@@ -1,13 +1,16 @@
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 
     public static class MethodTimeLogger
     {
 
-        public static MethodBase MethodBase;
+        public static List<MethodBase> MethodBase = new List<MethodBase>();
 
         public static void Log(MethodBase methodBase, long milliseconds)
         {
-            MethodBase = methodBase;
+            Debug.WriteLine(methodBase.Name + " " + milliseconds);
+            MethodBase.Add(methodBase);
         }
 
     }

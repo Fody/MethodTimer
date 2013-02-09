@@ -1,10 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 public class  DebugRunner
 {
 
-    public static string CaptureDebug(Action action)
+    public static List<string> CaptureDebug(Action action)
     {
         var myTraceListener = new MyTraceListener();
         try
@@ -16,7 +17,7 @@ public class  DebugRunner
         {
             Debug.Listeners.Remove(myTraceListener);
         }
-        return myTraceListener.message;
+        return myTraceListener.messages;
     }
 
 }

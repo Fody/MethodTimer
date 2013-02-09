@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using NUnit.Framework;
@@ -32,9 +34,14 @@ public class WithInterceptorTests
         var type = assemblyWeaver.Assembly.GetType("ClassWithAttribute");
         var instance = (dynamic) Activator.CreateInstance(type);
         instance.Method();
-        Assert.AreEqual(GetMethodInfoField().Name, "Method");
-        Assert.AreEqual(GetMethodInfoField().DeclaringType, type);
+
+        var methodBases = GetMethodInfoField();
+        Assert.AreEqual(1, methodBases.Count);
+        var methodBase = methodBases.First();
+        Assert.AreEqual(methodBase.Name, "Method");
+        Assert.AreEqual(methodBase.DeclaringType, type);
     }
+
     [Test]
     public void CheckErrors()
     {
@@ -48,8 +55,13 @@ public class WithInterceptorTests
         ClearMessage();
         var type = assemblyWeaver.Assembly.GetType("ClassWithConstructor");
         Activator.CreateInstance(type);
-        Assert.AreEqual(GetMethodInfoField().Name, ".ctor");
-        Assert.AreEqual(GetMethodInfoField().DeclaringType, type);
+        var methodBases = GetMethodInfoField();
+        Assert.AreEqual(2, methodBases.Count);
+        
+        Assert.AreEqual(methodBases[0].Name, ".cctor");
+        Assert.AreEqual(methodBases[0].DeclaringType, type);
+        Assert.AreEqual(methodBases[1].Name, ".ctor");
+        Assert.AreEqual(methodBases[1].DeclaringType, type);
     }
 
     [Test]
@@ -59,8 +71,11 @@ public class WithInterceptorTests
         var type = assemblyWeaver.Assembly.GetType("ClassWithMethod");
         var instance = (dynamic) Activator.CreateInstance(type);
         instance.Method();
-        Assert.AreEqual(GetMethodInfoField().Name, "Method");
-        Assert.AreEqual(GetMethodInfoField().DeclaringType, type);
+        var methodBases = GetMethodInfoField();
+        Assert.AreEqual(1, methodBases.Count);
+        var methodBase = methodBases.First();
+        Assert.AreEqual(methodBase.Name, "Method");
+        Assert.AreEqual(methodBase.DeclaringType, type);
 
     }
 
@@ -71,9 +86,14 @@ public class WithInterceptorTests
         var type = assemblyWeaver.Assembly.GetType("MiscMethods");
         var instance = (dynamic) Activator.CreateInstance(type);
         instance.MethodWithReturn();
-        Assert.AreEqual(GetMethodInfoField().Name, "MethodWithReturn");
-        Assert.AreEqual(GetMethodInfoField().DeclaringType, type);
+        var methodBases = GetMethodInfoField();
+        Assert.AreEqual(1, methodBases.Count);
+        var methodBase = methodBases.First();
+
+        Assert.AreEqual(methodBase.Name, "MethodWithReturn");
+        Assert.AreEqual(methodBase.DeclaringType, type);
     }
+
 #if(DEBUG)
     [Test]
     public void MethodWithAsync()
@@ -83,9 +103,30 @@ public class WithInterceptorTests
         var instance = (dynamic) Activator.CreateInstance(type);
         instance.Method();
         Thread.Sleep(100);
-        Assert.AreEqual(GetMethodInfoField().Name, "Method");
-        Assert.AreEqual(GetMethodInfoField().DeclaringType, type);
+        var methodBases = GetMethodInfoField();
+        Assert.AreEqual(1, methodBases.Count);
+        var methodBase = methodBases.First();
+
+        Assert.AreEqual(methodBase.Name, "Method");
+        Assert.AreEqual(methodBase.DeclaringType, type);
     }
+
+    [Test]
+    public void MethodWithAwait()
+    {
+        ClearMessage();
+        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic) Activator.CreateInstance(type);
+        instance.MethodWithAwait();
+        Thread.Sleep(100);
+        var methodBases = GetMethodInfoField();
+        Assert.AreEqual(1, methodBases.Count);
+        var methodBase = methodBases.First();
+
+        Assert.AreEqual(methodBase.Name, "MethodWithAwait");
+        Assert.AreEqual(methodBase.DeclaringType, type);
+    }
+
     [Test]
     public void MethodWithAsyncReturn()
     {
@@ -94,19 +135,22 @@ public class WithInterceptorTests
         var instance = (dynamic) Activator.CreateInstance(type);
         instance.MethodWithReturn();
         Thread.Sleep(100);
-        Assert.AreEqual(GetMethodInfoField().Name, "MethodWithReturn");
-        Assert.AreEqual(GetMethodInfoField().DeclaringType, type);
+        var methodBases = GetMethodInfoField();
+        Assert.AreEqual(1, methodBases.Count);
+        var methodBase = methodBases.First();
+        Assert.AreEqual(methodBase.Name, "MethodWithReturn");
+        Assert.AreEqual(methodBase.DeclaringType, type);
     }
 #endif
 
     void ClearMessage()
     {
-        methodBaseField.SetValue(null, null);
+        methodBaseField.SetValue(null,new List<MethodBase>());
     }
 
-    MethodBase GetMethodInfoField()
+    List<MethodBase> GetMethodInfoField()
     {
-        return (MethodBase)methodBaseField.GetValue(null);
+        return (List<MethodBase>)methodBaseField.GetValue(null);
     }
 
 #if(DEBUG)

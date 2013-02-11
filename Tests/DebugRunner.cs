@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
 
 public class  DebugRunner
 {
@@ -12,6 +13,7 @@ public class  DebugRunner
         {
             Debug.Listeners.Add(myTraceListener);
             action();
+            Thread.Sleep(1000);
         }
         finally
         {

@@ -9,6 +9,12 @@ public static class AttributeChecker
 
         return customAttributes.Any(x => x.AttributeType.Name == "TimeAttribute");
     }
+    public static bool IsCompilerGenerated(this ICustomAttributeProvider definition)
+    {
+        var customAttributes = definition.CustomAttributes;
+
+        return customAttributes.Any(x => x.AttributeType.Name == "CompilerGeneratedAttribute");
+    }
 
     public static void RemoveTimeAttribute(this ICustomAttributeProvider definition)
     {

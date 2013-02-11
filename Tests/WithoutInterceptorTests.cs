@@ -53,6 +53,18 @@ public class WithoutInterceptorTests
         Assert.AreEqual(1, message.Count);
         Assert.IsTrue(message.First().StartsWith("ClassWithAttribute.Method "));
     }
+    [Test]
+    public void MethodWithReturnAndCatchReThrow()
+    {
+        var message = DebugRunner.CaptureDebug(() =>
+            {
+                var type = assemblyWeaver.Assembly.GetType("MiscMethods");
+                var instance = (dynamic) Activator.CreateInstance(type);
+                instance.MethodWithReturnAndCatchReThrow();
+            });
+        Assert.AreEqual(1, message.Count);
+        Assert.IsTrue(message.First().StartsWith("MiscMethods.MethodWithReturnAndCatchReThrow "));
+    }
 
     [Test]
     public void ClassWithMethod()
@@ -68,19 +80,33 @@ public class WithoutInterceptorTests
 
     }
 
-    [Test]
-    public void ClassWithAsyncMethod()
-    {
-        var message = DebugRunner.CaptureDebug(() =>
-            {
-                var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
-                var instance = (dynamic) Activator.CreateInstance(type);
-                instance.Method();
-            });
-        Assert.AreEqual(1, message.Count);
-        Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.Method "));
+    //[Test]
+    //public void ClassWithAsyncMethod()
+    //{
+    //    var message = DebugRunner.CaptureDebug(() =>
+    //        {
+    //            var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+    //            var instance = (dynamic) Activator.CreateInstance(type);
+    //            instance.Method();
+    //        });
+    //    Assert.AreEqual(1, message.Count);
+    //    Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.Method "));
 
-    }
+    //}
+    //[Test]
+    //public void MethodWithAwait()
+    //{
+    //    var message = DebugRunner.CaptureDebug(() =>
+    //        {
+    //            var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+    //            var instance = (dynamic) Activator.CreateInstance(type);
+    //            instance.MethodWithAwait();
+    //        });
+    //    Assert.AreEqual(1, message.Count);
+    //    var first = message.First();
+    //    Assert.IsTrue(first.StartsWith("ClassWithAsyncMethod.MethodWithAwait "));
+
+    //}
 
     [Test]
     public void MethodWithReturn()
@@ -96,19 +122,19 @@ public class WithoutInterceptorTests
 
     }
 
-    [Test]
-    public void MethodWithAsyncReturn()
-    {
-        var message = DebugRunner.CaptureDebug(() =>
-            {
-                var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
-                var instance = (dynamic) Activator.CreateInstance(type);
-                instance.MethodWithReturn();
-            });
-        Assert.AreEqual(1, message.Count);
-        Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.MethodWithReturn "));
+    //[Test]
+    //public void MethodWithAsyncReturn()
+    //{
+    //    var message = DebugRunner.CaptureDebug(() =>
+    //        {
+    //            var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+    //            var instance = (dynamic) Activator.CreateInstance(type);
+    //            instance.MethodWithReturn();
+    //        });
+    //    Assert.AreEqual(1, message.Count);
+    //    Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.MethodWithReturn "));
 
-    }
+    //}
 
     [Test]
     public void PeVerify()

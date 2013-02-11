@@ -1,5 +1,5 @@
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Reflection;
 
     public static class MethodTimeLogger
@@ -9,7 +9,7 @@ using System.Reflection;
 
         public static void Log(MethodBase methodBase, long milliseconds)
         {
-            Debug.WriteLine(methodBase.Name + " " + milliseconds);
+            Console.WriteLine(methodBase.Name + " " + milliseconds);
             MethodBase.Add(methodBase);
         }
 

@@ -18,6 +18,10 @@ public partial class ModuleWeaver
 
         foreach (var type in types)
         {
+            if (type.IsCompilerGenerated())
+            {
+                continue; 
+            }
             if (type.ContainsTimeAttribute())
             {
                 foreach (var method in type.ConcreteMethods())
@@ -37,12 +41,32 @@ public partial class ModuleWeaver
 
     void ProcessMethod(MethodDefinition method)
     {
-        var methodProcessor = new MethodProcessor
-            {
-                ModuleWeaver = this,
-                TypeSystem = ModuleDefinition.TypeSystem,
-                Method = method,
-            };
-        methodProcessor.Process();
+        var asyncAttribute = method.CustomAttributes.FirstOrDefault(_ => _.AttributeType.Name == "AsyncStateMachineAttribute");
+        if (asyncAttribute == null)
+        {
+            var methodProcessor = new MethodProcessor
+                {
+                    ModuleWeaver = this,
+                    TypeSystem = ModuleDefinition.TypeSystem,
+                    Method = method,
+                };
+            methodProcessor.Process();
+            return;
+        }
+        LogError(string.Format("Could not process '{0}'. async methods are not currently supported. Feel free to submit a pull request if you want this feature.", method.FullName));
+            
+        //var fullName = method.FullName;
+        //var customAttributeArgument = asyncAttribute.ConstructorArguments.First();
+        //var typeReference = (TypeReference) customAttributeArgument.Value;
+        //var asyncTypeDefinition = typeReference.Resolve();
+
+        //var methodProcessorAsync = new MethodProcessorAsync
+        //    {
+        //        ModuleWeaver = this,
+        //        TypeSystem = ModuleDefinition.TypeSystem,
+        //        AsyncTypeReference = asyncTypeDefinition,
+        //        OriginalMethod = method
+        //    };
+        //methodProcessorAsync.Process();
     }
 }

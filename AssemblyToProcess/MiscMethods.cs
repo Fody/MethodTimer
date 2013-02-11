@@ -7,17 +7,13 @@ using MethodTimer;
 public class MiscMethods
 {
 
-    public void Method()
-    {
-        Thread.Sleep(10);
-    }
-    
+
     public int MethodWithReturn()
     {
         Thread.Sleep(10);
         return 0;
     }
-    
+
     public int MethodWithReturnAndCatchReThrow()
     {
         try
@@ -42,7 +38,31 @@ public class MiscMethods
             Debug.WriteLine("sdf");
             throw;
         }
+
     }
+
+    //public void Expected()
+    //{
+    //    var startNew = Stopwatch.StartNew();
+    //    try
+    //    {
+
+    //        try
+    //        {
+    //            Thread.Sleep(10);
+    //        }
+    //        catch (Exception)
+    //        {
+    //            throw;
+    //        }
+
+    //    }
+    //    finally
+    //    {
+    //        startNew.Stop();
+    //    }
+    //}
+
     public int MethodWithReturnAndCatchFinallyReThrow()
     {
         try
@@ -60,33 +80,33 @@ public class MiscMethods
             Debug.WriteLine("sdf");
         }
     }
-    public void MethodAndCatchFinallyReThrow()
-    {
-        try
-        {
-            Thread.Sleep(10);
-        }
-        catch (Exception)
-        {
-            Debug.WriteLine("sdf");
-            throw;
-        }
-        finally
-        {
-            Debug.WriteLine("sdf");
-        }
-    }
+    //public void MethodAndCatchFinallyReThrow()
+    //{
+    //    try
+    //    {
+    //        Thread.Sleep(10);
+    //    }
+    //    catch (Exception)
+    //    {
+    //        Debug.WriteLine("sdf");
+    //        throw;
+    //    }
+    //    finally
+    //    {
+    //        Debug.WriteLine("sdf");
+    //    }
+    //}
     
-    public void MethodAndCatchSwallow()
-    {
-        try
-        {
-            Thread.Sleep(10);
-        }
-        catch (Exception)
-        {
-        }
-    }
+    //public void MethodAndCatchSwallow()
+    //{
+    //    try
+    //    {
+    //        Thread.Sleep(10);
+    //    }
+    //    catch (Exception)
+    //    {
+    //    }
+    //}
     public int MethodWithReturnAndCatchSwallow()
     {
         try
@@ -99,9 +119,42 @@ public class MiscMethods
             return 1;
         }
     }
-
-    public int MethodRecursive()
+    public int MethodWithThrowNewException()
     {
-        return MethodRecursive();
+        try
+        {
+            Thread.Sleep(10);
+            return 0;
+        }
+        catch (Exception e)
+        {
+            throw new Exception("dd", e);
+        }
     }
+    public int MultiCatch()
+    {
+        try
+        {
+            
+        try
+        {
+            Thread.Sleep(10);
+            return 0;
+        }
+        catch (Exception e)
+        {
+            throw new Exception("dd", e);
+        }
+        }
+        catch (Exception)
+        {
+            
+            throw;
+        }
+    }
+
+    //public int MethodRecursive()
+    //{
+    //    return MethodRecursive();
+    //}
 }

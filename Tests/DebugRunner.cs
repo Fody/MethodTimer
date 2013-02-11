@@ -13,7 +13,7 @@ public class  DebugRunner
         {
             Debug.Listeners.Add(myTraceListener);
             action();
-            Thread.Sleep(1000);
+            Thread.Sleep(100);
         }
         finally
         {

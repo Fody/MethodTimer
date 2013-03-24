@@ -44,5 +44,8 @@
     <Compile Include="..\CommonAssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
-  <Import Project="..\packages\Fody.1.13.0.0\Fody.targets" Condition="Exists('..\packages\Fody.1.13.0.0\Fody.targets')" />
+  <Import Project="..\packages\Fody.1.13.3.0\Fody.targets" Condition="Exists('..\packages\Fody.1.13.3.0\Fody.targets')" />
+  <Target Name="FodyTargetsCheck" BeforeTargets="BeforeCompile">
+    <Error Condition="!Exists('..\packages\Fody.1.13.3.0\Fody.targets')" Text="Could not find Fody.targets. You either forget to check in the package or forgot to enable package restore." />
+  </Target>
 </Project>

@@ -4,7 +4,13 @@ Injects some very basic method timing code.
 
 [Introduction to Fody](http://github.com/Fody/Fody/wiki/SampleUsage)
 
-## Nuget package http://nuget.org/packages/MethodTimer.Fody 
+## Nuget
+
+Nuget package http://nuget.org/packages/MethodTimer.Fody 
+
+To Install from the Nuget Package Manager Console 
+    
+    PM> Install-Package MethodTimer.Fody
 
 ### Your Code
 

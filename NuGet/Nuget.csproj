@@ -19,7 +19,10 @@
     <None Include="uninstall.ps1" />
   </ItemGroup>
   <Target Name="Clean">
-    <RemoveDir Directories="$(SolutionDir)NuGetBuild" />
+    <ItemGroup>
+      <FilesToDelete Include="$(SolutionDir)NLogNuGetBuild\**\*.*" />
+    </ItemGroup>
+    <Delete Files="@(FilesToDelete)" />
   </Target>
   <Target Name="Build" DependsOnTargets="NuGetBuild" />
   <Target Name="ReBuild" DependsOnTargets="NuGetBuild" />

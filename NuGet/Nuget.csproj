@@ -20,7 +20,7 @@
   </ItemGroup>
   <Target Name="Clean">
     <ItemGroup>
-      <FilesToDelete Include="$(SolutionDir)NLogNuGetBuild\**\*.*" />
+      <FilesToDelete Include="$(SolutionDir)NuGetBuild\**\*.*" />
     </ItemGroup>
     <Delete Files="@(FilesToDelete)" />
   </Target>
@@ -43,8 +43,6 @@
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <Name>Fody</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\ReferenceAssembly\ReferenceAssembly.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <Name>ReferenceAssembly</Name>

@@ -1,5 +1,7 @@
 ## This is an add-in for [Fody](https://github.com/Fody/Fody/) 
 
+![Icon](https://raw.github.com/Fody/MethodTimer/master/Icons/package_icon.png)
+
 Injects some very basic method timing code.
 
 [Introduction to Fody](http://github.com/Fody/Fody/wiki/SampleUsage)

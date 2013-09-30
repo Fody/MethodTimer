@@ -9,11 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj
 		{23C29B37-221D-473E-967B-DC423F5F4AB2} = {23C29B37-221D-473E-967B-DC423F5F4AB2}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nuget", "NuGet\Nuget.csproj", "{63786CE5-D899-43DF-AD4E-C2CA3BAC3FC2}"
-	ProjectSection(ProjectDependencies) = postProject
-		{C3578A7B-09A6-4444-9383-0DEAFA4958BD} = {C3578A7B-09A6-4444-9383-0DEAFA4958BD}
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyWithoutInterceptor", "AssemblyToProcess\AssemblyWithoutInterceptor.csproj", "{DFE56C18-3504-4265-A3FE-7F434B1FD38D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyWithInterceptor", "AssemblyToProcess\AssemblyWithInterceptor.csproj", "{23C29B37-221D-473E-967B-DC423F5F4AB2}"
@@ -44,12 +39,6 @@ Global
 		{5A86453B-96FB-4B6E-A283-225BB9F753D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5A86453B-96FB-4B6E-A283-225BB9F753D3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5A86453B-96FB-4B6E-A283-225BB9F753D3}.Release|x86.ActiveCfg = Release|Any CPU
-		{63786CE5-D899-43DF-AD4E-C2CA3BAC3FC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{63786CE5-D899-43DF-AD4E-C2CA3BAC3FC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{63786CE5-D899-43DF-AD4E-C2CA3BAC3FC2}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{63786CE5-D899-43DF-AD4E-C2CA3BAC3FC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{63786CE5-D899-43DF-AD4E-C2CA3BAC3FC2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{63786CE5-D899-43DF-AD4E-C2CA3BAC3FC2}.Release|x86.ActiveCfg = Release|Any CPU
 		{DFE56C18-3504-4265-A3FE-7F434B1FD38D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DFE56C18-3504-4265-A3FE-7F434B1FD38D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DFE56C18-3504-4265-A3FE-7F434B1FD38D}.Debug|x86.ActiveCfg = Debug|Any CPU

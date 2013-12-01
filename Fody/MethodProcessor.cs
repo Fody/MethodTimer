@@ -25,7 +25,7 @@ public class MethodProcessor
         }
     }
 
-    void InnerProcess()
+    public void InnerProcess()
     {
         body = Method.Body;
         body.SimplifyMacros();

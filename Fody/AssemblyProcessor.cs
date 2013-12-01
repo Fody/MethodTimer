@@ -50,7 +50,7 @@ public partial class ModuleWeaver
                     TypeSystem = ModuleDefinition.TypeSystem,
                     Method = method,
                 };
-            methodProcessor.Process();
+            methodProcessor.InnerProcess();
             return;
         }
         LogError(string.Format("Could not process '{0}'. async methods are not currently supported. Feel free to submit a pull request if you want this feature.", method.FullName));

@@ -35,4 +35,11 @@ public static class CecilExtensions
             collection.Insert(index, instruction);
         }   
     }
+    public static void Add(this Collection<Instruction> collection,  params Instruction[] instructions)
+    {
+        foreach (var instruction in instructions)
+        {
+            collection.Add(instruction);
+        }   
+    }
 }

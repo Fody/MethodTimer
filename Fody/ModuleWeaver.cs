@@ -20,8 +20,8 @@ public partial class ModuleWeaver
 
     public void Execute()
     {
-        FindReferences();
         types = ModuleDefinition.GetTypes().ToList();
+        FindReferences();
         FindInterceptor();
         CheckForBadAttributes();
         ProcessAssembly();

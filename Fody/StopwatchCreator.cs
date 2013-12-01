@@ -1,0 +1,105 @@
+using Mono.Cecil;
+using Mono.Cecil.Cil;
+
+public partial class ModuleWeaver
+{
+    
+    public void InjectStopwatch()
+    {
+        var typeSystem = ModuleDefinition.TypeSystem;
+        var type = new TypeDefinition("MethodTimer","Stopwatch",TypeAttributes.BeforeFieldInit| TypeAttributes.AnsiClass| TypeAttributes.AutoClass,typeSystem.Object);
+        ModuleDefinition.Types.Add(type);
+
+        var startTicks = new FieldDefinition("startTicks",FieldAttributes.Private,typeSystem.Int64);
+        type.Fields.Add(startTicks);
+
+        var stopped = new FieldDefinition("stopped", FieldAttributes.Private, typeSystem.Boolean);
+        type.Fields.Add(stopped);
+
+        var elapsedTicks = new FieldDefinition("elapsedTicks", FieldAttributes.Private, typeSystem.Int64);
+        type.Fields.Add(elapsedTicks);
+
+
+        var currentTicks = new MethodDefinition("CurrentTicks",
+            MethodAttributes.HideBySig | MethodAttributes.Private| MethodAttributes.Static, typeSystem.Int64)
+            {
+                Body =
+                    {
+                        InitLocals = true
+                    }
+            };
+        type.Methods.Add(currentTicks);
+        var timeVariable = new VariableDefinition(DateTimeType);
+        currentTicks.Body.Variables.Add(timeVariable);
+        currentTicks.Body.Instructions.Add(
+            Instruction.Create(OpCodes.Call, UtcNowMethod),
+            Instruction.Create(OpCodes.Stloc, timeVariable),
+            Instruction.Create(OpCodes.Ldloca_S, timeVariable),
+            Instruction.Create(OpCodes.Call, GetTicksMethod),
+            Instruction.Create(OpCodes.Ret));
+
+
+        var constructor = new MethodDefinition(".ctor",
+            MethodAttributes.RTSpecialName|
+            MethodAttributes.SpecialName|
+            MethodAttributes.HideBySig|MethodAttributes.Public,typeSystem.Void);
+        type.Methods.Add(constructor);
+        constructor.Body.Instructions.Add(
+            Instruction.Create(OpCodes.Ldarg_0),
+            Instruction.Create(OpCodes.Call,currentTicks),
+            Instruction.Create(OpCodes.Stfld, startTicks),
+            Instruction.Create(OpCodes.Ldarg_0),
+            Instruction.Create(OpCodes.Call, ObjectConstructorMethod), 
+            Instruction.Create(OpCodes.Ret));
+
+
+
+        var startNew = new MethodDefinition("StartNew",
+            MethodAttributes.HideBySig | MethodAttributes.Public | MethodAttributes.Static, type);
+        type.Methods.Add(startNew);
+        startNew.Body.Instructions.Add(
+            Instruction.Create(OpCodes.Newobj, constructor),
+            Instruction.Create(OpCodes.Ret));
+
+
+        var stop = new MethodDefinition("Stop",
+            MethodAttributes.HideBySig | MethodAttributes.Public , typeSystem.Void);
+        type.Methods.Add(stop);
+        var stopReturn = Instruction.Create(OpCodes.Ret);
+        stop.Body.Instructions.Add(
+            Instruction.Create(OpCodes.Ldarg_0),
+            Instruction.Create(OpCodes.Ldfld, stopped),
+            Instruction.Create(OpCodes.Brtrue, stopReturn),
+            Instruction.Create(OpCodes.Ldarg_0),
+            Instruction.Create(OpCodes.Ldc_I4_1),
+            Instruction.Create(OpCodes.Stfld,stopped),
+            Instruction.Create(OpCodes.Ldarg_0),
+            Instruction.Create(OpCodes.Ldc_I4_0),
+            Instruction.Create(OpCodes.Conv_I8),
+            Instruction.Create(OpCodes.Call,currentTicks),
+            Instruction.Create(OpCodes.Ldarg_0),
+            Instruction.Create(OpCodes.Ldfld,startTicks),
+            Instruction.Create(OpCodes.Sub),
+            Instruction.Create(OpCodes.Call,MaxMethod),
+            Instruction.Create(OpCodes.Stfld, elapsedTicks),
+            stopReturn);
+
+
+        var elapsedMilliseconds = new MethodDefinition("GetElapsedMilliseconds", MethodAttributes.HideBySig | MethodAttributes.Public , typeSystem.Int64);
+        type.Methods.Add(elapsedMilliseconds);
+        elapsedMilliseconds.Body.Instructions.Add(
+            Instruction.Create(OpCodes.Ldarg_0),
+            Instruction.Create(OpCodes.Call, stop),
+            Instruction.Create(OpCodes.Ldarg_0),
+            Instruction.Create(OpCodes.Ldfld,elapsedTicks),
+            Instruction.Create(OpCodes.Ldc_I4,10000),
+            Instruction.Create(OpCodes.Conv_I8),
+            Instruction.Create(OpCodes.Div),
+            Instruction.Create(OpCodes.Ret));
+
+        ElapsedMilliseconds = elapsedMilliseconds;
+        StopMethod = stop;
+        StopwatchType = type;
+        StartNewMethod = startNew;
+    }
+}

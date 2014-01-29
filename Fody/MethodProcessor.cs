@@ -84,6 +84,7 @@ public class MethodProcessor
         else
         {
             yield return Instruction.Create(OpCodes.Ldtoken, Method);
+            yield return Instruction.Create(OpCodes.Ldtoken, Method.DeclaringType);
             yield return Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle);
             yield return Instruction.Create(OpCodes.Ldloc, stopwatchVar);
             yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);
@@ -103,8 +104,9 @@ public class MethodProcessor
         if (ModuleWeaver.LogOnMethodStartMethod != null)
         {
             body.Instructions.Insert(0, Instruction.Create(OpCodes.Ldtoken, Method));
-            body.Instructions.Insert(1, Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle));
-            body.Instructions.Insert(2, Instruction.Create(OpCodes.Call, ModuleWeaver.LogOnMethodStartMethod));
+            body.Instructions.Insert(1, Instruction.Create(OpCodes.Ldtoken, Method.DeclaringType));
+            body.Instructions.Insert(2, Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle));
+            body.Instructions.Insert(3, Instruction.Create(OpCodes.Call, ModuleWeaver.LogOnMethodStartMethod));
         }
         else
         {

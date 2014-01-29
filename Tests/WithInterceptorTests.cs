@@ -105,6 +105,28 @@ public class WithInterceptorTests
     }
 
     [Test]
+    public void GenericClassWithMethod()
+    {
+        ClearMessage();
+        var type = assemblyWeaver.Assembly.GetType("GenericClassWithMethod`1[[System.String, mscorlib]]");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        instance.Method();
+
+        var methodBases = GetMethodInfoField();
+        Assert.AreEqual(1, methodBases.Count);
+        var methodBase = methodBases.First();
+        Assert.AreEqual(methodBase.Name, "Method");
+        Assert.That(methodBase.DeclaringType.Name.StartsWith("GenericClassWithMethod`1"));
+
+        var methodBasesStart = GetMethodOnStartInfoField();
+        Assert.AreEqual(1, methodBasesStart.Count);
+        var methodBaseStart = methodBasesStart.First();
+        Assert.AreEqual(methodBaseStart.Name, "Method");
+        Assert.That(methodBaseStart.DeclaringType.Name.StartsWith("GenericClassWithMethod`1"));
+
+    }
+
+    [Test]
     public void MethodWithReturn()
     {
         ClearMessage();

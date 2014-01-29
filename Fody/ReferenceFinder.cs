@@ -50,8 +50,7 @@ public partial class ModuleWeaver
 
         GetMethodFromHandle = ModuleDefinition.Import(methodBaseType.Methods.First(x =>
             x.Name == "GetMethodFromHandle" &&
-            x.Parameters.Count == 1 &&
-            x.Parameters[0].ParameterType.Name == "RuntimeMethodHandle"));
+            x.Parameters.Count == 2));
 
         var stopwatchType = coreTypes.FirstOrDefault(x => x.Name == "Stopwatch");
         if (stopwatchType == null)

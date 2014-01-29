@@ -56,6 +56,7 @@ public class Template
 #endif
     public void WithWeavingInterceptor()
     {
+        MethodTimeLogger.LogOnMethodStart(typeof(Template));
         var stopwatch = Stopwatch.StartNew();
         try
         {
@@ -93,6 +94,9 @@ public class Template
 public static class MethodTimeLogger
 {
     public static void Log(Type methodInfo, long milliseconds)
+    {
+    }
+    public static void LogOnMethodStart(Type methodInfo)
     {
     }
 }

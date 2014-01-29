@@ -47,6 +47,7 @@ public partial class ModuleWeaver
         GetTicksMethod = ModuleDefinition.Import(dateTimeType.Methods.First(x => x.Name == "get_Ticks"));
 
         var methodBaseType = coreTypes.First(x => x.Name == "MethodBase");
+
         GetMethodFromHandle = ModuleDefinition.Import(methodBaseType.Methods.First(x =>
             x.Name == "GetMethodFromHandle" &&
             x.Parameters.Count == 1 &&

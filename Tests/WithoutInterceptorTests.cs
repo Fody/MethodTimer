@@ -36,9 +36,11 @@ public class WithoutInterceptorTests
                 var type = assemblyWeaver.Assembly.GetType("ClassWithConstructor");
                 Activator.CreateInstance(type);
             });
-        Assert.AreEqual(2, message.Count);
+        Assert.AreEqual(4, message.Count);
         Assert.IsTrue(message[0].StartsWith("ClassWithConstructor.cctor "));
-        Assert.IsTrue(message[1].StartsWith("ClassWithConstructor.ctor "));
+        Assert.IsTrue(message[1].StartsWith("ClassWithConstructor.cctor "));
+        Assert.IsTrue(message[2].StartsWith("ClassWithConstructor.ctor "));
+        Assert.IsTrue(message[3].StartsWith("ClassWithConstructor.ctor "));
     }
 
     [Test]
@@ -50,8 +52,9 @@ public class WithoutInterceptorTests
                 var instance = (dynamic) Activator.CreateInstance(type);
                 instance.Method();
             });
-        Assert.AreEqual(1, message.Count);
+        Assert.AreEqual(2, message.Count);
         Assert.IsTrue(message.First().StartsWith("ClassWithAttribute.Method "));
+        Assert.IsTrue(message.Last().StartsWith("ClassWithAttribute.Method "));
     }
     [Test]
     public void MethodWithReturnAndCatchReThrow()
@@ -62,8 +65,9 @@ public class WithoutInterceptorTests
                 var instance = (dynamic) Activator.CreateInstance(type);
                 instance.MethodWithReturnAndCatchReThrow();
             });
-        Assert.AreEqual(1, message.Count);
+        Assert.AreEqual(2, message.Count);
         Assert.IsTrue(message.First().StartsWith("MiscMethods.MethodWithReturnAndCatchReThrow "));
+        Assert.IsTrue(message.Last().StartsWith("MiscMethods.MethodWithReturnAndCatchReThrow "));
     }
 
     [Test]
@@ -75,8 +79,9 @@ public class WithoutInterceptorTests
                 var instance = (dynamic) Activator.CreateInstance(type);
                 instance.Method();
             });
-        Assert.AreEqual(1, message.Count);
+        Assert.AreEqual(2, message.Count);
         Assert.IsTrue(message.First().StartsWith("ClassWithMethod.Method "));
+        Assert.IsTrue(message.Last().StartsWith("ClassWithMethod.Method "));
 
     }
 
@@ -117,8 +122,9 @@ public class WithoutInterceptorTests
                 var instance = (dynamic) Activator.CreateInstance(type);
                 instance.MethodWithReturn();
             });
-        Assert.AreEqual(1, message.Count);
+        Assert.AreEqual(2, message.Count);
         Assert.IsTrue(message.First().StartsWith("MiscMethods.MethodWithReturn "));
+        Assert.IsTrue(message.Last().StartsWith("MiscMethods.MethodWithReturn "));
 
     }
 

@@ -10,6 +10,7 @@ public class WithInterceptorTests
 {
     AssemblyWeaver assemblyWeaver;
     FieldInfo methodBaseField;
+    FieldInfo methodBaseStartField;
 
     public WithInterceptorTests()
     {
@@ -17,6 +18,7 @@ public class WithInterceptorTests
         assemblyWeaver = new AssemblyWeaver(assemblyPath);
         var methodTimeLogger = assemblyWeaver.Assembly.GetType("MethodTimeLogger");
         methodBaseField = methodTimeLogger.GetField("MethodBase");
+        methodBaseStartField = methodTimeLogger.GetField("MethodBaseOnStart");
     }
 
     [Test]
@@ -39,6 +41,12 @@ public class WithInterceptorTests
         var methodBase = methodBases.First();
         Assert.AreEqual(methodBase.Name, "Method");
         Assert.AreEqual(methodBase.DeclaringType, type);
+
+        var methodBasesStart = GetMethodOnStartInfoField();
+        Assert.AreEqual(1, methodBasesStart.Count);
+        var methodBaseStart = methodBasesStart.First();
+        Assert.AreEqual(methodBaseStart.Name, "Method");
+        Assert.AreEqual(methodBaseStart.DeclaringType, type);
     }
 
     [Test]
@@ -54,13 +62,23 @@ public class WithInterceptorTests
         ClearMessage();
         var type = assemblyWeaver.Assembly.GetType("ClassWithConstructor");
         Activator.CreateInstance(type);
+
         var methodBases = GetMethodInfoField();
         Assert.AreEqual(2, methodBases.Count);
-        
+
         Assert.AreEqual(methodBases[0].Name, ".cctor");
         Assert.AreEqual(methodBases[0].DeclaringType, type);
         Assert.AreEqual(methodBases[1].Name, ".ctor");
         Assert.AreEqual(methodBases[1].DeclaringType, type);
+
+        var methodBasesStart = GetMethodOnStartInfoField();
+        Assert.AreEqual(2, methodBasesStart.Count);
+
+        Assert.AreEqual(methodBasesStart[0].Name, ".cctor");
+        Assert.AreEqual(methodBasesStart[0].DeclaringType, type);
+        Assert.AreEqual(methodBasesStart[1].Name, ".ctor");
+        Assert.AreEqual(methodBasesStart[1].DeclaringType, type);
+
     }
 
     [Test]
@@ -70,11 +88,41 @@ public class WithInterceptorTests
         var type = assemblyWeaver.Assembly.GetType("ClassWithMethod");
         var instance = (dynamic) Activator.CreateInstance(type);
         instance.Method();
+
         var methodBases = GetMethodInfoField();
         Assert.AreEqual(1, methodBases.Count);
         var methodBase = methodBases.First();
         Assert.AreEqual(methodBase.Name, "Method");
         Assert.AreEqual(methodBase.DeclaringType, type);
+
+        var methodBasesStart = GetMethodOnStartInfoField();
+        Assert.AreEqual(1, methodBasesStart.Count);
+        var methodBaseStart = methodBasesStart.First();
+        Assert.AreEqual(methodBaseStart.Name, "Method");
+        Assert.AreEqual(methodBaseStart.DeclaringType, type);
+
+
+    }
+
+    [Test]
+    public void GenericClassWithMethod()
+    {
+        ClearMessage();
+        var type = assemblyWeaver.Assembly.GetType("GenericClassWithMethod`1[[System.String, mscorlib]]");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        instance.Method();
+
+        var methodBases = GetMethodInfoField();
+        Assert.AreEqual(1, methodBases.Count);
+        var methodBase = methodBases.First();
+        Assert.AreEqual(methodBase.Name, "Method");
+        Assert.That(methodBase.DeclaringType.Name.StartsWith("GenericClassWithMethod`1"));
+
+        var methodBasesStart = GetMethodOnStartInfoField();
+        Assert.AreEqual(1, methodBasesStart.Count);
+        var methodBaseStart = methodBasesStart.First();
+        Assert.AreEqual(methodBaseStart.Name, "Method");
+        Assert.That(methodBaseStart.DeclaringType.Name.StartsWith("GenericClassWithMethod`1"));
 
     }
 
@@ -85,12 +133,21 @@ public class WithInterceptorTests
         var type = assemblyWeaver.Assembly.GetType("MiscMethods");
         var instance = (dynamic) Activator.CreateInstance(type);
         instance.MethodWithReturn();
+
         var methodBases = GetMethodInfoField();
         Assert.AreEqual(1, methodBases.Count);
         var methodBase = methodBases.First();
 
         Assert.AreEqual(methodBase.Name, "MethodWithReturn");
         Assert.AreEqual(methodBase.DeclaringType, type);
+
+        var methodBasesStart = GetMethodOnStartInfoField();
+        Assert.AreEqual(1, methodBasesStart.Count);
+        var methodBaseStart = methodBasesStart.First();
+
+        Assert.AreEqual(methodBaseStart.Name, "MethodWithReturn");
+        Assert.AreEqual(methodBaseStart.DeclaringType, type);
+
     }
 
     [Test]
@@ -100,12 +157,21 @@ public class WithInterceptorTests
         var type = assemblyWeaver.Assembly.GetType("MiscMethods");
         var instance = (dynamic) Activator.CreateInstance(type);
         instance.MethodWithReturnAndCatchReThrow();
+
         var methodBases = GetMethodInfoField();
         Assert.AreEqual(1, methodBases.Count);
         var methodBase = methodBases.First();
 
         Assert.AreEqual(methodBase.Name, "MethodWithReturnAndCatchReThrow");
         Assert.AreEqual(methodBase.DeclaringType, type);
+
+        var methodBasesStart = GetMethodOnStartInfoField();
+        Assert.AreEqual(1, methodBasesStart.Count);
+        var methodBaseStart = methodBasesStart.First();
+
+        Assert.AreEqual(methodBaseStart.Name, "MethodWithReturnAndCatchReThrow");
+        Assert.AreEqual(methodBaseStart.DeclaringType, type);
+
     }
 
     //[Test]
@@ -158,12 +224,19 @@ public class WithInterceptorTests
     void ClearMessage()
     {
         methodBaseField.SetValue(null,new List<MethodBase>());
+        methodBaseStartField.SetValue(null, new List<MethodBase>());
     }
 
     List<MethodBase> GetMethodInfoField()
     {
         return (List<MethodBase>)methodBaseField.GetValue(null);
     }
+
+    List<MethodBase> GetMethodOnStartInfoField()
+    {
+        return (List<MethodBase>)methodBaseStartField.GetValue(null);
+    }
+
 
     [Test]
     public void PeVerify()

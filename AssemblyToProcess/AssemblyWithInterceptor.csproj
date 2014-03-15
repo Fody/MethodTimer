@@ -46,6 +46,7 @@
     <Compile Include="ClassWithConstructor.cs" />
     <Compile Include="ClassWithMethod.cs" />
     <Compile Include="ClassWithAttribute.cs" />
+    <Compile Include="GenericClassWithMethod.cs" />
     <Compile Include="MethodTimeLogger.cs" />
     <Compile Include="MiscMethods.cs" />
     <Compile Include="MyInterface.cs" />

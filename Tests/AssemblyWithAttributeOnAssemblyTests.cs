@@ -23,8 +23,9 @@ public class AssemblyWithAttributeOnAssemblyTests
 				var instance = (dynamic) Activator.CreateInstance(type);
 				instance.Method();
             });
-        Assert.AreEqual(1, message.Count);
+        Assert.AreEqual(2, message.Count);
         Assert.IsTrue(message.First().StartsWith("ClassWithNoAttribute.Method "));
+        Assert.IsTrue(message.Last().StartsWith("ClassWithNoAttribute.Method "));
 	}
 
 	[Test]

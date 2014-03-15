@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
+using MethodBody = Mono.Cecil.Cil.MethodBody;
 
 public class MethodProcessor
 {
@@ -82,6 +84,7 @@ public class MethodProcessor
         else
         {
             yield return Instruction.Create(OpCodes.Ldtoken, Method);
+            yield return Instruction.Create(OpCodes.Ldtoken, Method.DeclaringType);
             yield return Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle);
             yield return Instruction.Create(OpCodes.Ldloc, stopwatchVar);
             yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);
@@ -92,9 +95,26 @@ public class MethodProcessor
 
     void InjectStopwatch()
     {
+
         stopwatchVar = new VariableDefinition("methodTimerStopwatch", ModuleWeaver.StopwatchType);
         body.Variables.Add(stopwatchVar);
-        body.Instructions.Insert(0, Instruction.Create(OpCodes.Call, ModuleWeaver.StartNewMethod));
-        body.Instructions.Insert(1, Instruction.Create(OpCodes.Stloc, stopwatchVar));
+        body.Instructions.Insert(1, Instruction.Create(OpCodes.Call, ModuleWeaver.StartNewMethod));
+        body.Instructions.Insert(2, Instruction.Create(OpCodes.Stloc, stopwatchVar));
+
+        if (ModuleWeaver.LogOnMethodStartMethod != null)
+        {
+            body.Instructions.Insert(0, Instruction.Create(OpCodes.Ldtoken, Method));
+            body.Instructions.Insert(1, Instruction.Create(OpCodes.Ldtoken, Method.DeclaringType));
+            body.Instructions.Insert(2, Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle));
+            body.Instructions.Insert(3, Instruction.Create(OpCodes.Call, ModuleWeaver.LogOnMethodStartMethod));
+        }
+        else
+        {
+            body.Instructions.Insert(0, Instruction.Create(OpCodes.Ldstr, Method.MethodName() + " starting"));
+            body.Instructions.Insert(1, Instruction.Create(OpCodes.Call, ModuleWeaver.DebugWriteLineMethod));
+        }
+
+
+
     }
 }

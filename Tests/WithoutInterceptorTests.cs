@@ -79,6 +79,17 @@ public class WithoutInterceptorTests
         Assert.IsTrue(message.First().StartsWith("ClassWithMethod.Method "));
 
     }
+    [Test]
+    public void GenericClassWithMethod()
+    {
+        var type = assemblyWeaver.Assembly.GetType("GenericClassWithMethod`1[[System.String, mscorlib]]");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        var message = DebugRunner.CaptureDebug(() => instance.Method());
+        Assert.AreEqual(1, message.Count);
+        Assert.IsTrue(message.First().StartsWith("GenericClassWithMethod`1.Method "));
+
+    }
+
 
     //[Test]
     //public void ClassWithAsyncMethod()
@@ -122,6 +133,7 @@ public class WithoutInterceptorTests
 
     }
 
+
     //[Test]
     //public void MethodWithAsyncReturn()
     //{
@@ -141,5 +153,6 @@ public class WithoutInterceptorTests
     {
         Verifier.Verify(assemblyWeaver.Assembly.CodeBase.Remove(0, 8));
     }
+
 
 }

@@ -1,20 +1,10 @@
-using System;
 using System.Diagnostics;
 using Mono.Cecil;
 
-public class MockAssemblyResolver : IAssemblyResolver
+public class MockAssemblyResolver : DefaultAssemblyResolver
 {
-    public AssemblyDefinition Resolve(AssemblyNameReference name)
-    {
-        throw new NotImplementedException();
-    }
-
-    public AssemblyDefinition Resolve(AssemblyNameReference name, ReaderParameters parameters)
-    {
-        throw new NotImplementedException();
-    }
-
-    public AssemblyDefinition Resolve(string fullName)
+    
+    public override AssemblyDefinition Resolve(string fullName)
     {
         if (fullName == "System")
         {
@@ -29,8 +19,4 @@ public class MockAssemblyResolver : IAssemblyResolver
 
     }
 
-    public AssemblyDefinition Resolve(string fullName, ReaderParameters parameters)
-    {
-        throw new NotImplementedException();
-    }
 }

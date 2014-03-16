@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyWithAttributeOnModu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyWithoutInterceptorAndReference", "AssemblyToProcess\AssemblyWithoutInterceptorAndReference.csproj", "{9318025E-77F4-47A7-99B5-47907EE00A10}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyToReference", "AssemblyToReference\AssemblyToReference.csproj", "{8A015E68-6B29-4E20-879A-3E3F47B34A0B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -79,6 +81,12 @@ Global
 		{9318025E-77F4-47A7-99B5-47907EE00A10}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9318025E-77F4-47A7-99B5-47907EE00A10}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9318025E-77F4-47A7-99B5-47907EE00A10}.Release|x86.ActiveCfg = Release|Any CPU
+		{8A015E68-6B29-4E20-879A-3E3F47B34A0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A015E68-6B29-4E20-879A-3E3F47B34A0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A015E68-6B29-4E20-879A-3E3F47B34A0B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8A015E68-6B29-4E20-879A-3E3F47B34A0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A015E68-6B29-4E20-879A-3E3F47B34A0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A015E68-6B29-4E20-879A-3E3F47B34A0B}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

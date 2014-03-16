@@ -82,6 +82,7 @@ public class MethodProcessor
         else
         {
             yield return Instruction.Create(OpCodes.Ldtoken, Method);
+            yield return Instruction.Create(OpCodes.Ldtoken, Method.DeclaringType);
             yield return Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle);
             yield return Instruction.Create(OpCodes.Ldloc, stopwatchVar);
             yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);

@@ -8,22 +8,34 @@ public class AssemblyWeaver
     public Assembly Assembly;
     public AssemblyWeaver(string assemblyPath, List<string> referenceAssemblyPaths = null)
     {
+
+        if (referenceAssemblyPaths == null)
+        {
+            referenceAssemblyPaths  = new List<string>();
+        }
 assemblyPath = FixAssemblyPath(assemblyPath);
 
         var newAssembly = assemblyPath.Replace(".dll", "2.dll");
         File.Copy(assemblyPath, newAssembly, true);
 
-        var moduleDefinition = ModuleDefinition.ReadModule(newAssembly);
-        var weavingTask = new ModuleWeaver
-            {
-                ModuleDefinition = moduleDefinition,
-                AssemblyResolver = new MockAssemblyResolver(),
-                LogError = LogError
-            };
-        if (referenceAssemblyPaths != null)
+        var assemblyResolver = new MockAssemblyResolver();
+        foreach (var referenceAssemblyPath in referenceAssemblyPaths)
         {
-            weavingTask.ReferenceCopyLocalPaths = referenceAssemblyPaths;
+            var directoryName = Path.GetDirectoryName(referenceAssemblyPath);
+            assemblyResolver.AddSearchDirectory(directoryName);
         }
+        var readerParameters = new ReaderParameters
+        {
+            AssemblyResolver = assemblyResolver
+        };
+        var moduleDefinition = ModuleDefinition.ReadModule(newAssembly, readerParameters);
+        var weavingTask = new ModuleWeaver
+        {
+            ModuleDefinition = moduleDefinition,
+            AssemblyResolver = assemblyResolver,
+            LogError = LogError,
+            ReferenceCopyLocalPaths = referenceAssemblyPaths
+        };
 
         weavingTask.Execute();
         moduleDefinition.Write(newAssembly);

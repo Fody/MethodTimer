@@ -12,7 +12,7 @@ public partial class ModuleWeaver
         {
             foreach (var referencePath in ReferenceCopyLocalPaths)
             {
-                interceptor = ModuleDefinition.ReadModule(referencePath)
+                interceptor = ModuleDefinition.ReadModule(referencePath, new ReaderParameters {AssemblyResolver = this.AssemblyResolver})
                     .GetTypes()
                     .FirstOrDefault(x => x.Name == "MethodTimeLogger");
                 if (interceptor != null)

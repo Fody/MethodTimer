@@ -14,10 +14,10 @@ public class WithoutInterceptorAndReferenceTests
     public WithoutInterceptorAndReferenceTests()
     {
         var assemblyPath = Path.GetFullPath(@"..\..\..\AssemblyToProcess\bin\DebugWithoutInterceptorAndReference\AssemblyWithoutInterceptorAndReference.dll");
-        var assemblyWithInterceptorPath =  AssemblyWeaver.FixAssemblyPath(Path.GetFullPath(@"..\..\..\AssemblyToProcess\bin\DebugWithoutInterceptorAndReference\AssemblyWithInterceptor.dll"));
-        assemblyWeaver = new AssemblyWeaver(assemblyPath, new List<string> { assemblyWithInterceptorPath });
+        var assemblyToReference = AssemblyWeaver.FixAssemblyPath(Path.GetFullPath(@"..\..\..\AssemblyToReference\bin\Debug\AssemblyToReference.dll"));
+        assemblyWeaver = new AssemblyWeaver(assemblyPath, new List<string> { assemblyToReference });
 
-        var interceptorAssembly = Assembly.LoadFrom(assemblyWithInterceptorPath);
+        var interceptorAssembly = Assembly.LoadFrom(assemblyToReference);
         var methodTimeLogger = interceptorAssembly.GetType("MethodTimeLogger");
         methodBaseField = methodTimeLogger.GetField("MethodBase");
     }
@@ -79,6 +79,22 @@ public class WithoutInterceptorAndReferenceTests
         Assert.AreEqual(methodBase.Name, "Method");
         Assert.AreEqual(methodBase.DeclaringType, type);
 
+    }
+
+
+    [Test]
+    public void GenericClassWithMethod()
+    {
+        ClearMessage();
+        var type = assemblyWeaver.Assembly.GetType("GenericClassWithMethod`1[[System.String, mscorlib]]");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        instance.Method();
+
+        var methodBases = GetMethodInfoField();
+        Assert.AreEqual(1, methodBases.Count);
+        var methodBase = methodBases.First();
+        Assert.AreEqual(methodBase.Name, "Method");
+        Assert.That(methodBase.DeclaringType.Name.StartsWith("GenericClassWithMethod`1"));
     }
 
     [Test]

@@ -11,11 +11,13 @@ public partial class ModuleWeaver
     public ModuleDefinition ModuleDefinition { get; set; }
     public IAssemblyResolver AssemblyResolver { get; set; }
     List<TypeDefinition> types;
+    public List<string> ReferenceCopyLocalPaths { get; set; }
 
     public ModuleWeaver()
     {
         LogInfo = s => { };
         LogError = s => { };
+        ReferenceCopyLocalPaths = new List<string>();
     }
 
     public void Execute()

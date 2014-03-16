@@ -3,29 +3,43 @@ using Mono.Cecil;
 
 public partial class ModuleWeaver
 {
-    public MethodDefinition LogMethod;
+    public MethodReference LogMethod;
 
     public void FindInterceptor()
     {
-        var errorHandler = types.FirstOrDefault(x => x.Name == "MethodTimeLogger");
-        if (errorHandler == null)
+        var interceptor = types.FirstOrDefault(x => x.Name == "MethodTimeLogger");
+        if (interceptor == null)
+        {
+            foreach (var referencePath in ReferenceCopyLocalPaths)
+            {
+                interceptor = ModuleDefinition.ReadModule(referencePath)
+                    .GetTypes()
+                    .FirstOrDefault(x => x.Name == "MethodTimeLogger");
+                if (interceptor != null)
+                {
+                    interceptor = ModuleDefinition.Import(interceptor).Resolve();
+                    break;
+                }
+            }
+        }
+        if (interceptor == null)
         {
             return;
         }
-        LogMethod = errorHandler.Methods.FirstOrDefault(x => x.Name == "Log");
-        if (LogMethod == null)
+        var logMethod = interceptor.Methods.FirstOrDefault(x => x.Name == "Log");
+        if (logMethod == null)
         {
-            throw new WeavingException(string.Format("Could not find 'Log' method on '{0}'.", errorHandler.FullName));
+            throw new WeavingException(string.Format("Could not find 'Log' method on '{0}'.", interceptor.FullName));
         }
-        if (!LogMethod.IsPublic)
+        if (!logMethod.IsPublic)
         {
             throw new WeavingException("Method 'MethodTimeLogger.Log' is not public.");
         }
-        if (!LogMethod.IsStatic)
+        if (!logMethod.IsStatic)
         {
             throw new WeavingException("Method 'MethodTimeLogger.Log' is not static.");
         }
-        var parameters = LogMethod.Parameters;
+        var parameters = logMethod.Parameters;
         if (parameters.Count != 2)
         {
             throw new WeavingException("Method 'MethodTimeLogger.Log' must have 2 parameters of type 'System.Reflection.MethodBase' and 'System.Int64'.");
@@ -39,6 +53,7 @@ public partial class ModuleWeaver
             throw new WeavingException("Method 'MethodTimeLogger.Log' must have 2 parameters of type 'System.Reflection.MethodBase' and 'System.Int64'.");
         }
 
+        LogMethod = ModuleDefinition.Import(logMethod);
     }
 
 }

@@ -6,16 +6,19 @@ using System.Reflection;
 using NUnit.Framework;
 
 [TestFixture]
-public class WithInterceptorTests
+public class WithoutInterceptorAndReferenceTests
 {
     AssemblyWeaver assemblyWeaver;
     FieldInfo methodBaseField;
 
-    public WithInterceptorTests()
+    public WithoutInterceptorAndReferenceTests()
     {
-        var assemblyPath = Path.GetFullPath(@"..\..\..\AssemblyToProcess\bin\DebugWithInterceptor\AssemblyWithInterceptor.dll");
-        assemblyWeaver = new AssemblyWeaver(assemblyPath);
-        var methodTimeLogger = assemblyWeaver.Assembly.GetType("MethodTimeLogger");
+        var assemblyPath = Path.GetFullPath(@"..\..\..\AssemblyToProcess\bin\DebugWithoutInterceptorAndReference\AssemblyWithoutInterceptorAndReference.dll");
+        var assemblyWithInterceptorPath =  AssemblyWeaver.FixAssemblyPath(Path.GetFullPath(@"..\..\..\AssemblyToProcess\bin\DebugWithoutInterceptorAndReference\AssemblyWithInterceptor.dll"));
+        assemblyWeaver = new AssemblyWeaver(assemblyPath, new List<string> { assemblyWithInterceptorPath });
+
+        var interceptorAssembly = Assembly.LoadFrom(assemblyWithInterceptorPath);
+        var methodTimeLogger = interceptorAssembly.GetType("MethodTimeLogger");
         methodBaseField = methodTimeLogger.GetField("MethodBase");
     }
 
@@ -31,7 +34,7 @@ public class WithInterceptorTests
     {
         ClearMessage();
         var type = assemblyWeaver.Assembly.GetType("ClassWithAttribute");
-        var instance = (dynamic) Activator.CreateInstance(type);
+        var instance = (dynamic)Activator.CreateInstance(type);
         instance.Method();
 
         var methodBases = GetMethodInfoField();
@@ -56,7 +59,7 @@ public class WithInterceptorTests
         Activator.CreateInstance(type);
         var methodBases = GetMethodInfoField();
         Assert.AreEqual(2, methodBases.Count);
-        
+
         Assert.AreEqual(methodBases[0].Name, ".cctor");
         Assert.AreEqual(methodBases[0].DeclaringType, type);
         Assert.AreEqual(methodBases[1].Name, ".ctor");
@@ -68,7 +71,7 @@ public class WithInterceptorTests
     {
         ClearMessage();
         var type = assemblyWeaver.Assembly.GetType("ClassWithMethod");
-        var instance = (dynamic) Activator.CreateInstance(type);
+        var instance = (dynamic)Activator.CreateInstance(type);
         instance.Method();
         var methodBases = GetMethodInfoField();
         Assert.AreEqual(1, methodBases.Count);
@@ -83,7 +86,7 @@ public class WithInterceptorTests
     {
         ClearMessage();
         var type = assemblyWeaver.Assembly.GetType("MiscMethods");
-        var instance = (dynamic) Activator.CreateInstance(type);
+        var instance = (dynamic)Activator.CreateInstance(type);
         instance.MethodWithReturn();
         var methodBases = GetMethodInfoField();
         Assert.AreEqual(1, methodBases.Count);
@@ -98,7 +101,7 @@ public class WithInterceptorTests
     {
         ClearMessage();
         var type = assemblyWeaver.Assembly.GetType("MiscMethods");
-        var instance = (dynamic) Activator.CreateInstance(type);
+        var instance = (dynamic)Activator.CreateInstance(type);
         instance.MethodWithReturnAndCatchReThrow();
         var methodBases = GetMethodInfoField();
         Assert.AreEqual(1, methodBases.Count);
@@ -157,7 +160,7 @@ public class WithInterceptorTests
 
     void ClearMessage()
     {
-        methodBaseField.SetValue(null,new List<MethodBase>());
+        methodBaseField.SetValue(null, new List<MethodBase>());
     }
 
     List<MethodBase> GetMethodInfoField()

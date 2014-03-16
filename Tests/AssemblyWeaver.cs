@@ -6,11 +6,9 @@ using Mono.Cecil;
 public class AssemblyWeaver
 {
     public Assembly Assembly;
-    public AssemblyWeaver(string assemblyPath)
+    public AssemblyWeaver(string assemblyPath, List<string> referenceAssemblyPaths = null)
     {
-#if (!DEBUG)
-        assemblyPath = assemblyPath.Replace("Debug", "Release");
-#endif
+assemblyPath = FixAssemblyPath(assemblyPath);
 
         var newAssembly = assemblyPath.Replace(".dll", "2.dll");
         File.Copy(assemblyPath, newAssembly, true);
@@ -22,11 +20,23 @@ public class AssemblyWeaver
                 AssemblyResolver = new MockAssemblyResolver(),
                 LogError = LogError
             };
+        if (referenceAssemblyPaths != null)
+        {
+            weavingTask.ReferenceCopyLocalPaths = referenceAssemblyPaths;
+        }
 
         weavingTask.Execute();
         moduleDefinition.Write(newAssembly);
 
-        Assembly = Assembly.LoadFile(newAssembly);
+        Assembly = Assembly.LoadFrom(newAssembly);
+    }
+
+   public static string FixAssemblyPath(string assemblyPath)
+    {
+#if (!DEBUG)
+        assemblyPath = assemblyPath.Replace("Debug", "Release");
+#endif
+        return assemblyPath;
     }
 
     void LogError(string error)

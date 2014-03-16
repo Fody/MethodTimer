@@ -73,6 +73,7 @@
     <Compile Include="MyTraceListener.cs" />
     <Compile Include="Template.cs" />
     <Compile Include="Verifier.cs" />
+    <Compile Include="WithoutInterceptorAndReferenceTests.cs" />
     <Compile Include="WithoutInterceptorTests.cs" />
     <Compile Include="AssemblyExtensions.cs" />
   </ItemGroup>

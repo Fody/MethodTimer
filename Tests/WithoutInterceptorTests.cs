@@ -10,7 +10,7 @@ public class WithoutInterceptorTests
 
     public WithoutInterceptorTests()
     {
-        var assemblyPath = Path.GetFullPath(@"..\..\..\AssemblyToProcess\bin\DebugWithoutInterceptor\AssemblyToProcess.dll");
+        var assemblyPath = Path.GetFullPath(@"..\..\..\AssemblyToProcess\bin\DebugWithoutInterceptor\AssemblyWithoutInterceptor.dll");
         assemblyWeaver = new AssemblyWeaver(assemblyPath);
     }
 

@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30110.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fody", "Fody\Fody.csproj", "{C3578A7B-09A6-4444-9383-0DEAFA4958BD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{5A86453B-96FB-4B6E-A283-225BB9F753D3}"
@@ -18,6 +20,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyWithAttributeOnAssembly", "AssemblyToProcess\AssemblyWithAttributeOnAssembly.csproj", "{54D8A3FC-E7DF-4FF1-8D3F-1CCAF7169CBE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyWithAttributeOnModule", "AssemblyToProcess\AssemblyWithAttributeOnModule.csproj", "{7B07AE87-F53D-4952-A7DB-8A5113A224A7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyWithoutInterceptorAndReference", "AssemblyToProcess\AssemblyWithoutInterceptorAndReference.csproj", "{9318025E-77F4-47A7-99B5-47907EE00A10}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +73,12 @@ Global
 		{7B07AE87-F53D-4952-A7DB-8A5113A224A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7B07AE87-F53D-4952-A7DB-8A5113A224A7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7B07AE87-F53D-4952-A7DB-8A5113A224A7}.Release|x86.ActiveCfg = Release|Any CPU
+		{9318025E-77F4-47A7-99B5-47907EE00A10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9318025E-77F4-47A7-99B5-47907EE00A10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9318025E-77F4-47A7-99B5-47907EE00A10}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9318025E-77F4-47A7-99B5-47907EE00A10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9318025E-77F4-47A7-99B5-47907EE00A10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9318025E-77F4-47A7-99B5-47907EE00A10}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

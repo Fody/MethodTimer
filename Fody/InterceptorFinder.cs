@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Mono.Cecil;
 
@@ -12,7 +13,13 @@ public partial class ModuleWeaver
         {
             foreach (var referencePath in ReferenceCopyLocalPaths)
             {
-                interceptor = ModuleDefinition.ReadModule(referencePath, new ReaderParameters {AssemblyResolver = this.AssemblyResolver})
+                if (!referencePath.EndsWith(".dll") && !referencePath.EndsWith(".exe"))
+                {
+                    continue;
+                }
+                var moduleDefinition = ReadModule(referencePath);
+
+                interceptor = moduleDefinition
                     .GetTypes()
                     .FirstOrDefault(x => x.Name == "MethodTimeLogger");
                 if (interceptor != null)
@@ -56,4 +63,20 @@ public partial class ModuleWeaver
         LogMethod = ModuleDefinition.Import(logMethod);
     }
 
+    ModuleDefinition ReadModule(string referencePath)
+    {
+        var readerParameters = new ReaderParameters
+            {
+                AssemblyResolver = AssemblyResolver
+            };
+        try
+        {
+            return ModuleDefinition.ReadModule(referencePath, readerParameters);
+        }
+        catch (Exception exception)
+        {
+            var message = string.Format("Failed to read {0}. {1}", referencePath, exception.Message);
+            throw new Exception(message, exception);
+        }
+    }
 }

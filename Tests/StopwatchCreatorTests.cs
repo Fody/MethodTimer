@@ -44,12 +44,12 @@ public class StopwatchCreatorTests : IDisposable
         var instance = Activator.CreateInstance(type);
         Thread.Sleep(1.Seconds());
 
-        var methodInfos = type.UnderlyingSystemType.GetMethods();
+        var methodInformations = type.UnderlyingSystemType.GetMethods();
 
-        methodInfos.First(x => x.Name == "Stop")
+        methodInformations.First(x => x.Name == "Stop")
             .Invoke(instance, null);
 
-        var elapsed = (long) methodInfos.First(x => x.Name == "GetElapsedMilliseconds")
+        var elapsed = (long) methodInformations.First(x => x.Name == "GetElapsedMilliseconds")
             .Invoke(instance, null);
         Assert.GreaterOrEqual(elapsed, 1000);
     }

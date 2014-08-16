@@ -12,12 +12,14 @@ public partial class ModuleWeaver
     public IAssemblyResolver AssemblyResolver { get; set; }
     List<TypeDefinition> types;
     public List<string> ReferenceCopyLocalPaths { get; set; }
+    public string AttributeName { get; set; }
 
     public ModuleWeaver()
     {
         LogInfo = s => { };
         LogError = s => { };
         ReferenceCopyLocalPaths = new List<string>();
+        AttributeName = "TimeAttribute";
     }
 
     public void Execute()

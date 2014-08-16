@@ -1,5 +1,6 @@
 using MethodTimer;
 
+[Alternate]
 [Time]
 public abstract class AbstractClassWithAttributeOnType
 {

@@ -3,11 +3,11 @@ using Mono.Cecil;
 
 public static class AttributeChecker
 {
-    public static bool ContainsTimeAttribute(this ICustomAttributeProvider definition)
+    public static bool ContainsAttribute(this ICustomAttributeProvider definition, string attributeName)
     {
         var customAttributes = definition.CustomAttributes;
 
-        return customAttributes.Any(x => x.AttributeType.Name == "TimeAttribute");
+        return customAttributes.Any(x => x.AttributeType.Name == attributeName);
     }
     public static bool IsCompilerGenerated(this ICustomAttributeProvider definition)
     {

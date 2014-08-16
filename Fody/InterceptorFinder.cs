@@ -6,8 +6,12 @@ public partial class ModuleWeaver
 {
     public MethodReference LogMethod;
 
-    public void FindInterceptor()
+    public void FindInterceptor(bool overwrite = true)
     {
+        //If the interceptor is already defined, only overwrite if the flag is set.
+        if(LogMethod != null && !overwrite)
+            return;
+        
         var interceptor = types.FirstOrDefault(x => x.Name == "MethodTimeLogger");
         if (interceptor == null)
         {

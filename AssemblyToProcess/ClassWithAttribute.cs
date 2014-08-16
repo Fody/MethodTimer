@@ -2,6 +2,7 @@ using System.Threading;
 using MethodTimer;
 
 [Time]
+[Alternate]
 public class ClassWithAttribute
 {
     public void Method()

@@ -68,17 +68,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyWeaver.cs" />
+    <Compile Include="AssemblyWithAttributeOnAssemblyTestsAlternate.cs" />
     <Compile Include="AssemblyWithAttributeOnAssemblyTests.cs" />
+    <Compile Include="AssemblyWithAttributeOnModuleTestsAlternate.cs" />
     <Compile Include="AssemblyWithAttributeOnModuleTests.cs" />
     <Compile Include="StopwatchCreatorTests.cs" />
     <Compile Include="Stopwatch.cs" />
+    <Compile Include="WithInterceptorTestsAlternate.cs" />
     <Compile Include="WithInterceptorTests.cs" />
     <Compile Include="DebugRunner.cs" />
     <Compile Include="MockAssemblyResolver.cs" />
     <Compile Include="MyTraceListener.cs" />
     <Compile Include="Template.cs" />
     <Compile Include="Verifier.cs" />
+    <Compile Include="WithoutInterceptorAndReferenceTestsAlternate.cs" />
     <Compile Include="WithoutInterceptorAndReferenceTests.cs" />
+    <Compile Include="WithoutInterceptorTestsAlternate.cs" />
     <Compile Include="WithoutInterceptorTests.cs" />
     <Compile Include="AssemblyExtensions.cs" />
   </ItemGroup>

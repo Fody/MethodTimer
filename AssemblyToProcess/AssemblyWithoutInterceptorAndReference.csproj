@@ -50,6 +50,10 @@
     <Compile Include="MyInterface.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AlternateAttribute\AlternateAttribute.csproj">
+      <Project>{35d4768e-ac7f-4c2f-a8c5-b9ab13447e53}</Project>
+      <Name>AlternateAttribute</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AssemblyToReference\AssemblyToReference.csproj">
       <Project>{8a015e68-6b29-4e20-879a-3e3f47b34a0b}</Project>
       <Name>AssemblyToReference</Name>

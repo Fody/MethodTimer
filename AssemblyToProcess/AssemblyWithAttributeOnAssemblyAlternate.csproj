@@ -2,14 +2,14 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <BaseIntermediateOutputPath>obj\WithAttributeOnModule</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>obj\WithAttributeOnAssemblyAlternate</BaseIntermediateOutputPath>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{7B07AE87-F53D-4952-A7DB-8A5113A224A7}</ProjectGuid>
+    <ProjectGuid>{CD72F9BB-83B7-4551-B7F1-7B415B78A31D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AssemblyToProcess</RootNamespace>
-    <AssemblyName>AssemblyWithAttributeOnModule</AssemblyName>
+    <AssemblyName>AssemblyWithAttributeOnAssemblyAlternate</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\DebugWithAttributeOnModule\</OutputPath>
+    <OutputPath>bin\DebugWithAttributeOnAssemblyAlternate\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -25,7 +25,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\ReleaseWithAttributeOnModule\</OutputPath>
+    <OutputPath>bin\ReleaseWithAttributeOnAssemblyAlternate\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -41,7 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AlternateAttribute\AlternateAttribute.csproj">
-      <Project>{35D4768E-AC7F-4C2F-A8C5-B9AB13447E53}</Project>
+      <Project>{35d4768e-ac7f-4c2f-a8c5-b9ab13447e53}</Project>
       <Name>AlternateAttribute</Name>
     </ProjectReference>
     <ProjectReference Include="..\ReferenceAssembly\ReferenceAssembly.csproj">
@@ -50,8 +50,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
     <Compile Include="ClassWithNoAttribute.cs" />
-    <Compile Include="ModuleInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

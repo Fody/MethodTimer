@@ -4,6 +4,7 @@ using System.Threading;
 using MethodTimer;
 
 [Time]
+[Alternate]
 public class MiscMethods
 {
 

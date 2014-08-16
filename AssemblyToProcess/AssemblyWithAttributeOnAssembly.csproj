@@ -40,6 +40,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AlternateAttribute\AlternateAttribute.csproj">
+      <Project>{35d4768e-ac7f-4c2f-a8c5-b9ab13447e53}</Project>
+      <Name>AlternateAttribute</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ReferenceAssembly\ReferenceAssembly.csproj">
       <Project>{B5AEB0E8-28F4-4955-A055-9C200F7113F0}</Project>
       <Name>ReferenceAssembly</Name>

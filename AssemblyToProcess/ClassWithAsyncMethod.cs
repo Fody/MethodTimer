@@ -7,11 +7,13 @@ using MethodTimer;
 public class ClassWithAsyncMethod
 {
     //[Time]
+    //[Alternate]
     //public async void Method()
     //{
     //    Thread.Sleep(10);
     //}
     //[Time]
+    //[Alternate]
     //public async Task<DateTime> MethodWithReturn()
     //{
     //    Thread.Sleep(2000);
@@ -19,6 +21,7 @@ public class ClassWithAsyncMethod
     //}
 
     [Time]
+    [Alternate]
     public async void MethodWithAwait()
     {
             await Task.Delay(500);

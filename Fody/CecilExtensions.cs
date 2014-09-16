@@ -42,4 +42,35 @@ public static class CecilExtensions
             collection.Add(instruction);
         }   
     }
+
+    public static CustomAttribute GetAsyncStateMachineAttribute(this MethodDefinition method)
+    {
+        var asyncAttribute = method.CustomAttributes.FirstOrDefault(_ => _.AttributeType.Name == "AsyncStateMachineAttribute");
+        return asyncAttribute;
+    }
+
+    public static bool IsAsync(this MethodDefinition method)
+    {
+        return GetAsyncStateMachineAttribute(method) != null;
+    }
+
+    public static bool IsLeaveInstruction(this Instruction instruction)
+    {
+        if ((instruction.OpCode == OpCodes.Leave) || (instruction.OpCode == OpCodes.Leave_S))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static bool IsBreakInstruction(this Instruction instruction)
+    {
+        if ((instruction.OpCode == OpCodes.Br) || (instruction.OpCode == OpCodes.Br_S))
+        {
+            return true;
+        }
+
+        return false;
+    }
 }

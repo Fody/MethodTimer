@@ -11,9 +11,9 @@ public class AssemblyWeaver
 
         if (referenceAssemblyPaths == null)
         {
-            referenceAssemblyPaths  = new List<string>();
+            referenceAssemblyPaths = new List<string>();
         }
-assemblyPath = FixAssemblyPath(assemblyPath);
+        assemblyPath = FixAssemblyPath(assemblyPath);
 
         var newAssembly = assemblyPath.Replace(".dll", "2.dll");
         File.Copy(assemblyPath, newAssembly, true);
@@ -43,7 +43,7 @@ assemblyPath = FixAssemblyPath(assemblyPath);
         Assembly = Assembly.LoadFrom(newAssembly);
     }
 
-   public static string FixAssemblyPath(string assemblyPath)
+    public static string FixAssemblyPath(string assemblyPath)
     {
 #if (!DEBUG)
         assemblyPath = assemblyPath.Replace("Debug", "Release");

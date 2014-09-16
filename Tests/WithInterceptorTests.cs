@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using NUnit.Framework;
 
 [TestFixture]
@@ -46,6 +47,26 @@ public class WithInterceptorTests
     {
         Assert.Contains("Method 'System.Void AbstractClassWithAttributeOnMethod::Method()' is abstract but has a [TimeAttribute]. Remove this attribute.", assemblyWeaver.Errors);
         Assert.Contains("Method 'System.Void MyInterface::MyMethod()' is abstract but has a [TimeAttribute]. Remove this attribute.", assemblyWeaver.Errors);
+    }
+
+    [Test]
+    public async void ClassWithAsyncMethod()
+    {
+        await DebugRunner.CaptureDebugAsync(ClassWithAsyncMethodInvocation);
+
+        var methodBases = GetMethodInfoField();
+        Assert.AreEqual(1, methodBases.Count);
+        var methodBase = methodBases.First();
+
+        Assert.AreEqual(methodBase.Name, "MethodWithAwait");
+        //Assert.AreEqual(methodBase.DeclaringType, type);
+    }
+
+    private async Task ClassWithAsyncMethodInvocation()
+    {
+        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        await instance.MethodWithAwait();
     }
 
     [Test]

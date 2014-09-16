@@ -19,26 +19,101 @@ public class ClassWithAsyncMethod
     //}
 
     [Time]
-    public async void MethodWithAwait()
+    public async Task MethodWithAwait()
     {
-            await Task.Delay(500);
-    }
-    public async void MethodWithAwaitExpected()
-    {
-        var startNew = Stopwatch.StartNew();
         await Task.Delay(500);
-        startNew.Stop();
-        Console.WriteLine(startNew.ElapsedMilliseconds);
     }
+
+    public async Task MethodWithAwaitExpected()
+    {
+        var stopwatch = Stopwatch.StartNew();
+
+        await Task.Delay(500);
+
+        stopwatch.Stop();
+        Debug.WriteLine("ClassWithAsyncMethod.MethodWithAwaitExpected " + stopwatch.ElapsedMilliseconds + "ms");
+    }
+
+    [Time]
+    public async Task<bool> ComplexMethodWithAwait(int instructionsToHandle)
+    {
+        if (instructionsToHandle < 0)
+        {
+            MethodWithException();
+        }
+
+        var instructionCounter = 0;
+        if (instructionsToHandle <= instructionCounter)
+        {
+            return false;
+        }
+
+        await Task.Delay(200);
+        instructionCounter++;
+
+        if (instructionsToHandle <= instructionCounter)
+        {
+            return false;
+        }
+
+        await Task.Delay(200);
+        instructionCounter++;
+
+        if (instructionsToHandle <= instructionCounter)
+        {
+            return false;
+        }
+
+        await Task.Delay(100);
+        instructionCounter++;
+
+        if (instructionsToHandle <= instructionCounter)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public async Task MethodWithException()
+    {
+        await Task.Factory.StartNew(() =>
+        {
+            throw new ArgumentOutOfRangeException();
+        });
+    }
+
+    public async Task<bool> MethodWithAwaitExpected(bool expectedReturn)
+    {
+        var stopwatch = Stopwatch.StartNew();
+
+        if (expectedReturn)
+        {
+            stopwatch.Stop();
+            Debug.WriteLine("ClassWithAsyncMethod.MethodWithAwaitExpected " + stopwatch.ElapsedMilliseconds + "ms");
+
+            return false;
+        }
+
+        await Task.Delay(500);
+
+        stopwatch.Stop();
+        Debug.WriteLine("ClassWithAsyncMethod.MethodWithAwaitExpected " + stopwatch.ElapsedMilliseconds + "ms");
+
+        return true;
+    }
+
     public async void MethodWithThreadSleep()
     {
         Thread.Sleep(2222);
     }
     public async void MethodWithThreadSleepExpected()
     {
-        var startNew = Stopwatch.StartNew();
+        var stopwatch = Stopwatch.StartNew();
+
         Thread.Sleep(2222);
-        startNew.Stop();
-        Console.WriteLine(startNew.ElapsedMilliseconds);
+
+        stopwatch.Stop();
+        Debug.WriteLine("ClassWithAsyncMethod.MethodWithAwaitExpected " + stopwatch.ElapsedMilliseconds + "ms");
     }
 }

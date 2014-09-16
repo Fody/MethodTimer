@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using NUnit.Framework;
 
 [TestFixture]
@@ -29,6 +30,86 @@ public class WithoutInterceptorTests
     }
 
     [Test]
+    public async void ClassWithAsyncMethod()
+    {
+        var message = await DebugRunner.CaptureDebugAsync(ClassWithAsyncMethodInvocation);
+
+        Assert.AreEqual(1, message.Count);
+        Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.MethodWithAwait "));
+    }
+
+    private async Task ClassWithAsyncMethodInvocation()
+    {
+        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        await instance.MethodWithAwait();
+    }
+
+    [Test]
+    public async void ClassWithExceptionAsyncMethod()
+    {
+        var message = await DebugRunner.CaptureDebugAsync(ClassWithExceptionAsyncMethodInvocation);
+
+        Assert.AreEqual(1, message.Count);
+        Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.ComplexMethodWithAwait "));
+    }
+
+    private async Task ClassWithExceptionAsyncMethodInvocation()
+    {
+        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        await instance.ComplexMethodWithAwait(-1);
+    }
+
+    [Test]
+    public async void ClassWithFastComplexAsyncMethod()
+    {
+        var message = await DebugRunner.CaptureDebugAsync(ClassWithFastComplexAsyncMethodInvocation);
+
+        Assert.AreEqual(1, message.Count);
+        Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.ComplexMethodWithAwait "));
+    }
+
+    private async Task ClassWithFastComplexAsyncMethodInvocation()
+    {
+        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        await instance.ComplexMethodWithAwait(0);
+    }
+
+    [Test]
+    public async void ClassWithMediumComplexAsyncMethod()
+    {
+        var message = await DebugRunner.CaptureDebugAsync(ClassWithMediumComplexAsyncMethodInvocation);
+
+        Assert.AreEqual(1, message.Count);
+        Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.ComplexMethodWithAwait "));
+    }
+
+    private async Task ClassWithMediumComplexAsyncMethodInvocation()
+    {
+        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        await instance.ComplexMethodWithAwait(2);
+    }
+
+    [Test]
+    public async void ClassWithSlowComplexAsyncMethod()
+    {
+        var message = await DebugRunner.CaptureDebugAsync(ClassWithSlowComplexAsyncMethodInvocation);
+
+        Assert.AreEqual(1, message.Count);
+        Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.ComplexMethodWithAwait "));
+    }
+
+    private async Task ClassWithSlowComplexAsyncMethodInvocation()
+    {
+        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        await instance.ComplexMethodWithAwait(100);
+    }
+
+    [Test]
     public void ClassWithConstructor()
     {
         var message = DebugRunner.CaptureDebug(() =>
@@ -53,6 +134,7 @@ public class WithoutInterceptorTests
         Assert.AreEqual(1, message.Count);
         Assert.IsTrue(message.First().StartsWith("ClassWithAttribute.Method "));
     }
+
     [Test]
     public void MethodWithReturnAndCatchReThrow()
     {
@@ -77,8 +159,8 @@ public class WithoutInterceptorTests
             });
         Assert.AreEqual(1, message.Count);
         Assert.IsTrue(message.First().StartsWith("ClassWithMethod.Method "));
-
     }
+
     [Test]
     public void GenericClassWithMethod()
     {

@@ -53,4 +53,24 @@ public static class CecilExtensions
     {
         return GetAsyncStateMachineAttribute(method) != null;
     }
+
+    public static bool IsLeaveInstruction(this Instruction instruction)
+    {
+        if ((instruction.OpCode == OpCodes.Leave) || (instruction.OpCode == OpCodes.Leave_S))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static bool IsBreakInstruction(this Instruction instruction)
+    {
+        if ((instruction.OpCode == OpCodes.Br) || (instruction.OpCode == OpCodes.Br_S))
+        {
+            return true;
+        }
+
+        return false;
+    }
 }

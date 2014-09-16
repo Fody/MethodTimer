@@ -97,54 +97,102 @@ public class MethodProcessor
     {
         var instructions = _body.Instructions;
 
-        // There are 2 possible return points:
-
+        // There are 3 possible return points:
+        // 
         // 1) async code:
         //      awaiter.GetResult();
         //      awaiter = new TaskAwaiter();
+        //
+        // 2) exception handling
+        //      L_00d5: ldloc.1 
+        //      L_00d6: call instance void [mscorlib]System.Runtime.CompilerServices.AsyncTaskMethodBuilder::SetException(class [mscorlib]System.Exception)
+        //
+        // 3) all other returns
+        //
+        // We can do this smart by searching for all leave and leave_S op codes and check if they point to the last
+        // instruction of the method. This equals a "return" call.
 
-        var getResultInstruction = (from instruction in instructions
-                                    where instruction.OpCode == OpCodes.Call && instruction.Operand is MethodReference
-                                          && string.Equals(((MethodReference)instruction.Operand).Name, "GetResult")
-                                    select instruction).First();
+        // 1) async code
 
-        var getResultIndex = instructions.IndexOf(getResultInstruction);
+        //var getResultInstruction = (from instruction in instructions
+        //                            where instruction.OpCode == OpCodes.Call && instruction.Operand is MethodReference
+        //                                  && string.Equals(((MethodReference)instruction.Operand).Name, "GetResult")
+        //                            select instruction).First();
 
-        var nextLeaveStatement = 0;
-        for (var i = getResultIndex; i < instructions.Count; i++)
+        //var getResultIndex = instructions.IndexOf(getResultInstruction);
+
+        //var nextLeaveStatement = 0;
+        //for (var i = getResultIndex; i < instructions.Count; i++)
+        //{
+        //    var instruction = instructions[i];
+        //    if (instruction.IsLeaveInstruction())
+        //    {
+        //        nextLeaveStatement = i;
+        //        break;
+        //    }
+        //}
+
+        //if (instructions[nextLeaveStatement - 1].OpCode == OpCodes.Nop)
+        //{
+        //    nextLeaveStatement--;
+        //}
+
+        //var finalInstruction = instructions[nextLeaveStatement];
+
+        //FixReturn(instructions, finalInstruction);
+
+
+        // 2) Exception handling 
+
+        //var setExceptionMethod = (from instruction in instructions
+        //                          where instruction.OpCode == OpCodes.Call && instruction.Operand is MethodReference
+        //                                && string.Equals(((MethodReference)instruction.Operand).Name, "SetException")
+        //                          select instruction).First();
+
+        //var setExceptionMethodIndex = instructions.IndexOf(setExceptionMethod);
+
+        //FixReturn(instructions, instructions[setExceptionMethodIndex + 1]);
+
+        // 3) All leave statements to the last label
+
+        //var lastReturn = (from instruction in instructions
+        //                  where instruction.OpCode == OpCodes.Ret
+        //                  select instruction).Last();
+
+        var possibleReturnStatements = new List<Instruction>();
+        //possibleReturnStatements.Add(lastReturn);
+
+        //var lineBeforeLastReturn = instructions[instructions.IndexOf(lastReturn) - 1];
+        //if (lineBeforeLastReturn.OpCode == OpCodes.Nop)
+        //{
+        //    possibleReturnStatements.Add(lineBeforeLastReturn);
+        //}
+
+        for (var i = instructions.Count - 1; i >= 0; i--)
         {
-            var instruction = instructions[i];
-            if ((instruction.OpCode == OpCodes.Leave) || (instruction.OpCode == OpCodes.Leave_S))
+            if (instructions[i].IsLeaveInstruction())
             {
-                nextLeaveStatement = i;
+                possibleReturnStatements.Add(instructions[i + 1]);
                 break;
             }
         }
 
-        if (instructions[nextLeaveStatement - 1].OpCode == OpCodes.Nop)
+        for (int i = 0; i < instructions.Count; i++)
         {
-            nextLeaveStatement--;
+            var instruction = instructions[i];
+            if (instruction.IsLeaveInstruction())
+            {
+                if (possibleReturnStatements.Any(x => ReferenceEquals(instruction.Operand, x)))
+                {
+                    // This is a return statement
+                    var instructionsAdded = FixReturn(instructions, instruction);
+                    i += instructionsAdded;
+                }
+            }
         }
-
-        var finalInstruction = instructions[nextLeaveStatement];
-
-        FixReturn(instructions, finalInstruction);
-
-        // 2) exception handling
-        //      L_00d5: ldloc.1 
-        //      L_00d6: call instance void [mscorlib]System.Runtime.CompilerServices.AsyncTaskMethodBuilder::SetException(class [mscorlib]System.Exception)
-
-        var setExceptionMethod = (from instruction in instructions
-                                  where instruction.OpCode == OpCodes.Call && instruction.Operand is MethodReference
-                                        && string.Equals(((MethodReference)instruction.Operand).Name, "SetException")
-                                  select instruction).First();
-
-        var setExceptionMethodIndex = instructions.IndexOf(setExceptionMethod);
-
-        FixReturn(instructions, instructions[setExceptionMethodIndex + 1]);
     }
 
-    void FixReturn(Collection<Instruction> instructions, Instruction returnPoint)
+    int FixReturn(Collection<Instruction> instructions, Instruction returnPoint)
     {
         var opCode = returnPoint.OpCode;
         var operand = returnPoint.Operand as Instruction;
@@ -152,11 +200,13 @@ public class MethodProcessor
         returnPoint.OpCode = OpCodes.Nop;
         returnPoint.Operand = null;
 
+        var instructionsAdded = 0;
         var indexOf = instructions.IndexOf(returnPoint);
         foreach (var instruction in GetWriteTimeIL())
         {
             indexOf++;
             instructions.Insert(indexOf, instruction);
+            instructionsAdded++;
         }
 
         indexOf++;
@@ -164,11 +214,15 @@ public class MethodProcessor
         if ((opCode == OpCodes.Leave) || (opCode == OpCodes.Leave_S))
         {
             instructions.Insert(indexOf, Instruction.Create(opCode, operand));
+            instructionsAdded++;
         }
         else
         {
             instructions.Insert(indexOf, Instruction.Create(opCode));
+            instructionsAdded++;
         }
+
+        return instructionsAdded;
     }
 
     private IEnumerable<Instruction> GetWriteTimeIL()
@@ -259,31 +313,89 @@ public class MethodProcessor
 
     static int FindMethodStartAsync(Collection<Instruction> instructions)
     {
-        // Inject stopwatch to beginning of "default" label, which is the first address after the ldc.i4.0:
+        // Inject stopwatch to beginning of "default" label
+
+        var startIndex = -1;
+        Instruction startInstruction = null;
+
+        // A) If there is a switch, go to the first:
+
+        // L_000d: switch (L_0034, L_0052, L_0052, L_0039, L_003e, L_0043, L_0048, L_004d)
+        // L_0032: br.s L_0052
+        // L_0034: br L_0719
+        // L_0039: br L_00f3
+        // L_003e: br L_01b8
+        // L_0043: br L_028f
+        // L_0048: br L_0466
+        // L_004d: br L_06d3
+        // L_0052: br.s L_0054
+
+        if (startInstruction == null)
+        {
+            var switchInstruction = (from instruction in instructions
+                                     where instruction.OpCode == OpCodes.Switch
+                                     select instruction).FirstOrDefault();
+            if (switchInstruction != null)
+            {
+                startInstruction = FindLastBrsAsync(instructions, switchInstruction);
+            }
+        }
+
+        // B) Get the right br.s
+
         // L_000f: ldc.i4.0         <== ldc.i4.0 which we are looking for
         // L_0010: beq.s L_0016     
         // L_0012: br.s L_0018      <== first br.s that jumpts to address #1
         // L_0014: br.s L_0083
         // L_0016: br.s L_0055      <== br.s that jumps to the actual start of the "method"
         // L_0018: br.s L_001a
+        // L_001d: nop 
 
-        var ldcLoadIndex = (from instruction in instructions
-                            where (instruction.OpCode == OpCodes.Ldc_I4_0) ||
-                                  (instruction.OpCode == OpCodes.Ldc_I4 && (int)instruction.Operand == 0)
-                            select instructions.IndexOf(instruction)).First();
-
-        var address1JumpIndex = ldcLoadIndex + 2;
-
-        var address2JumpInstruction = (Instruction)instructions[address1JumpIndex].Operand;
-
-        var startInstruction = (Instruction)address2JumpInstruction.Operand;
-        var startInstructionIndex = instructions.IndexOf(startInstruction);
-
-        if (startInstruction.OpCode == OpCodes.Nop)
+        if (startInstruction == null)
         {
-            startInstructionIndex++;
+            var firstBreakInstruction = (from instruction in instructions
+                                         where instruction.IsBreakInstruction()
+                                         select instruction).FirstOrDefault();
+            if (firstBreakInstruction != null)
+            {
+                startInstruction = FindLastBrsAsync(instructions, firstBreakInstruction);
+            }
         }
 
-        return startInstructionIndex;
+        // If instruction is nop, increase index
+        if (startInstruction != null)
+        {
+            startIndex = instructions.IndexOf(startInstruction);
+            if (startInstruction.OpCode == OpCodes.Nop)
+            {
+                startIndex++;
+            }
+        }
+
+        return startIndex;
+    }
+
+    static Instruction FindLastBrsAsync(Collection<Instruction> instructions, Instruction startInstruction)
+    {
+        var wasPreviousBr = false;
+
+        for (int i = 0; i < instructions.Count; i++)
+        {
+            var instruction = instructions[i];
+            if (instruction.IsBreakInstruction())
+            {
+                wasPreviousBr = true;
+                continue;
+            }
+
+            if (!wasPreviousBr)
+            {
+                continue;
+            }
+
+            return instruction;
+        }
+
+        return null;
     }
 }

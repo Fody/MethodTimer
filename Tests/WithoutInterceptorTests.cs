@@ -46,6 +46,54 @@ public class WithoutInterceptorTests
     }
 
     [Test]
+    public async void ClassWithFastComplexAsyncMethod()
+    {
+        var message = await DebugRunner.CaptureDebugAsync(ClassWithFastComplexAsyncMethodInvocation);
+
+        Assert.AreEqual(1, message.Count);
+        Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.ComplexMethodWithAwait "));
+    }
+
+    private async Task ClassWithFastComplexAsyncMethodInvocation()
+    {
+        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        await instance.ComplexMethodWithAwait(0);
+    }
+
+    [Test]
+    public async void ClassWithMediumComplexAsyncMethod()
+    {
+        var message = await DebugRunner.CaptureDebugAsync(ClassWithMediumComplexAsyncMethodInvocation);
+
+        Assert.AreEqual(1, message.Count);
+        Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.ComplexMethodWithAwait "));
+    }
+
+    private async Task ClassWithMediumComplexAsyncMethodInvocation()
+    {
+        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        await instance.ComplexMethodWithAwait(2);
+    }
+
+    [Test]
+    public async void ClassWithSlowComplexAsyncMethod()
+    {
+        var message = await DebugRunner.CaptureDebugAsync(ClassWithSlowComplexAsyncMethodInvocation);
+
+        Assert.AreEqual(1, message.Count);
+        Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.ComplexMethodWithAwait "));
+    }
+
+    private async Task ClassWithSlowComplexAsyncMethodInvocation()
+    {
+        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        await instance.ComplexMethodWithAwait(100);
+    }
+
+    [Test]
     public void ClassWithConstructor()
     {
         var message = DebugRunner.CaptureDebug(() =>

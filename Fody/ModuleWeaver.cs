@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Mono.Cecil;
 
@@ -22,6 +23,13 @@ public partial class ModuleWeaver
 
     public void Execute()
     {
+#if DEBUG
+        //if (!Debugger.IsAttached)
+        //{
+        //    Debugger.Launch();
+        //}
+#endif
+
         types = ModuleDefinition.GetTypes().ToList();
         FindReferences();
         FindInterceptor();

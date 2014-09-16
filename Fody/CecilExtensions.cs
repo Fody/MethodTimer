@@ -42,4 +42,15 @@ public static class CecilExtensions
             collection.Add(instruction);
         }   
     }
+
+    public static CustomAttribute GetAsyncStateMachineAttribute(this MethodDefinition method)
+    {
+        var asyncAttribute = method.CustomAttributes.FirstOrDefault(_ => _.AttributeType.Name == "AsyncStateMachineAttribute");
+        return asyncAttribute;
+    }
+
+    public static bool IsAsync(this MethodDefinition method)
+    {
+        return GetAsyncStateMachineAttribute(method) != null;
+    }
 }

@@ -19,26 +19,37 @@ public class ClassWithAsyncMethod
     //}
 
     [Time]
-    public async void MethodWithAwait()
+    public async Task MethodWithAwait()
     {
-            await Task.Delay(500);
-    }
-    public async void MethodWithAwaitExpected()
-    {
-        var startNew = Stopwatch.StartNew();
         await Task.Delay(500);
-        startNew.Stop();
-        Console.WriteLine(startNew.ElapsedMilliseconds);
     }
+
+    public async Task MethodWithAwaitOriginal()
+    {
+        await Task.Delay(500);
+    }
+
+    public async Task MethodWithAwaitExpected()
+    {
+        var stopwatch = Stopwatch.StartNew();
+
+        await Task.Delay(500);
+
+        stopwatch.Stop();
+        Debug.WriteLine("ClassWithAsyncMethod.MethodWithAwaitExpected " + stopwatch.ElapsedMilliseconds + "ms");
+    }
+
     public async void MethodWithThreadSleep()
     {
         Thread.Sleep(2222);
     }
     public async void MethodWithThreadSleepExpected()
     {
-        var startNew = Stopwatch.StartNew();
+        var stopwatch = Stopwatch.StartNew();
+
         Thread.Sleep(2222);
-        startNew.Stop();
-        Console.WriteLine(startNew.ElapsedMilliseconds);
+
+        stopwatch.Stop();
+        Debug.WriteLine("ClassWithAsyncMethod.MethodWithAwaitExpected " + stopwatch.ElapsedMilliseconds + "ms");
     }
 }

@@ -7,7 +7,7 @@ public partial class ModuleWeaver
     void ProcessAssembly()
     {
 
-		if (ModuleDefinition.Assembly.ContainsTimeAttribute() || ModuleDefinition.ContainsTimeAttribute())
+        if (ModuleDefinition.Assembly.ContainsTimeAttribute() || ModuleDefinition.ContainsTimeAttribute())
         {
             foreach (var method in types.SelectMany(type => type.ConcreteMethods()))
             {
@@ -20,7 +20,7 @@ public partial class ModuleWeaver
         {
             if (type.IsCompilerGenerated())
             {
-                continue; 
+                continue;
             }
             if (type.ContainsTimeAttribute())
             {
@@ -41,20 +41,15 @@ public partial class ModuleWeaver
 
     void ProcessMethod(MethodDefinition method)
     {
-        var asyncAttribute = method.CustomAttributes.FirstOrDefault(_ => _.AttributeType.Name == "AsyncStateMachineAttribute");
-        if (asyncAttribute == null)
+        var methodProcessor = new MethodProcessor
         {
-            var methodProcessor = new MethodProcessor
-                {
-                    ModuleWeaver = this,
-                    TypeSystem = ModuleDefinition.TypeSystem,
-                    Method = method,
-                };
-            methodProcessor.InnerProcess();
-            return;
-        }
-        LogError(string.Format("Could not process '{0}'. async methods are not currently supported. Feel free to submit a pull request if you want this feature.", method.FullName));
-            
+            ModuleWeaver = this,
+            TypeSystem = ModuleDefinition.TypeSystem,
+            Method = method,
+        };
+
+        methodProcessor.Process();
+
         //var fullName = method.FullName;
         //var customAttributeArgument = asyncAttribute.ConstructorArguments.First();
         //var typeReference = (TypeReference) customAttributeArgument.Value;

@@ -46,6 +46,22 @@ public class WithoutInterceptorTests
     }
 
     [Test]
+    public async void ClassWithExceptionAsyncMethod()
+    {
+        var message = await DebugRunner.CaptureDebugAsync(ClassWithExceptionAsyncMethodInvocation);
+
+        Assert.AreEqual(1, message.Count);
+        Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.ComplexMethodWithAwait "));
+    }
+
+    private async Task ClassWithExceptionAsyncMethodInvocation()
+    {
+        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        await instance.ComplexMethodWithAwait(-1);
+    }
+
+    [Test]
     public async void ClassWithFastComplexAsyncMethod()
     {
         var message = await DebugRunner.CaptureDebugAsync(ClassWithFastComplexAsyncMethodInvocation);

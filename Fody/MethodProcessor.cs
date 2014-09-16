@@ -49,12 +49,10 @@ public class MethodProcessor
 
     void InnerProcessAsync()
     {
-        // Find state machine type
         var asyncAttribute = Method.GetAsyncStateMachineAttribute();
         _asyncStateMachineType = (from ctor in asyncAttribute.ConstructorArguments
                                   select (TypeDefinition)ctor.Value).First();
 
-        // Find the MoveNext method
         var moveNextMethod = (from method in _asyncStateMachineType.Methods
                               where string.Equals(method.Name, "MoveNext")
                               select method).First();
@@ -62,13 +60,8 @@ public class MethodProcessor
         _body = moveNextMethod.Body;
         _body.SimplifyMacros();
 
-        // Find the real start of the "method"
         var startInstructionIndex = FindMethodStartAsync(_body.Instructions);
-
-        // Inject the stopwatch
         InjectStopwatchAsync(_asyncStateMachineType, _body.Instructions, startInstructionIndex);
-
-        // Handle the returns in async mode
         HandleReturnsAsync();
 
         _body.InitLocals = true;
@@ -112,61 +105,7 @@ public class MethodProcessor
         // We can do this smart by searching for all leave and leave_S op codes and check if they point to the last
         // instruction of the method. This equals a "return" call.
 
-        // 1) async code
-
-        //var getResultInstruction = (from instruction in instructions
-        //                            where instruction.OpCode == OpCodes.Call && instruction.Operand is MethodReference
-        //                                  && string.Equals(((MethodReference)instruction.Operand).Name, "GetResult")
-        //                            select instruction).First();
-
-        //var getResultIndex = instructions.IndexOf(getResultInstruction);
-
-        //var nextLeaveStatement = 0;
-        //for (var i = getResultIndex; i < instructions.Count; i++)
-        //{
-        //    var instruction = instructions[i];
-        //    if (instruction.IsLeaveInstruction())
-        //    {
-        //        nextLeaveStatement = i;
-        //        break;
-        //    }
-        //}
-
-        //if (instructions[nextLeaveStatement - 1].OpCode == OpCodes.Nop)
-        //{
-        //    nextLeaveStatement--;
-        //}
-
-        //var finalInstruction = instructions[nextLeaveStatement];
-
-        //FixReturn(instructions, finalInstruction);
-
-
-        // 2) Exception handling 
-
-        //var setExceptionMethod = (from instruction in instructions
-        //                          where instruction.OpCode == OpCodes.Call && instruction.Operand is MethodReference
-        //                                && string.Equals(((MethodReference)instruction.Operand).Name, "SetException")
-        //                          select instruction).First();
-
-        //var setExceptionMethodIndex = instructions.IndexOf(setExceptionMethod);
-
-        //FixReturn(instructions, instructions[setExceptionMethodIndex + 1]);
-
-        // 3) All leave statements to the last label
-
-        //var lastReturn = (from instruction in instructions
-        //                  where instruction.OpCode == OpCodes.Ret
-        //                  select instruction).Last();
-
         var possibleReturnStatements = new List<Instruction>();
-        //possibleReturnStatements.Add(lastReturn);
-
-        //var lineBeforeLastReturn = instructions[instructions.IndexOf(lastReturn) - 1];
-        //if (lineBeforeLastReturn.OpCode == OpCodes.Nop)
-        //{
-        //    possibleReturnStatements.Add(lineBeforeLastReturn);
-        //}
 
         for (var i = instructions.Count - 1; i >= 0; i--)
         {
@@ -177,7 +116,7 @@ public class MethodProcessor
             }
         }
 
-        for (int i = 0; i < instructions.Count; i++)
+        for (var i = 0; i < instructions.Count; i++)
         {
             var instruction = instructions[i];
             if (instruction.IsLeaveInstruction())
@@ -379,7 +318,7 @@ public class MethodProcessor
     {
         var wasPreviousBr = false;
 
-        for (int i = 0; i < instructions.Count; i++)
+        for (var i = 0; i < instructions.Count; i++)
         {
             var instruction = instructions[i];
             if (instruction.IsBreakInstruction())

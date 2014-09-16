@@ -37,6 +37,11 @@ public class ClassWithAsyncMethod
     [Time]
     public async Task<bool> ComplexMethodWithAwait(int instructionsToHandle)
     {
+        if (instructionsToHandle < 0)
+        {
+            MethodWithException();
+        }
+
         var instructionCounter = 0;
         if (instructionsToHandle <= instructionCounter)
         {
@@ -68,6 +73,14 @@ public class ClassWithAsyncMethod
         }
 
         return true;
+    }
+
+    public async Task MethodWithException()
+    {
+        await Task.Factory.StartNew(() =>
+        {
+            throw new ArgumentOutOfRangeException();
+        });
     }
 
     public async Task<bool> MethodWithAwaitExpected(bool expectedReturn)

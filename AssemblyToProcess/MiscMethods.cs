@@ -131,24 +131,26 @@ public class MiscMethods
             throw new Exception("dd", e);
         }
     }
+
     public int MultiCatch()
     {
         try
         {
-            
-        try
-        {
-            Thread.Sleep(10);
-            return 0;
+
+            try
+            {
+                Thread.Sleep(10);
+                return 0;
+            }
+            catch (Exception e)
+            {
+                throw new Exception("dd", e);
+            }
         }
-        catch (Exception e)
-        {
-            throw new Exception("dd", e);
-        }
-        }
+// ReSharper disable once RedundantCatchClause
         catch (Exception)
         {
-            
+
             throw;
         }
     }

@@ -61,8 +61,16 @@ public class MethodProcessor
         _body.SimplifyMacros();
 
         var startInstructionIndex = FindMethodStartAsync(_body.Instructions);
-        InjectStopwatchAsync(_asyncStateMachineType, _body.Instructions, startInstructionIndex);
-        HandleReturnsAsync();
+        if (startInstructionIndex != -1)
+        {
+            InjectStopwatchAsync(_asyncStateMachineType, _body.Instructions, startInstructionIndex);
+            HandleReturnsAsync();
+        }
+        else
+        {
+            ModuleWeaver.LogWarning(string.Format("Cannot find start point of async method '{0}.{1}', method will be skipped", 
+                Method.DeclaringType.Name, Method.Name));
+        }
 
         _body.InitLocals = true;
         _body.OptimizeMacros();
@@ -257,7 +265,7 @@ public class MethodProcessor
         var startIndex = -1;
         Instruction startInstruction = null;
 
-        // A) If there is a switch, go to the first:
+        // A) If there is a switch, go to the last break ==> multiple awaits in debug mode
 
         // L_000d: switch (L_0034, L_0052, L_0052, L_0039, L_003e, L_0043, L_0048, L_004d)
         // L_0032: br.s L_0052
@@ -280,7 +288,20 @@ public class MethodProcessor
             }
         }
 
-        // B) Get the right br.s
+        // B) If there is a switch, go to the first line after the switch ==> multiple awaits in release mode
+
+        if (startInstruction == null)
+        {
+            var switchInstruction = (from instruction in instructions
+                                     where instruction.OpCode == OpCodes.Switch
+                                     select instruction).FirstOrDefault();
+            if (switchInstruction != null)
+            {
+                startInstruction = instructions[instructions.IndexOf(switchInstruction) + 1];
+            }
+        }
+
+        // C) Get the right br.s ==> single await in debug mode
 
         // L_000f: ldc.i4.0         <== ldc.i4.0 which we are looking for
         // L_0010: beq.s L_0016     
@@ -298,6 +319,19 @@ public class MethodProcessor
             if (firstBreakInstruction != null)
             {
                 startInstruction = FindLastBrsAsync(instructions, firstBreakInstruction);
+            }
+        }
+
+        // D) Get the right beq (if statement) ==> single await in release mode
+
+        if (startInstruction == null)
+        {
+            var firstIfInstruction = (from instruction in instructions
+                                         where instruction.IsIfInstruction()
+                                         select instruction).FirstOrDefault();
+            if (firstIfInstruction != null)
+            {
+                startInstruction = instructions[instructions.IndexOf(firstIfInstruction) + 1];
             }
         }
 

@@ -73,4 +73,14 @@ public static class CecilExtensions
 
         return false;
     }
+
+    public static bool IsIfInstruction(this Instruction instruction)
+    {
+        if ((instruction.OpCode == OpCodes.Beq) || (instruction.OpCode == OpCodes.Beq_S))
+        {
+            return true;
+        }
+
+        return false;
+    }
 }

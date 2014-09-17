@@ -352,7 +352,7 @@ public class MethodProcessor
     {
         var wasPreviousBr = false;
 
-        for (var i = 0; i < instructions.Count; i++)
+        for (var i = instructions.IndexOf(startInstruction); i < instructions.Count; i++)
         {
             var instruction = instructions[i];
             if (instruction.IsBreakInstruction())

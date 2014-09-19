@@ -26,7 +26,11 @@ public class ClassWithAsyncMethod
 
     public async Task MethodWithAwaitExpected()
     {
-        var stopwatch = Stopwatch.StartNew();
+        Stopwatch stopwatch = null;
+        if (stopwatch == null)
+        {
+            stopwatch = Stopwatch.StartNew();
+        }
 
         await Task.Delay(500);
 

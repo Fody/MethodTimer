@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -251,21 +252,93 @@ public class MethodProcessor
         _stopwatchField = new FieldDefinition("methodTimerStopwatch", new FieldAttributes(), ModuleWeaver.StopwatchType);
         typeDefinition.Fields.Add(_stopwatchField);
 
+        // This code:
+        // 
+        // if (_stopwatchField == null)
+        // {
+        //     _stopwatchField = Stopwatch.StartNew();
+        // }
+        //
+        // Translated to IL:
+        //
+        // L_0025: ldarg.0 
+        // L_0026: ldfld class [System]System.Diagnostics.Stopwatch ClassWithAsyncMethod/<MethodWithAwaitExpected>d__3::<stopwatch>5__4
+        // L_002b: ldnull 
+        // L_002c: ceq 
+        // L_002e: ldc.i4.0 
+        // L_002f: ceq 
+        // L_0031: stloc.3 <== bool variable
+        // L_0032: ldloc.3 <== bool variable
+        // L_0033: brtrue.s L_0042 <== first instruction after stfld
+        // L_0035: nop 
+        // L_0036: ldarg.0 
+        // L_0037: call class [System]System.Diagnostics.Stopwatch [System]System.Diagnostics.Stopwatch::StartNew()
+        // L_003c: stfld class [System]System.Diagnostics.Stopwatch ClassWithAsyncMethod/<MethodWithAwaitExpected>d__3::<stopwatch>5__4
+
+
+        var isNullBoolVariable = new VariableDefinition("isStopwatchNull", ModuleWeaver.BooleanType);
+        _body.Variables.Add(isNullBoolVariable);
+
+        var startInstruction = instructions[instructionIndex];
+
         instructions.Insert(instructionIndex, new List<Instruction>(new[] {
+            Instruction.Create(OpCodes.Ldarg_0),
+            Instruction.Create(OpCodes.Ldfld, _stopwatchField),
+            Instruction.Create(OpCodes.Ldnull),
+            Instruction.Create(OpCodes.Ceq),
+            Instruction.Create(OpCodes.Ldc_I4, 0),
+            Instruction.Create(OpCodes.Ceq),
+            Instruction.Create(OpCodes.Stloc, isNullBoolVariable),
+            Instruction.Create(OpCodes.Ldloc, isNullBoolVariable),
+            Instruction.Create(OpCodes.Brtrue_S, startInstruction),
             Instruction.Create(OpCodes.Ldarg_0),
             Instruction.Create(OpCodes.Call, ModuleWeaver.StartNewMethod),
             Instruction.Create(OpCodes.Stfld, _stopwatchField)
         }));
     }
 
-    static int FindMethodStartAsync(Collection<Instruction> instructions)
+    int FindMethodStartAsync(Collection<Instruction> instructions)
     {
-        // Inject stopwatch to beginning of "default" label
-
         var startIndex = -1;
         Instruction startInstruction = null;
 
-        // A) If there is a switch, go to the last break ==> multiple awaits in debug mode
+        // V1: Inject stopwatch to beginning of "default" label
+        //startInstruction = FindMethodStartInstructionAsyncV1(instructions);
+
+        // V2: Inject at the beginning, check if item is null
+        startInstruction = FindMethodStartInstructionAsyncV2(instructions);
+
+        // If instruction is nop, increase index
+        if (startInstruction != null)
+        {
+            startIndex = instructions.IndexOf(startInstruction);
+            if (startInstruction.OpCode == OpCodes.Nop)
+            {
+                startIndex++;
+            }
+        }
+
+        return startIndex;
+    }
+
+    Instruction FindMethodStartInstructionAsyncV1(Collection<Instruction> instructions)
+    {
+        Instruction startInstruction = null;
+
+        // A) If there is a switch, go to the first line after the switch ==> multiple awaits in release mode
+
+        if (startInstruction == null)
+        {
+            var switchInstruction = (from instruction in instructions
+                                     where instruction.OpCode == OpCodes.Switch
+                                     select instruction).FirstOrDefault();
+            if (switchInstruction != null)
+            {
+                startInstruction = instructions[instructions.IndexOf(switchInstruction) + 1];
+            }
+        }
+
+        // B) If there is a switch, go to the last break ==> multiple awaits in debug mode
 
         // L_000d: switch (L_0034, L_0052, L_0052, L_0039, L_003e, L_0043, L_0048, L_004d)
         // L_0032: br.s L_0052
@@ -288,20 +361,20 @@ public class MethodProcessor
             }
         }
 
-        // B) If there is a switch, go to the first line after the switch ==> multiple awaits in release mode
+        // C) Get the right beq (if statement) ==> single await in release mode
 
         if (startInstruction == null)
         {
-            var switchInstruction = (from instruction in instructions
-                                     where instruction.OpCode == OpCodes.Switch
-                                     select instruction).FirstOrDefault();
-            if (switchInstruction != null)
+            var firstIfInstruction = (from instruction in instructions
+                                      where instruction.IsIfInstruction()
+                                      select instruction).FirstOrDefault();
+            if (firstIfInstruction != null)
             {
-                startInstruction = instructions[instructions.IndexOf(switchInstruction) + 1];
+                startInstruction = instructions[instructions.IndexOf(firstIfInstruction) + 1];
             }
         }
 
-        // C) Get the right br.s ==> single await in debug mode
+        // D) Get the right br.s ==> single await in debug mode
 
         // L_000f: ldc.i4.0         <== ldc.i4.0 which we are looking for
         // L_0010: beq.s L_0016     
@@ -322,30 +395,12 @@ public class MethodProcessor
             }
         }
 
-        // D) Get the right beq (if statement) ==> single await in release mode
+        return startInstruction;
+    }
 
-        if (startInstruction == null)
-        {
-            var firstIfInstruction = (from instruction in instructions
-                                         where instruction.IsIfInstruction()
-                                         select instruction).FirstOrDefault();
-            if (firstIfInstruction != null)
-            {
-                startInstruction = instructions[instructions.IndexOf(firstIfInstruction) + 1];
-            }
-        }
-
-        // If instruction is nop, increase index
-        if (startInstruction != null)
-        {
-            startIndex = instructions.IndexOf(startInstruction);
-            if (startInstruction.OpCode == OpCodes.Nop)
-            {
-                startIndex++;
-            }
-        }
-
-        return startIndex;
+    private Instruction FindMethodStartInstructionAsyncV2(Collection<Instruction> instructions)
+    {
+        return instructions.First();
     }
 
     static Instruction FindLastBrsAsync(Collection<Instruction> instructions, Instruction startInstruction)

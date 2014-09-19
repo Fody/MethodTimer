@@ -16,6 +16,7 @@ public partial class ModuleWeaver
     public MethodReference GetTicksMethod;
     public MethodReference UtcNowMethod;
     public TypeReference DateTimeType;
+    public TypeReference BooleanType;
     
     public void FindReferences()
     {
@@ -51,6 +52,9 @@ public partial class ModuleWeaver
             x.Parameters.Count == 2 &&
             x.Parameters[0].ParameterType.Name == "RuntimeMethodHandle" &&
             x.Parameters[1].ParameterType.Name == "RuntimeTypeHandle"));
+
+        var booleanType = coreTypes.First(x => x.Name == "Boolean");
+        BooleanType = ModuleDefinition.Import(booleanType);
 
         var stopwatchType = coreTypes.FirstOrDefault(x => x.Name == "Stopwatch");
         if (stopwatchType == null)

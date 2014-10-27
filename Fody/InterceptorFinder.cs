@@ -9,35 +9,53 @@ public partial class ModuleWeaver
     public void FindInterceptor()
     {
         var interceptor = types.FirstOrDefault(x => x.Name == "MethodTimeLogger");
-        if (interceptor == null)
+        if (interceptor != null)
         {
-            foreach (var referencePath in ReferenceCopyLocalPaths)
+            var logMethod = interceptor.Methods.FirstOrDefault(x => x.Name == "Log");
+            if (logMethod == null)
             {
-                if (!referencePath.EndsWith(".dll") && !referencePath.EndsWith(".exe"))
-                {
-                    continue;
-                }
-                var moduleDefinition = ReadModule(referencePath);
-
-                interceptor = moduleDefinition
-                    .GetTypes()
-                    .FirstOrDefault(x => x.Name == "MethodTimeLogger");
-                if (interceptor != null)
-                {
-                    interceptor = ModuleDefinition.Import(interceptor).Resolve();
-                    break;
-                }
+                throw new WeavingException(string.Format("Could not find 'Log' method on '{0}'.", interceptor.FullName));
             }
-        }
-        if (interceptor == null)
-        {
+            VerifyHasCorrectParameters(logMethod);
+            VerifyMethodIsPublicStatic(logMethod);
+            LogMethod = logMethod;
             return;
         }
-        var logMethod = interceptor.Methods.FirstOrDefault(x => x.Name == "Log");
-        if (logMethod == null)
+        foreach (var referencePath in ReferenceCopyLocalPaths)
         {
-            throw new WeavingException(string.Format("Could not find 'Log' method on '{0}'.", interceptor.FullName));
+            if (!referencePath.EndsWith(".dll") && !referencePath.EndsWith(".exe"))
+            {
+                continue;
+            }
+            var moduleDefinition = ReadModule(referencePath);
+
+            interceptor = moduleDefinition
+                .GetTypes()
+                .FirstOrDefault(x => x.Name == "MethodTimeLogger");
+            if (interceptor == null)
+            {
+                continue;
+            }
+            if (!interceptor.IsPublic)
+            {
+                LogInfo(string.Format("Did not use '{0}' since it is not public.", interceptor.FullName));
+                continue;
+            }
+            var logMethod = interceptor.Methods.FirstOrDefault(x => x.Name == "Log");
+            if (logMethod == null)
+            {
+                throw new WeavingException(string.Format("Could not find 'Log' method on '{0}'.", interceptor.FullName));
+            }
+            VerifyHasCorrectParameters(logMethod);
+            VerifyMethodIsPublicStatic(logMethod);
+            LogMethod = ModuleDefinition.Import(logMethod);
+            return;
         }
+    }
+
+// ReSharper disable once UnusedParameter.Local
+    static void VerifyMethodIsPublicStatic(MethodDefinition logMethod)
+    {
         if (!logMethod.IsPublic)
         {
             throw new WeavingException("Method 'MethodTimeLogger.Log' is not public.");
@@ -46,21 +64,28 @@ public partial class ModuleWeaver
         {
             throw new WeavingException("Method 'MethodTimeLogger.Log' is not static.");
         }
+    }
+
+    static void VerifyHasCorrectParameters(MethodDefinition logMethod)
+    {
+        var logMethodHasCorrectParameters = true;
         var parameters = logMethod.Parameters;
         if (parameters.Count != 2)
         {
-            throw new WeavingException("Method 'MethodTimeLogger.Log' must have 2 parameters of type 'System.Reflection.MethodBase' and 'System.Int64'.");
+            logMethodHasCorrectParameters = false;
         }
         if (parameters[0].ParameterType.FullName != "System.Reflection.MethodBase")
         {
-            throw new WeavingException("Method 'MethodTimeLogger.Log' must have 2 parameters of type 'System.Reflection.MethodBase' and 'System.Int64'.");
+            logMethodHasCorrectParameters = false;
         }
         if (parameters[1].ParameterType.FullName != "System.Int64")
         {
-            throw new WeavingException("Method 'MethodTimeLogger.Log' must have 2 parameters of type 'System.Reflection.MethodBase' and 'System.Int64'.");
+            logMethodHasCorrectParameters = false;
         }
-
-        LogMethod = ModuleDefinition.Import(logMethod);
+        if (!logMethodHasCorrectParameters)
+        {
+            throw new WeavingException(string.Format("Method '{0}' must have 2 parameters of type 'System.Reflection.MethodBase' and 'System.Int64'.", logMethod.FullName));
+        }
     }
 
     ModuleDefinition ReadModule(string referencePath)

@@ -6,14 +6,12 @@ Injects some very basic method timing code.
 
 [Introduction to Fody](http://github.com/Fody/Fody/wiki/SampleUsage)
 
-## Nuget
+## The nuget package  [![NuGet Status](http://img.shields.io/nuget/v/MethodTimer.Fody.svg?style=flat)](https://www.nuget.org/packages/MethodTimer.Fody/)
 
-Nuget package http://nuget.org/packages/MethodTimer.Fody 
+https://nuget.org/packages/MethodTimer.Fody/
 
-To Install from the Nuget Package Manager Console 
-    
     PM> Install-Package MethodTimer.Fody
-
+    
 ### Your Code
 
 	public class MyClass

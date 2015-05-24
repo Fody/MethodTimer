@@ -3,6 +3,7 @@ using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
+using Mono.Collections.Generic;
 
 public class MethodProcessor
 {
@@ -28,11 +29,13 @@ public class MethodProcessor
         body = Method.Body;
         body.SimplifyMacros();
 
-        var returnInstruction = FixReturns();
-
         var firstInstruction = FirstInstructionSkipCtor();
 
-        stopwatchVar = ModuleWeaver.InjectStopwatch(body);
+        var indexOf = body.Instructions.IndexOf(firstInstruction);
+
+        var returnInstruction = FixReturns();
+
+        stopwatchVar = ModuleWeaver.InjectStopwatch(body, indexOf);
 
         var beforeReturn = Instruction.Create(OpCodes.Nop);
         body.InsertBefore(returnInstruction, beforeReturn);
@@ -64,6 +67,10 @@ public class MethodProcessor
                 }
                 var methodReference = instruction.Operand as MethodReference;
                 if (methodReference.Name != ".ctor")
+                {
+                    continue;
+                }
+                if (methodReference.DeclaringType != Method.DeclaringType.BaseType)
                 {
                     continue;
                 }

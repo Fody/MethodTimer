@@ -189,22 +189,26 @@ public class WithoutInterceptorTests
     {
         var type = assemblyWeaver.Assembly.GetType("InheritedClass");
         var message = DebugRunner.CaptureDebug(() => Activator.CreateInstance(type));
-        Assert.AreEqual(2, message.Count);
-        var second = message.Skip(1).First();
-        Assert.IsTrue(second.StartsWith("InheritedClass.ctor "), second);
+        Assert.AreEqual(1, message.Count);
         var first = message.First();
-        Assert.IsTrue(first.StartsWith("BaseClass.ctor "), first);
+        Assert.IsTrue(first.StartsWith("InheritedClass.ctor "), first);
     }
 
     [Test]
-    public void InheritedClassDoingCall()
+    public void InheritedClassDoingPropertyCall()
     {
-        var type = assemblyWeaver.Assembly.GetType("InheritedClassDoingCall");
+        var type = assemblyWeaver.Assembly.GetType("InheritedClassDoingPropertyCall");
         var message = DebugRunner.CaptureDebug(() => Activator.CreateInstance(type));
-        Assert.AreEqual(3, message.Count);
-        Assert.IsTrue(message[0].StartsWith("InheritedClassDoingCall.get_Property "), message[0]);
-        Assert.IsTrue(message[1].StartsWith("BaseClass.ctor "), message[1]);
-        Assert.IsTrue(message[2].StartsWith("InheritedClassDoingCall.ctor "), message[2]);
+        Assert.AreEqual(1, message.Count);
+        Assert.IsTrue(message[0].StartsWith("InheritedClassDoingPropertyCall.ctor "), message[0]);
+    }
+    [Test]
+    public void InheritedClassDoingConstructionCall()
+    {
+        var type = assemblyWeaver.Assembly.GetType("InheritedClassDoingConstructionCall");
+        var message = DebugRunner.CaptureDebug(() => Activator.CreateInstance(type));
+        Assert.AreEqual(1, message.Count);
+        Assert.IsTrue(message[0].StartsWith("InheritedClassDoingConstructionCall.ctor "), message[0]);
     }
 
 

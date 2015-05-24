@@ -7,12 +7,26 @@ public class InheritedClass : BaseClass
         : base("message")
     {
     }
+
 }
 [Time]
-public class InheritedClassDoingCall : BaseClass
+public class InheritedClassDoingPropertyCall : BaseClass
 {
-    public InheritedClassDoingCall()
-        : base(Property)
+    public InheritedClassDoingPropertyCall()
+        : base(SomeOtherClass.Static)
+    {
+    }
+
+    static string Property
+    {
+        get { return "aaa"; }
+    }
+}
+[Time]
+public class InheritedClassDoingConstructionCall : BaseClass
+{
+    public InheritedClassDoingConstructionCall()
+        : base(new SomeOtherClass().Instance)
     {
     }
 
@@ -22,7 +36,12 @@ public class InheritedClassDoingCall : BaseClass
     }
 }
 
-[Time]
+public class SomeOtherClass
+{
+    public string Instance { get { return "aaa"; } }
+    public static string Static { get { return "aaa"; } }
+}
+
 public class BaseClass
 {
     // ReSharper disable once UnusedParameter.Local

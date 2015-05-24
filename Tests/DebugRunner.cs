@@ -21,7 +21,7 @@ public class DebugRunner
             Debug.Listeners.Remove(myTraceListener);
         }
 
-        return myTraceListener.messages;
+        return myTraceListener.Messages;
     }
 
     public static List<string> CaptureDebug(Action action)
@@ -37,7 +37,7 @@ public class DebugRunner
         {
             Debug.Listeners.Remove(myTraceListener);
         }
-        return myTraceListener.messages;
+        return myTraceListener.Messages;
     }
 
 }

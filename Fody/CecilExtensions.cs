@@ -45,8 +45,7 @@ public static class CecilExtensions
 
     public static CustomAttribute GetAsyncStateMachineAttribute(this MethodDefinition method)
     {
-        var asyncAttribute = method.CustomAttributes.FirstOrDefault(_ => _.AttributeType.Name == "AsyncStateMachineAttribute");
-        return asyncAttribute;
+        return method.CustomAttributes.FirstOrDefault(_ => _.AttributeType.Name == "AsyncStateMachineAttribute");
     }
 
     public static bool IsAsync(this MethodDefinition method)

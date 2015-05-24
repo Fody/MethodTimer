@@ -12,7 +12,7 @@ public class Template
     public void LookAtIL()
     {
         var moduleDefinition = ModuleDefinition.ReadModule(GetType().Assembly.Location);
-        var methods = moduleDefinition.GetType("Tempalate").Methods;
+        var methods = moduleDefinition.GetType("Template").Methods;
         var noWeaving = methods.First(x=>x.Name=="NoWeaving").Body;
         var withWeaving = methods.First(x => x.Name == "WithWeaving").Body;
         Debug.WriteLine(noWeaving);

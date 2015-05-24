@@ -11,10 +11,10 @@ public class MethodProcessor
     public ModuleWeaver ModuleWeaver;
     public TypeSystem TypeSystem;
     public MethodDefinition Method;
-    MethodBody _body;
-    VariableDefinition _stopwatchVar;
-    FieldDefinition _stopwatchField;
-    TypeDefinition _asyncStateMachineType;
+    MethodBody body;
+    VariableDefinition stopwatchVar;
+    FieldDefinition stopwatchField;
+    TypeDefinition asyncStateMachineType;
 
     public void Process()
     {
@@ -37,33 +37,33 @@ public class MethodProcessor
 
     void InnerProcess()
     {
-        _body = Method.Body;
-        _body.SimplifyMacros();
+        body = Method.Body;
+        body.SimplifyMacros();
 
         InjectStopwatch();
         HandleReturns();
 
-        _body.InitLocals = true;
-        _body.OptimizeMacros();
+        body.InitLocals = true;
+        body.OptimizeMacros();
     }
 
     void InnerProcessAsync()
     {
         var asyncAttribute = Method.GetAsyncStateMachineAttribute();
-        _asyncStateMachineType = (from ctor in asyncAttribute.ConstructorArguments
+        asyncStateMachineType = (from ctor in asyncAttribute.ConstructorArguments
                                   select (TypeDefinition)ctor.Value).First();
 
-        var moveNextMethod = (from method in _asyncStateMachineType.Methods
+        var moveNextMethod = (from method in asyncStateMachineType.Methods
                               where string.Equals(method.Name, "MoveNext")
                               select method).First();
 
-        _body = moveNextMethod.Body;
-        _body.SimplifyMacros();
+        body = moveNextMethod.Body;
+        body.SimplifyMacros();
 
-        var startInstructionIndex = FindMethodStartAsync(_body.Instructions);
+        var startInstructionIndex = FindMethodStartAsync(body.Instructions);
         if (startInstructionIndex != -1)
         {
-            InjectStopwatchAsync(_asyncStateMachineType, _body.Instructions, startInstructionIndex);
+            InjectStopwatchAsync(asyncStateMachineType, body.Instructions, startInstructionIndex);
             HandleReturnsAsync();
         }
         else
@@ -72,13 +72,13 @@ public class MethodProcessor
                 Method.DeclaringType.Name, Method.Name));
         }
 
-        _body.InitLocals = true;
-        _body.OptimizeMacros();
+        body.InitLocals = true;
+        body.OptimizeMacros();
     }
 
     void HandleReturns()
     {
-        var instructions = _body.Instructions;
+        var instructions = body.Instructions;
 
         var returnPoints = instructions.Where(x => x.OpCode == OpCodes.Ret).ToList();
 
@@ -96,7 +96,7 @@ public class MethodProcessor
 
     void HandleReturnsAsync()
     {
-        var instructions = _body.Instructions;
+        var instructions = body.Instructions;
 
         // There are 3 possible return points:
         // 
@@ -213,20 +213,20 @@ public class MethodProcessor
 
     Instruction[] GetLoadStopwatchInstruction()
     {
-        if (_stopwatchVar != null)
+        if (stopwatchVar != null)
         {
             return new[]
             {
-                Instruction.Create(OpCodes.Ldloc, _stopwatchVar)
+                Instruction.Create(OpCodes.Ldloc, stopwatchVar)
             };
         }
 
-        if (_stopwatchField != null)
+        if (stopwatchField != null)
         {
             return new[]
             {
                 Instruction.Create(OpCodes.Ldarg_0),
-                Instruction.Create(OpCodes.Ldfld, _stopwatchField)
+                Instruction.Create(OpCodes.Ldfld, stopwatchField)
             };
         }
 
@@ -236,20 +236,20 @@ public class MethodProcessor
     void InjectStopwatch()
     {
         // inject as variable
-        _stopwatchVar = new VariableDefinition("methodTimerStopwatch", ModuleWeaver.StopwatchType);
-        _body.Variables.Add(_stopwatchVar);
+        stopwatchVar = new VariableDefinition("methodTimerStopwatch", ModuleWeaver.StopwatchType);
+        body.Variables.Add(stopwatchVar);
 
-        _body.Instructions.Insert(0, new List<Instruction>(new[] {
+        body.Instructions.Insert(0, new List<Instruction>(new[] {
             Instruction.Create(OpCodes.Call, ModuleWeaver.StartNewMethod),
-            Instruction.Create(OpCodes.Stloc, _stopwatchVar)
+            Instruction.Create(OpCodes.Stloc, stopwatchVar)
         }));
     }
 
     void InjectStopwatchAsync(TypeDefinition typeDefinition, Collection<Instruction> instructions, int instructionIndex)
     {
         // inject as field
-        _stopwatchField = new FieldDefinition("methodTimerStopwatch", new FieldAttributes(), ModuleWeaver.StopwatchType);
-        typeDefinition.Fields.Add(_stopwatchField);
+        stopwatchField = new FieldDefinition("methodTimerStopwatch", new FieldAttributes(), ModuleWeaver.StopwatchType);
+        typeDefinition.Fields.Add(stopwatchField);
 
         // This code:
         // 
@@ -276,13 +276,13 @@ public class MethodProcessor
 
 
         var isNullBoolVariable = new VariableDefinition("isStopwatchNull", ModuleWeaver.BooleanType);
-        _body.Variables.Add(isNullBoolVariable);
+        body.Variables.Add(isNullBoolVariable);
 
         var startInstruction = instructions[instructionIndex];
 
         instructions.Insert(instructionIndex, new List<Instruction>(new[] {
             Instruction.Create(OpCodes.Ldarg_0),
-            Instruction.Create(OpCodes.Ldfld, _stopwatchField),
+            Instruction.Create(OpCodes.Ldfld, stopwatchField),
             Instruction.Create(OpCodes.Ldnull),
             Instruction.Create(OpCodes.Ceq),
             Instruction.Create(OpCodes.Ldc_I4, 0),
@@ -292,7 +292,7 @@ public class MethodProcessor
             Instruction.Create(OpCodes.Brtrue_S, startInstruction),
             Instruction.Create(OpCodes.Ldarg_0),
             Instruction.Create(OpCodes.Call, ModuleWeaver.StartNewMethod),
-            Instruction.Create(OpCodes.Stfld, _stopwatchField)
+            Instruction.Create(OpCodes.Stfld, stopwatchField)
         }));
     }
 

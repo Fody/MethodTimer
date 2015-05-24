@@ -38,7 +38,7 @@ public class WithoutInterceptorTests
         Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.MethodWithAwait "));
     }
 
-    private async Task ClassWithAsyncMethodInvocation()
+    async Task ClassWithAsyncMethodInvocation()
     {
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
@@ -54,7 +54,7 @@ public class WithoutInterceptorTests
         Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.ComplexMethodWithAwait "));
     }
 
-    private async Task ClassWithExceptionAsyncMethodInvocation()
+    async Task ClassWithExceptionAsyncMethodInvocation()
     {
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
@@ -70,7 +70,7 @@ public class WithoutInterceptorTests
         Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.ComplexMethodWithAwait "));
     }
 
-    private async Task ClassWithFastComplexAsyncMethodInvocation()
+    async Task ClassWithFastComplexAsyncMethodInvocation()
     {
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
@@ -86,7 +86,7 @@ public class WithoutInterceptorTests
         Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.ComplexMethodWithAwait "));
     }
 
-    private async Task ClassWithMediumComplexAsyncMethodInvocation()
+    async Task ClassWithMediumComplexAsyncMethodInvocation()
     {
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
@@ -102,7 +102,7 @@ public class WithoutInterceptorTests
         Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.ComplexMethodWithAwait "));
     }
 
-    private async Task ClassWithSlowComplexAsyncMethodInvocation()
+    async Task ClassWithSlowComplexAsyncMethodInvocation()
     {
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);

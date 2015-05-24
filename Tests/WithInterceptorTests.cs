@@ -62,7 +62,7 @@ public class WithInterceptorTests
         //Assert.AreEqual(methodBase.DeclaringType, type);
     }
 
-    private async Task ClassWithAsyncMethodInvocation()
+    async Task ClassWithAsyncMethodInvocation()
     {
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);

@@ -149,7 +149,7 @@ public class MethodProcessor
 
         var instructionsAdded = 0;
         var indexOf = instructions.IndexOf(returnPoint);
-        foreach (var instruction in GetWriteTimeIL())
+        foreach (var instruction in GetWriteTimeInstructions())
         {
             indexOf++;
             instructions.Insert(indexOf, instruction);
@@ -172,7 +172,7 @@ public class MethodProcessor
         return instructionsAdded;
     }
 
-    private IEnumerable<Instruction> GetWriteTimeIL()
+    IEnumerable<Instruction> GetWriteTimeInstructions()
     {
         foreach (var instruction in GetLoadStopwatchInstruction())
         {
@@ -320,109 +320,9 @@ public class MethodProcessor
         return startIndex;
     }
 
-    Instruction FindMethodStartInstructionAsyncV1(Collection<Instruction> instructions)
-    {
-        Instruction startInstruction = null;
-
-        // A) If there is a switch, go to the first line after the switch ==> multiple awaits in release mode
-
-        if (startInstruction == null)
-        {
-            var switchInstruction = (from instruction in instructions
-                                     where instruction.OpCode == OpCodes.Switch
-                                     select instruction).FirstOrDefault();
-            if (switchInstruction != null)
-            {
-                startInstruction = instructions[instructions.IndexOf(switchInstruction) + 1];
-            }
-        }
-
-        // B) If there is a switch, go to the last break ==> multiple awaits in debug mode
-
-        // L_000d: switch (L_0034, L_0052, L_0052, L_0039, L_003e, L_0043, L_0048, L_004d)
-        // L_0032: br.s L_0052
-        // L_0034: br L_0719
-        // L_0039: br L_00f3
-        // L_003e: br L_01b8
-        // L_0043: br L_028f
-        // L_0048: br L_0466
-        // L_004d: br L_06d3
-        // L_0052: br.s L_0054
-
-        if (startInstruction == null)
-        {
-            var switchInstruction = (from instruction in instructions
-                                     where instruction.OpCode == OpCodes.Switch
-                                     select instruction).FirstOrDefault();
-            if (switchInstruction != null)
-            {
-                startInstruction = FindLastBrsAsync(instructions, switchInstruction);
-            }
-        }
-
-        // C) Get the right beq (if statement) ==> single await in release mode
-
-        if (startInstruction == null)
-        {
-            var firstIfInstruction = (from instruction in instructions
-                                      where instruction.IsIfInstruction()
-                                      select instruction).FirstOrDefault();
-            if (firstIfInstruction != null)
-            {
-                startInstruction = instructions[instructions.IndexOf(firstIfInstruction) + 1];
-            }
-        }
-
-        // D) Get the right br.s ==> single await in debug mode
-
-        // L_000f: ldc.i4.0         <== ldc.i4.0 which we are looking for
-        // L_0010: beq.s L_0016     
-        // L_0012: br.s L_0018      <== first br.s that jumpts to address #1
-        // L_0014: br.s L_0083
-        // L_0016: br.s L_0055      <== br.s that jumps to the actual start of the "method"
-        // L_0018: br.s L_001a
-        // L_001d: nop 
-
-        if (startInstruction == null)
-        {
-            var firstBreakInstruction = (from instruction in instructions
-                                         where instruction.IsBreakInstruction()
-                                         select instruction).FirstOrDefault();
-            if (firstBreakInstruction != null)
-            {
-                startInstruction = FindLastBrsAsync(instructions, firstBreakInstruction);
-            }
-        }
-
-        return startInstruction;
-    }
-
-    private Instruction FindMethodStartInstructionAsyncV2(Collection<Instruction> instructions)
+    Instruction FindMethodStartInstructionAsyncV2(Collection<Instruction> instructions)
     {
         return instructions.First();
     }
 
-    static Instruction FindLastBrsAsync(Collection<Instruction> instructions, Instruction startInstruction)
-    {
-        var wasPreviousBr = false;
-
-        for (var i = instructions.IndexOf(startInstruction); i < instructions.Count; i++)
-        {
-            var instruction = instructions[i];
-            if (instruction.IsBreakInstruction())
-            {
-                wasPreviousBr = true;
-                continue;
-            }
-
-            if (!wasPreviousBr)
-            {
-                continue;
-            }
-
-            return instruction;
-        }
-
-        return null;
-    }
 }

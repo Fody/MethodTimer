@@ -74,7 +74,6 @@
     <Compile Include="AssemblyProcessor.cs" />
     <Compile Include="CecilExtensions.cs" />
     <Compile Include="StopwatchCreator.cs" />
-    <Compile Include="MethodProcessorAsync.cs" />
     <Compile Include="InterceptorFinder.cs" />
     <Compile Include="MethodProcessor.cs" />
     <Compile Include="ModuleWeaver.cs" />

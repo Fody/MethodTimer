@@ -22,7 +22,7 @@ public class StopwatchCreatorTests : IDisposable
                 LogError = LogError
             };
         weavingTask.FindReferences();
-        weavingTask.InjectStopwatch();
+        weavingTask.InjectStopwatchType();
         using (var fileStream = File.OpenWrite("temp.dll"))
         {
             moduleDefinition.Write(fileStream);

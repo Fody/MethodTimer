@@ -44,7 +44,6 @@ public partial class ModuleWeaver
         var methodProcessor = new MethodProcessor
         {
             ModuleWeaver = this,
-            TypeSystem = ModuleDefinition.TypeSystem,
             Method = method,
         };
 

@@ -4,7 +4,7 @@ using Mono.Cecil.Cil;
 public partial class ModuleWeaver
 {
     
-    public void InjectStopwatch()
+    public void InjectStopwatchType()
     {
         var typeSystem = ModuleDefinition.TypeSystem;
         var type = new TypeDefinition("MethodTimer","Stopwatch",TypeAttributes.BeforeFieldInit| TypeAttributes.AnsiClass| TypeAttributes.AutoClass,typeSystem.Object);

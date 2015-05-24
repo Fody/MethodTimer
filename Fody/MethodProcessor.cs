@@ -9,7 +9,6 @@ using Mono.Collections.Generic;
 public class MethodProcessor
 {
     public ModuleWeaver ModuleWeaver;
-    public TypeSystem TypeSystem;
     public MethodDefinition Method;
     MethodBody body;
     VariableDefinition stopwatchVar;
@@ -49,7 +48,7 @@ public class MethodProcessor
         }
 
         body.SimplifyMacros();
-        InjectStopwatch();
+        stopwatchVar = ModuleWeaver.InjectStopwatch(body);
         HandleReturns();
         body.InitLocals = true;
         body.OptimizeMacros();
@@ -61,7 +60,7 @@ public class MethodProcessor
         var last = instructions.Last();
         if (last.OpCode == OpCodes.Rethrow || last.OpCode == OpCodes.Throw)
         {
-         //   returnPoints.Add(last);
+            returnPoints.Add(last);
         }
         return returnPoints;
     }
@@ -127,7 +126,7 @@ public class MethodProcessor
 
         var instructions = body.Instructions;
         var indexOf = instructions.IndexOf(returnPoint);
-        foreach (var instruction in GetWriteTimeInstructions())
+        foreach (var instruction in ModuleWeaver.GetWriteTimeInstruction(stopwatchVar,Method))
         {
             indexOf++;
             instructions.Insert(indexOf, instruction);
@@ -144,42 +143,5 @@ public class MethodProcessor
             instructions.Insert(indexOf, Instruction.Create(opCode));
         }
     }
-
-    IEnumerable<Instruction> GetWriteTimeInstructions()
-    {
-        yield return Instruction.Create(OpCodes.Ldloc, stopwatchVar);
-        yield return Instruction.Create(OpCodes.Call, ModuleWeaver.StopMethod);
-        if (ModuleWeaver.LogMethod == null)
-        {
-            yield return Instruction.Create(OpCodes.Ldstr, Method.MethodName());
-            yield return Instruction.Create(OpCodes.Ldloc, stopwatchVar);
-            yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);
-            yield return Instruction.Create(OpCodes.Box, TypeSystem.Int64);
-            yield return Instruction.Create(OpCodes.Ldstr, "ms");
-            yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ConcatMethod);
-            yield return Instruction.Create(OpCodes.Call, ModuleWeaver.DebugWriteLineMethod);
-        }
-        else
-        {
-            yield return Instruction.Create(OpCodes.Ldtoken, Method);
-            yield return Instruction.Create(OpCodes.Ldtoken, Method.DeclaringType);
-            yield return Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle);
-            yield return Instruction.Create(OpCodes.Ldloc, stopwatchVar);
-            yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);
-            yield return Instruction.Create(OpCodes.Call, ModuleWeaver.LogMethod);
-        }
-    }
-
-    void InjectStopwatch()
-    {
-        // inject as variable
-        stopwatchVar = new VariableDefinition("methodTimerStopwatch", ModuleWeaver.StopwatchType);
-        body.Variables.Add(stopwatchVar);
-
-        body.Instructions.Insert(0, new List<Instruction>(new[] {
-            Instruction.Create(OpCodes.Call, ModuleWeaver.StartNewMethod),
-            Instruction.Create(OpCodes.Stloc, stopwatchVar)
-        }));
-    }
-
 }
+

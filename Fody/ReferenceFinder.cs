@@ -59,7 +59,7 @@ public partial class ModuleWeaver
         var stopwatchType = coreTypes.FirstOrDefault(x => x.Name == "Stopwatch");
         if (stopwatchType == null)
         {
-            InjectStopwatch();
+            InjectStopwatchType();
         }
         else
         {

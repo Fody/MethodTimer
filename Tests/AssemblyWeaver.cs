@@ -31,7 +31,6 @@ public class AssemblyWeaver
         {
             AssemblyResolver = assemblyResolver,
             ReadSymbols = true,
-
         };
         var moduleDefinition = ModuleDefinition.ReadModule(newAssembly, readerParameters);
         var weavingTask = new ModuleWeaver

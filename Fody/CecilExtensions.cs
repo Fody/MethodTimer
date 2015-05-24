@@ -8,42 +8,34 @@ public static class CecilExtensions
 {
     public static IEnumerable<MethodDefinition> AbstractMethods(this TypeDefinition type)
     {
-        return type.Methods.Where(x=>x.IsAbstract);
+        return type.Methods.Where(x => x.IsAbstract);
     }
+
     public static IEnumerable<MethodDefinition> ConcreteMethods(this TypeDefinition type)
     {
-        return type.Methods.Where(x=>!x.IsAbstract  && !IsEmptyConstructor(x));
+        return type.Methods.Where(x => !x.IsAbstract && !IsEmptyConstructor(x));
     }
-     static bool IsEmptyConstructor(this MethodDefinition method)
+
+    static bool IsEmptyConstructor(this MethodDefinition method)
     {
         return ((method.Name == ".ctor") && (method.HasBody) && (method.Body.Instructions.Count == 3));
     }
 
-     public static bool IsInstanceConstructor(this MethodDefinition methodDefinition)
-     {
-         return methodDefinition.IsConstructor && !methodDefinition.IsStatic;
-     }
+    public static bool IsInstanceConstructor(this MethodDefinition methodDefinition)
+    {
+        return methodDefinition.IsConstructor && !methodDefinition.IsStatic;
+    }
 
-     public static void InsertBefore(this MethodBody body, Instruction target, Instruction instruction)
-     {
-         body.Instructions.InsertBefore(target, instruction);
-     }
+    public static void InsertBefore(this MethodBody body, Instruction target, Instruction instruction)
+    {
+        body.Instructions.InsertBefore(target, instruction);
+    }
 
-     public static void InsertBefore(this Collection<Instruction> instructions, Instruction target, Instruction instruction)
-     {
-         var index = instructions.IndexOf(target);
-         instructions.Insert(index, instruction);
-     }
-     public static void InsertAfter(this MethodBody body, Instruction target, Instruction instruction)
-     {
-         body.Instructions.InsertAfter(target, instruction);
-     }
-
-     public static void InsertAfter(this Collection<Instruction> instructions, Instruction target, Instruction instruction)
-     {
-         var index = instructions.IndexOf(target);
-         instructions.Insert(index, instruction);
-     }
+    public static void InsertBefore(this Collection<Instruction> instructions, Instruction target, Instruction instruction)
+    {
+        var index = instructions.IndexOf(target);
+        instructions.Insert(index, instruction);
+    }
 
     public static string MethodName(this MethodDefinition method)
     {
@@ -68,13 +60,14 @@ public static class CecilExtensions
         foreach (var instruction in instructions)
         {
             body.Instructions.Add(instruction);
-        }   
+        }
     }
 
     public static CustomAttribute GetAsyncStateMachineAttribute(this MethodDefinition method)
     {
         return method.CustomAttributes.FirstOrDefault(_ => _.AttributeType.Name == "AsyncStateMachineAttribute");
     }
+
     public static bool IsAsync(this MethodDefinition method)
     {
         return GetAsyncStateMachineAttribute(method) != null;
@@ -90,23 +83,4 @@ public static class CecilExtensions
         return false;
     }
 
-    public static bool IsBreakInstruction(this Instruction instruction)
-    {
-        if ((instruction.OpCode == OpCodes.Br) || (instruction.OpCode == OpCodes.Br_S))
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    public static bool IsIfInstruction(this Instruction instruction)
-    {
-        if ((instruction.OpCode == OpCodes.Beq) || (instruction.OpCode == OpCodes.Beq_S))
-        {
-            return true;
-        }
-
-        return false;
-    }
 }

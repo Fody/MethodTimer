@@ -83,7 +83,7 @@
     <Compile Include="AssemblyExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AssemblyToProcess\AssemblyWithoutInterceptor.csproj">
+    <ProjectReference Include="..\AssemblyWithoutInterceptor\AssemblyWithoutInterceptor.csproj">
       <Project>{dfe56c18-3504-4265-a3fe-7f434b1fd38d}</Project>
       <Name>AssemblyWithoutInterceptor</Name>
     </ProjectReference>

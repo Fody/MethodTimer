@@ -38,12 +38,12 @@ public class WithInterceptorTests
 
     void ClearMessage()
     {
-        methodBaseField.SetValue(null,new List<MethodBase>());
+        methodBaseField.SetValue(null, new List<MethodBase>());
     }
 
     List<MethodBase> GetMethodInfoField()
     {
-        return (List<MethodBase>)methodBaseField.GetValue(null);
+        return (List<MethodBase>) methodBaseField.GetValue(null);
     }
 
     [Test]
@@ -57,7 +57,7 @@ public class WithInterceptorTests
     {
         ClearMessage();
         var type = assemblyWeaver.Assembly.GetType("GenericClassWithMethod`1[[System.String, mscorlib]]");
-        var instance = (dynamic)Activator.CreateInstance(type);
+        var instance = (dynamic) Activator.CreateInstance(type);
         instance.Method();
 
         var methodBases = GetMethodInfoField();
@@ -68,20 +68,19 @@ public class WithInterceptorTests
     }
 
     [Test]
-    public async void ClassWithAsyncMethod()
+    public void ClassWithAsyncMethod()
     {
-        await DebugRunner.CaptureDebugAsync(ClassWithAsyncMethodInvocation);
+        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic) Activator.CreateInstance(type);
+        DebugRunner.CaptureDebug(() =>
+        {
+            var task = (Task) instance.MethodWithAwait();
+            task.Wait();
+        });
 
         var methodBases = GetMethodInfoField();
         Assert.AreEqual(1, methodBases.Count);
         var methodBase = methodBases.First();
         Assert.AreEqual(methodBase.Name, "MethodWithAwait");
-    }
-
-    async Task ClassWithAsyncMethodInvocation()
-    {
-        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
-        var instance = (dynamic)Activator.CreateInstance(type);
-        await instance.MethodWithAwait();
     }
 }

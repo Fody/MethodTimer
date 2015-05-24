@@ -10,7 +10,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj
 		{DFE56C18-3504-4265-A3FE-7F434B1FD38D} = {DFE56C18-3504-4265-A3FE-7F434B1FD38D}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyWithoutInterceptor", "AssemblyToProcess\AssemblyWithoutInterceptor.csproj", "{DFE56C18-3504-4265-A3FE-7F434B1FD38D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyWithoutInterceptor", "AssemblyWithoutInterceptor\AssemblyWithoutInterceptor.csproj", "{DFE56C18-3504-4265-A3FE-7F434B1FD38D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReferenceAssembly", "ReferenceAssembly\ReferenceAssembly.csproj", "{B5AEB0E8-28F4-4955-A055-9C200F7113F0}"
 EndProject

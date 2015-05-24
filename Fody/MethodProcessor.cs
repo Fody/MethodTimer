@@ -56,7 +56,19 @@ public class MethodProcessor
     {
         if (Method.IsInstanceConstructor())
         {
-            return body.Instructions.Skip(2).First();
+            foreach (var instruction in body.Instructions)
+            {
+                if (instruction.OpCode != OpCodes.Call)
+                {
+                    continue;
+                }
+                var methodReference = instruction.Operand as MethodReference;
+                if (methodReference.Name != ".ctor")
+                {
+                    continue;
+                }
+                return instruction.Next;
+            }
         }
         return body.Instructions.First();
     }

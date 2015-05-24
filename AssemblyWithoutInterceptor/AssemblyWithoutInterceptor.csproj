@@ -46,6 +46,7 @@
     <Compile Include="AbstractClassWithAttributeOnType.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Delegate.cs" />
     <Compile Include="Template.cs" />
     <Compile Include="ClassWithAsyncMethod.cs" />
     <Compile Include="ClassWithAttribute.cs">

@@ -1,0 +1,1 @@
+﻿public delegate object SiteDelegate(string param2);

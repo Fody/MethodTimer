@@ -47,6 +47,10 @@ public class AsyncMethodProcessor
             ModuleWeaver.LogWarning(message);
             return;
         }
+        if (first.OpCode == OpCodes.Nop)
+        {
+            first = first.Next;
+        }
         body.SimplifyMacros();
         InjectStopwatch(body.Instructions.IndexOf(first));
         HandleReturns();

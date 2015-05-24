@@ -13,12 +13,12 @@ public static class CecilExtensions
 
     public static IEnumerable<MethodDefinition> ConcreteMethods(this TypeDefinition type)
     {
-        return type.Methods.Where(x => !x.IsAbstract && !IsEmptyConstructor(x));
+        return type.Methods.Where(x => !x.IsAbstract && x.HasBody && !IsEmptyConstructor(x));
     }
 
     static bool IsEmptyConstructor(this MethodDefinition method)
     {
-        return ((method.Name == ".ctor") && (method.HasBody) && (method.Body.Instructions.Count == 3));
+        return ((method.Name == ".ctor") && (method.Body.Instructions.Count == 3));
     }
 
     public static bool IsInstanceConstructor(this MethodDefinition methodDefinition)

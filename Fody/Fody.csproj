@@ -73,6 +73,7 @@
     <Compile Include="AttributeRemover.cs" />
     <Compile Include="AssemblyProcessor.cs" />
     <Compile Include="CecilExtensions.cs" />
+    <Compile Include="AsyncMethodProcessor.cs" />
     <Compile Include="StopwatchHelper.cs" />
     <Compile Include="StopwatchCreator.cs" />
     <Compile Include="InterceptorFinder.cs" />

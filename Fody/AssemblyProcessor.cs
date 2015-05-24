@@ -41,6 +41,17 @@ public partial class ModuleWeaver
 
     void ProcessMethod(MethodDefinition method)
     {
+        if (method.IsAsync())
+        {
+            var asyncProcessor = new AsyncMethodProcessor
+            {
+                ModuleWeaver = this,
+                Method = method,
+            };
+
+            asyncProcessor.Process();
+            return;
+        }
         var methodProcessor = new MethodProcessor
         {
             ModuleWeaver = this,

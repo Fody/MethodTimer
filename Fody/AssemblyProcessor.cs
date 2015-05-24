@@ -49,19 +49,5 @@ public partial class ModuleWeaver
         };
 
         methodProcessor.Process();
-
-        //var fullName = method.FullName;
-        //var customAttributeArgument = asyncAttribute.ConstructorArguments.First();
-        //var typeReference = (TypeReference) customAttributeArgument.Value;
-        //var asyncTypeDefinition = typeReference.Resolve();
-
-        //var methodProcessorAsync = new MethodProcessorAsync
-        //    {
-        //        ModuleWeaver = this,
-        //        TypeSystem = ModuleDefinition.TypeSystem,
-        //        AsyncTypeReference = asyncTypeDefinition,
-        //        OriginalMethod = method
-        //    };
-        //methodProcessorAsync.Process();
     }
 }

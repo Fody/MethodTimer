@@ -68,36 +68,40 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyWeaver.cs" />
-    <Compile Include="AssemblyWithAttributeOnAssemblyTests.cs" />
-    <Compile Include="AssemblyWithAttributeOnModuleTests.cs" />
+    <Compile Include="AssemblyTestersests\AssemblyWithAttributeOnAssemblyTests.cs" />
+    <Compile Include="AssemblyTestersests\AssemblyWithAttributeOnModuleTests.cs" />
     <Compile Include="StopwatchCreatorTests.cs" />
     <Compile Include="Stopwatch.cs" />
-    <Compile Include="WithInterceptorTests.cs" />
+    <Compile Include="AssemblyTestersests\WithInterceptorTests.cs" />
     <Compile Include="DebugRunner.cs" />
     <Compile Include="MockAssemblyResolver.cs" />
     <Compile Include="MyTraceListener.cs" />
     <Compile Include="Template.cs" />
     <Compile Include="Verifier.cs" />
-    <Compile Include="WithoutInterceptorAndReferenceTests.cs" />
-    <Compile Include="WithoutInterceptorTests.cs" />
+    <Compile Include="AssemblyTestersests\WithInterceptorInReferenceTests.cs" />
+    <Compile Include="AssemblyTestersests\WithoutInterceptorTests.cs" />
     <Compile Include="AssemblyExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AssemblyToProcess\AssemblyWithAttributeOnAssembly.csproj">
-      <Project>{54d8a3fc-e7df-4ff1-8d3f-1ccaf7169cbe}</Project>
-      <Name>AssemblyWithAttributeOnAssembly</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\AssemblyToProcess\AssemblyWithAttributeOnModule.csproj">
-      <Project>{7b07ae87-f53d-4952-a7db-8a5113a224a7}</Project>
-      <Name>AssemblyWithAttributeOnModule</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\AssemblyToProcess\AssemblyWithInterceptor.csproj">
-      <Project>{23c29b37-221d-473e-967b-dc423f5f4ab2}</Project>
-      <Name>AssemblyWithInterceptor</Name>
-    </ProjectReference>
     <ProjectReference Include="..\AssemblyToProcess\AssemblyWithoutInterceptor.csproj">
       <Project>{dfe56c18-3504-4265-a3fe-7f434b1fd38d}</Project>
       <Name>AssemblyWithoutInterceptor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AssemblyWithAttributeOnAssembly\AssemblyWithAttributeOnAssembly.csproj">
+      <Project>{6c028879-7e51-44e3-a3c4-0a01353eef19}</Project>
+      <Name>AssemblyWithAttributeOnAssembly</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AssemblyWithAttributeOnModule\AssemblyWithAttributeOnModule.csproj">
+      <Project>{35205183-e7a9-4584-9bac-d5d103346c84}</Project>
+      <Name>AssemblyWithAttributeOnModule</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AssemblyWIthInterceptorInReference\AssemblyWithInterceptorInReference.csproj">
+      <Project>{918e4285-60a4-4c1a-8caa-e257f6a0c564}</Project>
+      <Name>AssemblyWithInterceptorInReference</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AssemblyWithInterceptor\AssemblyWithInterceptor.csproj">
+      <Project>{eb33f608-2124-4128-820f-dc4e07e88028}</Project>
+      <Name>AssemblyWithInterceptor</Name>
     </ProjectReference>
     <ProjectReference Include="..\Fody\Fody.csproj">
       <Project>{C3578A7B-09A6-4444-9383-0DEAFA4958BD}</Project>

@@ -10,7 +10,7 @@ public class AssemblyWithAttributeOnModuleTests
 
     public AssemblyWithAttributeOnModuleTests()
     {
-        var assemblyPath = Path.GetFullPath(@"..\..\..\AssemblyToProcess\bin\DebugWithAttributeOnModule\AssemblyWithAttributeOnModule.dll");
+        var assemblyPath = Path.GetFullPath(@"..\..\..\AssemblyWithAttributeOnModule\bin\Debug\AssemblyWithAttributeOnModule.dll");
         assemblyWeaver = new AssemblyWeaver(assemblyPath);
     }
 

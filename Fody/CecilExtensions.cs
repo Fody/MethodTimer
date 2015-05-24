@@ -2,7 +2,6 @@
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Mono.Collections.Generic;
 
 public static class CecilExtensions
 {
@@ -19,6 +18,17 @@ public static class CecilExtensions
         return ((method.Name == ".ctor") && (method.HasBody) && (method.Body.Instructions.Count == 3));
     }
 
+     public static bool IsInstanceConstructor(this MethodDefinition methodDefinition)
+     {
+         return methodDefinition.IsConstructor && !methodDefinition.IsStatic;
+     }
+
+     public static  void InsertBefore(this MethodBody body, Instruction target, Instruction instruction)
+     {
+         var index = body.Instructions.IndexOf(target);
+         body.Instructions.Insert(index, instruction);
+     }
+
     public static string MethodName(this MethodDefinition method)
     {
         if (method.IsConstructor)
@@ -27,19 +37,19 @@ public static class CecilExtensions
         }
         return string.Format("{0}.{1} ", method.DeclaringType.Name, method.Name);
     }
-    public static void Insert(this Collection<Instruction> collection, int index,  List<Instruction> instructions)
+    public static void Insert(this MethodBody body, int index,  List<Instruction> instructions)
     {
         instructions.Reverse();
         foreach (var instruction in instructions)
         {
-            collection.Insert(index, instruction);
+            body.Instructions.Insert(index, instruction);
         }   
     }
-    public static void Add(this Collection<Instruction> collection,  params Instruction[] instructions)
+    public static void Add(this MethodBody body, params Instruction[] instructions)
     {
         foreach (var instruction in instructions)
         {
-            collection.Add(instruction);
+            body.Instructions.Add(instruction);
         }   
     }
 

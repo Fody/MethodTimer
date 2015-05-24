@@ -31,7 +31,7 @@ public partial class ModuleWeaver
         type.Methods.Add(currentTicks);
         var timeVariable = new VariableDefinition(DateTimeType);
         currentTicks.Body.Variables.Add(timeVariable);
-        currentTicks.Body.Instructions.Add(
+        currentTicks.Body.Add(
             Instruction.Create(OpCodes.Call, UtcNowMethod),
             Instruction.Create(OpCodes.Stloc, timeVariable),
             Instruction.Create(OpCodes.Ldloca_S, timeVariable),
@@ -44,7 +44,7 @@ public partial class ModuleWeaver
             MethodAttributes.SpecialName|
             MethodAttributes.HideBySig|MethodAttributes.Public,typeSystem.Void);
         type.Methods.Add(constructor);
-        constructor.Body.Instructions.Add(
+        constructor.Body.Add(
             Instruction.Create(OpCodes.Ldarg_0),
             Instruction.Create(OpCodes.Call,currentTicks),
             Instruction.Create(OpCodes.Stfld, startTicks),
@@ -57,7 +57,7 @@ public partial class ModuleWeaver
         var startNew = new MethodDefinition("StartNew",
             MethodAttributes.HideBySig | MethodAttributes.Public | MethodAttributes.Static, type);
         type.Methods.Add(startNew);
-        startNew.Body.Instructions.Add(
+        startNew.Body.Add(
             Instruction.Create(OpCodes.Newobj, constructor),
             Instruction.Create(OpCodes.Ret));
 
@@ -66,7 +66,7 @@ public partial class ModuleWeaver
             MethodAttributes.HideBySig | MethodAttributes.Public , typeSystem.Void);
         type.Methods.Add(stop);
         var stopReturn = Instruction.Create(OpCodes.Ret);
-        stop.Body.Instructions.Add(
+        stop.Body.Add(
             Instruction.Create(OpCodes.Ldarg_0),
             Instruction.Create(OpCodes.Ldfld, stopped),
             Instruction.Create(OpCodes.Brtrue, stopReturn),
@@ -87,7 +87,7 @@ public partial class ModuleWeaver
 
         var elapsedMilliseconds = new MethodDefinition("GetElapsedMilliseconds", MethodAttributes.HideBySig | MethodAttributes.Public , typeSystem.Int64);
         type.Methods.Add(elapsedMilliseconds);
-        elapsedMilliseconds.Body.Instructions.Add(
+        elapsedMilliseconds.Body.Add(
             Instruction.Create(OpCodes.Ldarg_0),
             Instruction.Create(OpCodes.Call, stop),
             Instruction.Create(OpCodes.Ldarg_0),

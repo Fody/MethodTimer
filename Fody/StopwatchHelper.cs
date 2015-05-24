@@ -34,8 +34,16 @@ public partial class ModuleWeaver
         // inject as variable
         var stopwatchVar = new VariableDefinition("methodTimerStopwatch", StopwatchType);
         body.Variables.Add(stopwatchVar);
-
-        body.Instructions.Insert(0, new List<Instruction>(new[] {
+        int index;
+        if (body.Method.IsInstanceConstructor())
+        {
+            index = 2;
+        }
+        else
+        {
+            index = 0;
+        }
+        body.Insert(index, new List<Instruction>(new[] {
             Instruction.Create(OpCodes.Call, StartNewMethod),
             Instruction.Create(OpCodes.Stloc, stopwatchVar)
         }));

@@ -30,14 +30,14 @@ public class AsyncMethodProcessor
     void InnerProcess()
     {
         var asyncAttribute = Method.GetAsyncStateMachineAttribute();
-            stateMachineType = asyncAttribute.ConstructorArguments
-                .Select(ctor => (TypeDefinition) ctor.Value)
-                .Single();
-            var moveNextMethod = stateMachineType.Methods
-                .Single(x => x.Name == "MoveNext");
-            body = moveNextMethod.Body;
-            returnPoints = GetAsyncReturns(body.Instructions)
-                .ToList();
+        stateMachineType = asyncAttribute.ConstructorArguments
+            .Select(ctor => (TypeDefinition) ctor.Value)
+            .Single();
+        var moveNextMethod = stateMachineType.Methods
+            .Single(x => x.Name == "MoveNext");
+        body = moveNextMethod.Body;
+        returnPoints = GetAsyncReturns(body.Instructions)
+            .ToList();
 
         body.SimplifyMacros();
         stopwatchVar = ModuleWeaver.InjectStopwatch(body);

@@ -1,10 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
-using Mono.Collections.Generic;
 
 public class MethodProcessor
 {
@@ -12,7 +10,6 @@ public class MethodProcessor
     public MethodDefinition Method;
     MethodBody body;
     VariableDefinition stopwatchVar;
-    List<Instruction> returnPoints;
 
     public void Process()
     {
@@ -28,61 +25,86 @@ public class MethodProcessor
 
     void InnerProcess()
     {
-            body = Method.Body;
-            returnPoints = GetSyncReturnPoints(body.Instructions);
-
+        body = Method.Body;
         body.SimplifyMacros();
         stopwatchVar = ModuleWeaver.InjectStopwatch(body);
-        HandleReturns();
+
+        var returnInstruction = FixReturns();
+
+        var firstInstruction = FirstInstructionSkipCtor();
+
+        var beforeReturn = Instruction.Create(OpCodes.Nop);
+        body.InsertBefore(returnInstruction, beforeReturn);
+
+        InjectIlForFinally(returnInstruction);
+
+        var handler = new ExceptionHandler(ExceptionHandlerType.Finally)
+        {
+            TryStart = firstInstruction,
+            TryEnd = beforeReturn,
+            HandlerStart = beforeReturn,
+            HandlerEnd = returnInstruction,
+        };
+
+        body.ExceptionHandlers.Add(handler);
         body.InitLocals = true;
         body.OptimizeMacros();
     }
 
-    static List<Instruction> GetSyncReturnPoints(Collection<Instruction> instructions)
+    Instruction FirstInstructionSkipCtor()
     {
-        var returnPoints = instructions.Where(x => x.OpCode == OpCodes.Ret).ToList();
-        var last = instructions.Last();
-        if (last.OpCode == OpCodes.Rethrow || last.OpCode == OpCodes.Throw)
+        if (Method.IsInstanceConstructor())
         {
-            returnPoints.Add(last);
+            return body.Instructions.Skip(2).First();
         }
-        return returnPoints;
+        return body.Instructions.First();
     }
 
-    void HandleReturns()
+
+    Instruction FixReturns()
     {
-        foreach (var returnPoint in returnPoints)
-        {
-            FixReturn(returnPoint);
-        }
-    }
-
-    void FixReturn(Instruction returnPoint)
-    {
-        var opCode = returnPoint.OpCode;
-        var operand = returnPoint.Operand as Instruction;
-
-        returnPoint.OpCode = OpCodes.Nop;
-        returnPoint.Operand = null;
-
         var instructions = body.Instructions;
-        var indexOf = instructions.IndexOf(returnPoint);
-        foreach (var instruction in ModuleWeaver.GetWriteTimeInstruction(stopwatchVar,Method))
+        if (Method.ReturnType == ModuleWeaver.ModuleDefinition.TypeSystem.Void)
         {
-            indexOf++;
-            instructions.Insert(indexOf, instruction);
-        }
+            var lastRet = Instruction.Create(OpCodes.Ret);
+            instructions.Add(lastRet);
 
-        indexOf++;
+            for (var index = 0; index < instructions.Count - 1; index++)
+            {
+                var instruction = instructions[index];
+                if (instruction.OpCode == OpCodes.Ret)
+                {
+                    instructions[index] = Instruction.Create(OpCodes.Leave, lastRet);
+                }
+            }
+            return lastRet;
+        }
+        var returnVariable = new VariableDefinition("methodTimerReturn", Method.ReturnType);
+        body.Variables.Add(returnVariable);
+        var lastLd = Instruction.Create(OpCodes.Ldloc, returnVariable);
+        instructions.Add(lastLd);
+        instructions.Add(Instruction.Create(OpCodes.Ret));
 
-        if ((opCode == OpCodes.Leave) || (opCode == OpCodes.Leave_S))
+        for (var index = 0; index < instructions.Count - 2; index++)
         {
-            instructions.Insert(indexOf, Instruction.Create(opCode, operand));
+            var instruction = instructions[index];
+            if (instruction.OpCode == OpCodes.Ret)
+            {
+                instructions[index] = Instruction.Create(OpCodes.Leave, lastLd);
+                instructions.Insert(index, Instruction.Create(OpCodes.Stloc, returnVariable));
+                index++;
+            }
         }
-        else
-        {
-            instructions.Insert(indexOf, Instruction.Create(opCode));
-        }
+        return lastLd;
     }
-}
 
+    void InjectIlForFinally(Instruction beforeThis)
+    {
+        foreach (var instruction in ModuleWeaver.GetWriteTimeInstruction(stopwatchVar, Method))
+        {
+            body.InsertBefore(beforeThis, instruction);
+        }
+        body.InsertBefore(beforeThis, Instruction.Create(OpCodes.Endfinally));
+    }
+
+}

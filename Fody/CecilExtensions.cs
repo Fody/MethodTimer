@@ -2,6 +2,7 @@
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Mono.Collections.Generic;
 
 public static class CecilExtensions
 {
@@ -23,10 +24,25 @@ public static class CecilExtensions
          return methodDefinition.IsConstructor && !methodDefinition.IsStatic;
      }
 
-     public static  void InsertBefore(this MethodBody body, Instruction target, Instruction instruction)
+     public static void InsertBefore(this MethodBody body, Instruction target, Instruction instruction)
      {
-         var index = body.Instructions.IndexOf(target);
-         body.Instructions.Insert(index, instruction);
+         body.Instructions.InsertBefore(target, instruction);
+     }
+
+     public static void InsertBefore(this Collection<Instruction> instructions, Instruction target, Instruction instruction)
+     {
+         var index = instructions.IndexOf(target);
+         instructions.Insert(index, instruction);
+     }
+     public static void InsertAfter(this MethodBody body, Instruction target, Instruction instruction)
+     {
+         body.Instructions.InsertAfter(target, instruction);
+     }
+
+     public static void InsertAfter(this Collection<Instruction> instructions, Instruction target, Instruction instruction)
+     {
+         var index = instructions.IndexOf(target);
+         instructions.Insert(index, instruction);
      }
 
     public static string MethodName(this MethodDefinition method)
@@ -37,14 +53,16 @@ public static class CecilExtensions
         }
         return string.Format("{0}.{1} ", method.DeclaringType.Name, method.Name);
     }
-    public static void Insert(this MethodBody body, int index,  List<Instruction> instructions)
+
+    public static void Insert(this MethodBody body, int index, IEnumerable<Instruction> instructions)
     {
-        instructions.Reverse();
+        instructions = instructions.Reverse();
         foreach (var instruction in instructions)
         {
             body.Instructions.Insert(index, instruction);
-        }   
+        }
     }
+
     public static void Add(this MethodBody body, params Instruction[] instructions)
     {
         foreach (var instruction in instructions)

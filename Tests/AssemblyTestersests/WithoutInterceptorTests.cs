@@ -44,20 +44,7 @@ public class WithoutInterceptorTests
         Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.MethodWithAwait "));
     }
 
-    [Test]
-    public void ClassWithAsyncVoidMethod()
-    {
-        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
-        var instance = (dynamic)Activator.CreateInstance(type);
-        var message = DebugRunner.CaptureDebug(async () =>
-        {
-            var task = (Task)(await instance.MethodWithVoid());
-            task.Wait();
-        });
-
-        Assert.AreEqual(1, message.Count);
-        Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.MethodWithVoid "));
-    }
+  
 
     [Test]
     public void ClassWithExceptionAsyncMethod()

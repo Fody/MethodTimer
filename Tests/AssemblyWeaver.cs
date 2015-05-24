@@ -17,6 +17,9 @@ public class AssemblyWeaver
 
         var newAssembly = assemblyPath.Replace(".dll", "2.dll");
         File.Copy(assemblyPath, newAssembly, true);
+        var oldPdb = Path.ChangeExtension(assemblyPath, "pdb");
+        var newPdb = Path.ChangeExtension(newAssembly,"pdb");
+        File.Copy(oldPdb, newPdb, true);
 
         var assemblyResolver = new MockAssemblyResolver();
         foreach (var referenceAssemblyPath in referenceAssemblyPaths)
@@ -26,7 +29,9 @@ public class AssemblyWeaver
         }
         var readerParameters = new ReaderParameters
         {
-            AssemblyResolver = assemblyResolver
+            AssemblyResolver = assemblyResolver,
+            ReadSymbols = true,
+
         };
         var moduleDefinition = ModuleDefinition.ReadModule(newAssembly, readerParameters);
         var weavingTask = new ModuleWeaver

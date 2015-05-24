@@ -27,11 +27,12 @@ public class MethodProcessor
     {
         body = Method.Body;
         body.SimplifyMacros();
-        stopwatchVar = ModuleWeaver.InjectStopwatch(body);
 
         var returnInstruction = FixReturns();
 
         var firstInstruction = FirstInstructionSkipCtor();
+
+        stopwatchVar = ModuleWeaver.InjectStopwatch(body);
 
         var beforeReturn = Instruction.Create(OpCodes.Nop);
         body.InsertBefore(returnInstruction, beforeReturn);
@@ -67,34 +68,34 @@ public class MethodProcessor
         if (Method.ReturnType == ModuleWeaver.ModuleDefinition.TypeSystem.Void)
         {
             var lastRet = Instruction.Create(OpCodes.Ret);
-            instructions.Add(lastRet);
 
-            for (var index = 0; index < instructions.Count - 1; index++)
+            foreach (var instruction in instructions)
             {
-                var instruction = instructions[index];
                 if (instruction.OpCode == OpCodes.Ret)
                 {
-                    instructions[index] = Instruction.Create(OpCodes.Leave, lastRet);
+                    instruction.OpCode = OpCodes.Leave;
+                    instruction.Operand = lastRet;
                 }
             }
+            instructions.Add(lastRet);
             return lastRet;
         }
-        var returnVariable = new VariableDefinition("methodTimerReturn", Method.ReturnType);
+        var returnVariable = new VariableDefinition(Method.ReturnType);
         body.Variables.Add(returnVariable);
         var lastLd = Instruction.Create(OpCodes.Ldloc, returnVariable);
-        instructions.Add(lastLd);
-        instructions.Add(Instruction.Create(OpCodes.Ret));
-
-        for (var index = 0; index < instructions.Count - 2; index++)
+        for (var index = 0; index < instructions.Count; index++)
         {
             var instruction = instructions[index];
             if (instruction.OpCode == OpCodes.Ret)
             {
-                instructions[index] = Instruction.Create(OpCodes.Leave, lastLd);
+                instruction.OpCode = OpCodes.Leave;
+                instruction.Operand = lastLd;
                 instructions.Insert(index, Instruction.Create(OpCodes.Stloc, returnVariable));
                 index++;
             }
         }
+        instructions.Add(lastLd);
+        instructions.Add(Instruction.Create(OpCodes.Ret));
         return lastLd;
     }
 

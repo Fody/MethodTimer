@@ -4,6 +4,8 @@ using Mono.Cecil.Cil;
 
 public partial class ModuleWeaver
 {
+
+    
     public IEnumerable<Instruction> GetWriteTimeInstruction(VariableDefinition variableDefinition, MethodDefinition methodDefinition)
     {
         yield return Instruction.Create(OpCodes.Ldloc, variableDefinition);

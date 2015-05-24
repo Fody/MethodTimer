@@ -40,15 +40,29 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AbstractClassWithAttributeOnMethod.cs" />
-    <Compile Include="AbstractClassWithAttributeOnType.cs" />
-    <Compile Include="ClassWithAsyncTemplate.cs" />
+    <Compile Include="AbstractClassWithAttributeOnMethod.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="AbstractClassWithAttributeOnType.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Template.cs" />
     <Compile Include="ClassWithAsyncMethod.cs" />
-    <Compile Include="ClassWithConstructor.cs" />
-    <Compile Include="ClassWithMethod.cs" />
-    <Compile Include="ClassWithAttribute.cs" />
-    <Compile Include="MiscMethods.cs" />
-    <Compile Include="MyInterface.cs" />
+    <Compile Include="ClassWithAttribute.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ClassWithConstructor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ClassWithMethod.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MiscMethods.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MyInterface.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ReferenceAssembly\ReferenceAssembly.csproj">

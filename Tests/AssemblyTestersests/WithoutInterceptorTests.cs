@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -27,6 +28,22 @@ public class WithoutInterceptorTests
     {
         Assert.Contains("Method 'System.Void AbstractClassWithAttributeOnMethod::Method()' is abstract but has a [TimeAttribute]. Remove this attribute.", assemblyWeaver.Errors);
         Assert.Contains("Method 'System.Void MyInterface::MyMethod()' is abstract but has a [TimeAttribute]. Remove this attribute.", assemblyWeaver.Errors);
+    }
+
+    [Test]
+    public void ClassWithYieldMethod()
+    {
+        var type = assemblyWeaver.Assembly.GetType("ClassWithYieldMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        var message = DebugRunner.CaptureDebug(() =>
+        {
+            var task = (IEnumerable<string>)instance.YieldMethod();
+            task.ToList();
+        });
+
+        Assert.AreEqual(0, message.Count);
+        //TODO: support yield
+        //Assert.IsTrue(message.First().StartsWith("ClassWithYieldMethod.YieldMethod "));
     }
 
     [Test]

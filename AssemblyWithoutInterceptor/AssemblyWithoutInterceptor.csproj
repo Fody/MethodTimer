@@ -46,6 +46,7 @@
     <Compile Include="AbstractClassWithAttributeOnType.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ClassWithYieldMethod.cs" />
     <Compile Include="Delegate.cs" />
     <Compile Include="InheritedClass.cs" />
     <Compile Include="Template.cs" />

@@ -56,6 +56,18 @@ public partial class ModuleWeaver
 
     void ProcessMethod(MethodDefinition method)
     {
+        if (method.IsYield())
+        {
+            if (method.ContainsTimeAttribute())
+            {
+                LogError("Could not process '" + method.FullName + "' since methods that yield are currently not supported. Please remove the [Time] attribute from that method.");
+                return;
+            }
+            LogInfo("Skipping '" + method.FullName + "' since methods that yield are not supported.");
+            return;
+        }
+
+
         if (method.IsAsync())
         {
             var asyncProcessor = new AsyncMethodProcessor

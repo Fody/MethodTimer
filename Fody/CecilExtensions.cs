@@ -67,6 +67,21 @@ public static class CecilExtensions
         }
     }
 
+    public static bool IsYield(this MethodDefinition method)
+    {
+        if (method.ReturnType == null)
+        {
+            return false;
+        }
+        if (!method.ReturnType.Name.StartsWith("IEnumerable"))
+        {
+            return false;
+        }
+        var stateMachinePrefix = string.Format("<{0}>", method.Name);
+        var nestedTypes = method.DeclaringType.NestedTypes;
+        return nestedTypes.Any(x => x.Name.StartsWith(stateMachinePrefix));
+    }
+
     public static CustomAttribute GetAsyncStateMachineAttribute(this MethodDefinition method)
     {
         return method.CustomAttributes.FirstOrDefault(_ => _.AttributeType.Name == "AsyncStateMachineAttribute");

@@ -8,7 +8,7 @@ public partial class ModuleWeaver
 
     public void FindInterceptor()
     {
-        var interceptor = types.FirstOrDefault(x => x.Name == "MethodTimeLogger");
+        var interceptor = types.FirstOrDefault(x => x.IsInterceptor());
         if (interceptor != null)
         {
             var logMethod = interceptor.Methods.FirstOrDefault(x => x.Name == "Log");
@@ -31,7 +31,7 @@ public partial class ModuleWeaver
 
             interceptor = moduleDefinition
                 .GetTypes()
-                .FirstOrDefault(x => x.Name == "MethodTimeLogger");
+                .FirstOrDefault(x => x.IsInterceptor());
             if (interceptor == null)
             {
                 continue;

@@ -21,6 +21,10 @@ public static class CecilExtensions
         return ((method.Name == ".ctor") && (method.Body.Instructions.Count == 3));
     }
 
+    public static bool IsInterceptor(this TypeReference type)
+    {
+        return type.Name == "MethodTimeLogger";
+    }
     public static bool IsInstanceConstructor(this MethodDefinition methodDefinition)
     {
         return methodDefinition.IsConstructor && !methodDefinition.IsStatic;

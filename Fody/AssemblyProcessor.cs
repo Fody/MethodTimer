@@ -9,10 +9,20 @@ public partial class ModuleWeaver
 
         if (ModuleDefinition.Assembly.ContainsTimeAttribute() || ModuleDefinition.ContainsTimeAttribute())
         {
-            foreach (var method in types.Where(x => !x.IsInterceptor())
-                .SelectMany(type => type.ConcreteMethods()))
+            foreach (var type in types)
             {
-                ProcessMethod(method);
+                if (type.IsInterceptor())
+                {
+                    continue;
+                }
+                if (type.IsCompilerGenerated())
+                {
+                    continue;
+                }
+                foreach (var method in type.ConcreteMethods())
+                {
+                    ProcessMethod(method);
+                }
             }
             return;
         }

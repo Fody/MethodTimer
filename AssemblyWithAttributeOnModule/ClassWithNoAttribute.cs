@@ -1,5 +1,4 @@
-﻿
-using System.Threading;
+﻿using System.Threading;
 
 public class ClassWithNoAttribute
 {
@@ -8,4 +7,3 @@ public class ClassWithNoAttribute
         Thread.Sleep(10);
     }
 }
-

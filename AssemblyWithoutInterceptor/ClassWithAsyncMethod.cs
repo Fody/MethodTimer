@@ -15,6 +15,12 @@ public class ClassWithAsyncMethod
     //    Thread.Sleep(2000);
     //    return DateTime.Now;
     //}
+    [Time]
+    public async Task MethodWithEmptyAsync()
+    {
+
+    }
+
 
     [Time]
     public async Task MethodWithAwait()

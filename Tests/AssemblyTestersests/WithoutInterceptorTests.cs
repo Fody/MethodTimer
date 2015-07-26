@@ -47,6 +47,21 @@ public class WithoutInterceptorTests
     }
 
     [Test]
+    public void MethodWithEmptyAsync()
+    {
+        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        var message = DebugRunner.CaptureDebug(() =>
+        {
+            var task = (Task)instance.MethodWithEmptyAsync();
+            task.Wait();
+        });
+
+        Assert.AreEqual(1, message.Count);
+        Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.MethodWithEmptyAsync "));
+    }
+
+    [Test]
     public void ClassWithAsyncMethod()
     {
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");

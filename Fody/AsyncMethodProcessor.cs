@@ -37,22 +37,15 @@ public class AsyncMethodProcessor
             .Single(x => x.Name == "MoveNext");
         body = moveNextMethod.Body;
 
-        var first = body.Instructions.FirstOrDefault(x => x.SequencePoint != null && x.SequencePoint.StartLine != 0xfeefee);
+        var exceptionHandler = body.ExceptionHandlers.First();
+        var first = exceptionHandler.TryStart;
 
         returnPoints = GetAsyncReturns(body.Instructions)
             .ToList();
-        if (first == null)
-        {
-            var message = string.Format("Cannot find start point of async method '{0}.{1}', method will be skipped. Ensure you are producing pdb as part of your build", Method.DeclaringType.Name, Method.Name);
-            ModuleWeaver.LogWarning(message);
-            return;
-        }
-        if (first.OpCode == OpCodes.Nop)
-        {
-            first = first.Next;
-        }
+        
         body.SimplifyMacros();
         InjectStopwatch(body.Instructions.IndexOf(first));
+
         HandleReturns();
         body.InitLocals = true;
         body.OptimizeMacros();

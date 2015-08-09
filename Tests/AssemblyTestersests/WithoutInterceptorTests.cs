@@ -68,15 +68,52 @@ public class WithoutInterceptorTests
         var instance = (dynamic) Activator.CreateInstance(type);
         var message = DebugRunner.CaptureDebug(() =>
         {
-            var task = (Task) instance.MethodWithAwait();
+            var task = (Task) instance.MethodWithAwaitAsync();
             task.Wait();
         });
 
         Assert.AreEqual(1, message.Count);
-        Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.MethodWithAwait "));
+        Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.MethodWithAwaitAsync "));
     }
 
+    [Test]
+    public void ClassWithAsyncMethodThatThrowsException()
+    {
+        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        var message = DebugRunner.CaptureDebug(() =>
+        {
+            try
+            {
+                var task = (Task)instance.MethodWithAwaitAndExceptionAsync();
+                task.Wait();
+            }
+            catch (Exception)
+            {
+                // Expected
+            }
+        });
 
+        Assert.AreEqual(1, message.Count);
+        Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.MethodWithAwaitAndExceptionAsync "));
+    }
+
+    [RequiresSTA]
+    [TestCase(true)]
+    [TestCase(false)]
+    public void ClassWithAsyncMethodWithFastPath(bool recurse)
+    {
+        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        var message = DebugRunner.CaptureDebug(() =>
+        {
+            var task = (Task)instance.MethodWithFastPathAsync(recurse);
+            task.Wait();
+        });
+
+        Assert.AreEqual(recurse ? 2 : 1, message.Count);
+        Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.MethodWithFastPathAsync "));
+    }
 
     [Test]
     public void ClassWithExceptionAsyncMethod()
@@ -85,12 +122,12 @@ public class WithoutInterceptorTests
         var instance = (dynamic) Activator.CreateInstance(type);
         var message = DebugRunner.CaptureDebug(() =>
         {
-            var task = (Task) instance.ComplexMethodWithAwait(-1);
+            var task = (Task) instance.ComplexMethodWithAwaitAsync(-1);
             task.Wait();
         });
 
         Assert.AreEqual(1, message.Count);
-        Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.ComplexMethodWithAwait "));
+        Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.ComplexMethodWithAwaitAsync "));
     }
 
     [Test]
@@ -100,12 +137,12 @@ public class WithoutInterceptorTests
         var instance = (dynamic) Activator.CreateInstance(type);
         var message = DebugRunner.CaptureDebug(() =>
         {
-            var task = (Task) instance.ComplexMethodWithAwait(0);
+            var task = (Task) instance.ComplexMethodWithAwaitAsync(0);
             task.Wait();
         });
 
         Assert.AreEqual(1, message.Count);
-        Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.ComplexMethodWithAwait "));
+        Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.ComplexMethodWithAwaitAsync "));
     }
 
     [Test]
@@ -115,12 +152,12 @@ public class WithoutInterceptorTests
         var instance = (dynamic) Activator.CreateInstance(type);
         var message = DebugRunner.CaptureDebug(() =>
         {
-            var task = (Task) instance.ComplexMethodWithAwait(2);
+            var task = (Task) instance.ComplexMethodWithAwaitAsync(2);
             task.Wait();
         });
 
         Assert.AreEqual(1, message.Count);
-        Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.ComplexMethodWithAwait "));
+        Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.ComplexMethodWithAwaitAsync "));
     }
 
     [Test]
@@ -130,12 +167,12 @@ public class WithoutInterceptorTests
         var instance = (dynamic) Activator.CreateInstance(type);
         var message = DebugRunner.CaptureDebug(() =>
         {
-            var task = (Task) instance.ComplexMethodWithAwait(100);
+            var task = (Task) instance.ComplexMethodWithAwaitAsync(100);
             task.Wait();
         });
 
         Assert.AreEqual(1, message.Count);
-        Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.ComplexMethodWithAwait "));
+        Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.ComplexMethodWithAwaitAsync "));
     }
 
     [Test]

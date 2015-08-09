@@ -74,13 +74,58 @@ public class WithInterceptorTests
         var instance = (dynamic) Activator.CreateInstance(type);
         DebugRunner.CaptureDebug(() =>
         {
-            var task = (Task) instance.MethodWithAwait();
+            var task = (Task) instance.MethodWithAwaitAsync();
             task.Wait();
         });
 
         var methodBases = GetMethodInfoField();
         Assert.AreEqual(1, methodBases.Count);
         var methodBase = methodBases.First();
-        Assert.AreEqual(methodBase.Name, "MethodWithAwait");
+        Assert.AreEqual(methodBase.Name, "MethodWithAwaitAsync");
+    }
+
+    [Test]
+    public void ClassWithAsyncMethodThatThrowsException()
+    {
+        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        DebugRunner.CaptureDebug(() =>
+        {
+            try
+            {
+                var task = (Task)instance.MethodWithAwaitAndExceptionAsync();
+                task.Wait();
+            }
+            catch (Exception)
+            {
+                // Expected
+            }
+        });
+
+        var methodBases = GetMethodInfoField();
+        var methodBase = methodBases.Last();
+        Assert.AreEqual(methodBase.Name, "MethodWithAwaitAndExceptionAsync");
+    }
+
+    [RequiresSTA]
+    [TestCase(true)]
+    [TestCase(false)]
+    public void ClassWithAsyncMethodWithFastPath(bool recurse)
+    {
+        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        DebugRunner.CaptureDebug(() =>
+        {
+            var task = (Task)instance.MethodWithFastPathAsync(recurse);
+            task.Wait();
+        });
+
+        var methodBases = GetMethodInfoField();
+
+        // Interceptor can't deal with 2 test cases
+        //Assert.AreEqual(recurse ? 2 : 1, methodBases.Count);
+
+        var methodBase = methodBases.Last();
+        Assert.AreEqual("MethodWithFastPathAsync", methodBase.Name);
     }
 }

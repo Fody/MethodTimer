@@ -8,7 +8,7 @@ using Mono.Collections.Generic;
 
 public class AsyncMethodProcessor
 {
-    private const string CheckStopwatchVariableName = "__fody__checkStopwatch";
+    const string CheckStopwatchVariableName = "__fody__checkStopwatch";
 
     public ModuleWeaver ModuleWeaver;
     public MethodDefinition Method;

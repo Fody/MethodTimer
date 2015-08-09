@@ -33,19 +33,19 @@ public class ClassWithAsyncMethod
         await Task.Factory.StartNew(() => { throw new Exception("Expected exception"); });
     }
 
-    private bool _isRunning;
-    private bool _isQueued;
+    bool isRunning;
+    bool isQueued;
 
     [Time]
     public async Task MethodWithFastPathAsync(bool recurse)
     {
-        if (_isRunning)
+        if (isRunning)
         {
-            _isQueued = true;
+            isQueued = true;
             return;
         }
 
-        _isRunning = true;
+        isRunning = true;
 
         await Task.Delay(500);
 
@@ -54,7 +54,7 @@ public class ClassWithAsyncMethod
             await MethodWithFastPathAsync(false);
         }
 
-        _isRunning = false;
+        isRunning = false;
     }
 
     [Time]

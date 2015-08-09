@@ -23,17 +23,18 @@ public class ClassWithAsyncMethod
 
 
     [Time]
-    public async Task MethodWithAwait()
+    public async Task MethodWithAwaitAsync()
     {
         await Task.Delay(500);
     }
 
     [Time]
-    public async Task<bool> ComplexMethodWithAwait(int instructionsToHandle)
+    public async Task<bool> ComplexMethodWithAwaitAsync(int instructionsToHandle)
     {
         if (instructionsToHandle < 0)
         {
-            MethodWithException();
+            // Note: important not to await
+            MethodWithExceptionAsync();
         }
 
         var instructionCounter = 0;
@@ -69,7 +70,7 @@ public class ClassWithAsyncMethod
         return true;
     }
 
-    public async Task MethodWithException()
+    public async Task MethodWithExceptionAsync()
     {
         await Task.Factory.StartNew(() =>
         {

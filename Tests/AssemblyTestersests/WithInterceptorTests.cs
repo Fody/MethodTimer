@@ -74,13 +74,13 @@ public class WithInterceptorTests
         var instance = (dynamic) Activator.CreateInstance(type);
         DebugRunner.CaptureDebug(() =>
         {
-            var task = (Task) instance.MethodWithAwait();
+            var task = (Task) instance.MethodWithAwaitAsync();
             task.Wait();
         });
 
         var methodBases = GetMethodInfoField();
         Assert.AreEqual(1, methodBases.Count);
         var methodBase = methodBases.First();
-        Assert.AreEqual(methodBase.Name, "MethodWithAwait");
+        Assert.AreEqual(methodBase.Name, "MethodWithAwaitAsync");
     }
 }

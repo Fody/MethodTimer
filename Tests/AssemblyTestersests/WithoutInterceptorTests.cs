@@ -76,7 +76,22 @@ public class WithoutInterceptorTests
         Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.MethodWithAwaitAsync "));
     }
 
+    [RequiresSTA]
+    [TestCase(true)]
+    [TestCase(false)]
+    public void ClassWithAsyncMethodWithFastPath(bool recurse)
+    {
+        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        var message = DebugRunner.CaptureDebug(() =>
+        {
+            var task = (Task)instance.MethodWithFastPathAsync(recurse);
+            task.Wait();
+        });
 
+        Assert.AreEqual(recurse ? 2 : 1, message.Count);
+        Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.MethodWithFastPathAsync "));
+    }
 
     [Test]
     public void ClassWithExceptionAsyncMethod()

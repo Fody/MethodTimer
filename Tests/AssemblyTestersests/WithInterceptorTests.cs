@@ -83,4 +83,26 @@ public class WithInterceptorTests
         var methodBase = methodBases.First();
         Assert.AreEqual(methodBase.Name, "MethodWithAwaitAsync");
     }
+
+    [RequiresSTA]
+    [TestCase(true)]
+    [TestCase(false)]
+    public void ClassWithAsyncMethodWithFastPath(bool recurse)
+    {
+        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        DebugRunner.CaptureDebug(() =>
+        {
+            var task = (Task)instance.MethodWithFastPathAsync(recurse);
+            task.Wait();
+        });
+
+        var methodBases = GetMethodInfoField();
+
+        // Interceptor can't deal with 2 test cases
+        //Assert.AreEqual(recurse ? 2 : 1, methodBases.Count);
+
+        var methodBase = methodBases.Last();
+        Assert.AreEqual("MethodWithFastPathAsync", methodBase.Name);
+    }
 }

@@ -27,6 +27,12 @@ public class ClassWithAsyncMethod
         await Task.Delay(500);
     }
 
+    [Time]
+    public async Task MethodWithAwaitAndExceptionAsync()
+    {
+        await Task.Factory.StartNew(() => { throw new Exception("Expected exception"); });
+    }
+
     private bool _isRunning;
     private bool _isQueued;
 

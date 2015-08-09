@@ -76,6 +76,28 @@ public class WithoutInterceptorTests
         Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.MethodWithAwaitAsync "));
     }
 
+    [Test]
+    public void ClassWithAsyncMethodThatThrowsException()
+    {
+        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        var message = DebugRunner.CaptureDebug(() =>
+        {
+            try
+            {
+                var task = (Task)instance.MethodWithAwaitAndExceptionAsync();
+                task.Wait();
+            }
+            catch (Exception)
+            {
+                // Expected
+            }
+        });
+
+        Assert.AreEqual(1, message.Count);
+        Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.MethodWithAwaitAndExceptionAsync "));
+    }
+
     [RequiresSTA]
     [TestCase(true)]
     [TestCase(false)]

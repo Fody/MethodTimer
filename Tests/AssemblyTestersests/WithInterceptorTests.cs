@@ -84,6 +84,29 @@ public class WithInterceptorTests
         Assert.AreEqual(methodBase.Name, "MethodWithAwaitAsync");
     }
 
+    [Test]
+    public void ClassWithAsyncMethodThatThrowsException()
+    {
+        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        DebugRunner.CaptureDebug(() =>
+        {
+            try
+            {
+                var task = (Task)instance.MethodWithAwaitAndExceptionAsync();
+                task.Wait();
+            }
+            catch (Exception)
+            {
+                // Expected
+            }
+        });
+
+        var methodBases = GetMethodInfoField();
+        var methodBase = methodBases.Last();
+        Assert.AreEqual(methodBase.Name, "MethodWithAwaitAndExceptionAsync");
+    }
+
     [RequiresSTA]
     [TestCase(true)]
     [TestCase(false)]

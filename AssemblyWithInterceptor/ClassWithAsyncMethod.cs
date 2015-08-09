@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using MethodTimer;
 
 public class ClassWithAsyncMethod
@@ -7,6 +8,12 @@ public class ClassWithAsyncMethod
     public async Task MethodWithAwaitAsync()
     {
         await Task.Delay(500);
+    }
+
+    [Time]
+    public async Task MethodWithAwaitAndExceptionAsync()
+    {
+        await Task.Factory.StartNew(() => { throw new Exception("Expected exception"); });
     }
 
     private bool _isRunning;

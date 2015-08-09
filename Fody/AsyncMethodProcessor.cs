@@ -23,7 +23,7 @@ public class AsyncMethodProcessor
         }
         catch (Exception exception)
         {
-            throw new Exception(string.Format("An error occurred processing '{0}'. Error: {1}", Method.FullName, exception.Message),exception);
+            throw new Exception(string.Format("An error occurred processing '{0}'. Error: {1}", Method.FullName, exception.Message), exception);
         }
     }
 
@@ -31,38 +31,73 @@ public class AsyncMethodProcessor
     {
         var asyncAttribute = Method.GetAsyncStateMachineAttribute();
         stateMachineType = asyncAttribute.ConstructorArguments
-            .Select(ctor => (TypeDefinition) ctor.Value)
+            .Select(ctor => (TypeDefinition)ctor.Value)
             .Single();
         var moveNextMethod = stateMachineType.Methods
             .Single(x => x.Name == "MoveNext");
         body = moveNextMethod.Body;
 
-        var exceptionHandler = body.ExceptionHandlers.First();
-        var first = exceptionHandler.TryStart;
+        body.SimplifyMacros();
+
+        int index;
 
         returnPoints = GetAsyncReturns(body.Instructions)
             .ToList();
-        
-        body.SimplifyMacros();
-        InjectStopwatch(body.Instructions.IndexOf(first));
+
+        var firstUsageOfState = (from instruction in body.Instructions
+                                 let fieldReference = instruction.Operand as FieldReference
+                                 where instruction.OpCode == OpCodes.Ldfld &&
+                                       fieldReference != null && fieldReference.Name.Contains("__state")
+                                 select instruction).FirstOrDefault();
+        if (firstUsageOfState != null)
+        {
+            // Initial code looks like this (hence the -1):
+            //
+            // <== this is where we want to start the stopwatch
+            // ldarg.0
+            // ldfld __state
+            // stloc.0
+            // ldloc.0
+            index = body.Instructions.IndexOf(firstUsageOfState) - 1;
+        }
+        else
+        {
+            // Fall back to old mechanism
+            var exceptionHandler = body.ExceptionHandlers.First();
+            index = body.Instructions.IndexOf(exceptionHandler.TryStart);
+        }
+
+        InjectStopwatch(index, body.Instructions[index]);
 
         HandleReturns();
         body.InitLocals = true;
         body.OptimizeMacros();
     }
 
-    void InjectStopwatch(int index)
+    void InjectStopwatch(int index, Instruction nextInstruction)
     {
         stopwatchField = new FieldDefinition("methodTimerStopwatch", new FieldAttributes(), ModuleWeaver.StopwatchType);
         stateMachineType.Fields.Add(stopwatchField);
         body.Insert(index, new[]
         {
+            // This code looks like this:
+            // if (_stopwatch == null)
+            // {
+            //    _stopwatch = Stopwatch.StartNew();
+            // }
+
+            Instruction.Create(OpCodes.Ldarg_0),
+            Instruction.Create(OpCodes.Ldfld, stopwatchField),
+            Instruction.Create(OpCodes.Ldnull),
+            Instruction.Create(OpCodes.Ceq),
+            Instruction.Create(OpCodes.Stloc_0),
+            Instruction.Create(OpCodes.Ldloc_0),
+            Instruction.Create(OpCodes.Brfalse_S, nextInstruction),
             Instruction.Create(OpCodes.Ldarg_0),
             Instruction.Create(OpCodes.Call, ModuleWeaver.StartNewMethod),
             Instruction.Create(OpCodes.Stfld, stopwatchField)
         });
     }
-
 
     void HandleReturns()
     {
@@ -89,8 +124,11 @@ public class AsyncMethodProcessor
         // We can do this smart by searching for all leave and leave_S op codes and check if they point to the last
         // instruction of the method. This equals a "return" call.
 
+        var returnStatements = new List<Instruction>();
+
         var possibleReturnStatements = new List<Instruction>();
 
+        // Look for the last leave statement (that is the line all "return" statements go to)
         for (var i = instructions.Count - 1; i >= 0; i--)
         {
             var instruction = instructions[i];
@@ -108,11 +146,33 @@ public class AsyncMethodProcessor
             {
                 if (possibleReturnStatements.Any(x => ReferenceEquals(instruction.Operand, x)))
                 {
-                    // This is a return statement
-                    yield return instruction;
+                    // This is a return statement, this covers scenarios 1 and 3
+                    returnStatements.Add(instruction);
+                }
+                else
+                {
+                    // Check if we set an exception in this block, this covers scenario 2
+                    for (var j = i - 3; j < i; j++)
+                    {
+                        var previousInstruction = instructions[j];
+                        if (previousInstruction.OpCode == OpCodes.Call)
+                        {
+                            var methodReference = previousInstruction.Operand as MethodReference;
+                            if (methodReference != null)
+                            {
+                                if (methodReference.Name.Equals("SetException"))
+                                {
+                                    returnStatements.Add(instruction);
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
+
+        return returnStatements;
     }
 
     void FixReturn(Instruction returnPoint)

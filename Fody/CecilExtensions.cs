@@ -18,7 +18,7 @@ public static class CecilExtensions
 
     static bool IsEmptyConstructor(this MethodDefinition method)
     {
-        return ((method.Name == ".ctor") && (method.Body.Instructions.Count == 3));
+        return ((method.Name == ".ctor") && (method.Body.Instructions.Count(x=>x.OpCode!=OpCodes.Nop) == 3));
     }
 
     public static bool IsInterceptor(this TypeReference type)

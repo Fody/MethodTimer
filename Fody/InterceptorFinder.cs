@@ -48,7 +48,7 @@ public partial class ModuleWeaver
             }
             VerifyHasCorrectParameters(logMethod);
             VerifyMethodIsPublicStatic(logMethod);
-            LogMethod = ModuleDefinition.Import(logMethod);
+            LogMethod = ModuleDefinition.ImportReference(logMethod);
             return;
         }
     }

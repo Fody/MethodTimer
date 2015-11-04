@@ -41,17 +41,21 @@ public class AsyncMethodProcessor
 
         body.SimplifyMacros();
 
-        int index;
-
         returnPoints = GetAsyncReturns(body.Instructions)
             .ToList();
 
-        var firstUsageOfState = (from instruction in body.Instructions
-                                 let fieldReference = instruction.Operand as FieldReference
-                                 where instruction.OpCode == OpCodes.Ldfld &&
-                                       fieldReference != null && fieldReference.Name.Contains("__state")
-                                 select instruction).FirstOrDefault();
-        if (firstUsageOfState != null)
+        // First, fall back to old mechanism
+        var exceptionHandler = body.ExceptionHandlers.First();
+        var index = body.Instructions.IndexOf(exceptionHandler.TryStart);
+
+        // Check roslyn usage
+        var firstStateUsage = (from instruction in body.Instructions
+                               let fieldReference = instruction.Operand as FieldReference
+                               where instruction.OpCode == OpCodes.Ldfld &&
+                                     fieldReference != null &&
+                                     fieldReference.Name.Contains("__state")
+                               select instruction).FirstOrDefault();
+        if (firstStateUsage != null)
         {
             // Initial code looks like this (hence the -1):
             //
@@ -60,13 +64,12 @@ public class AsyncMethodProcessor
             // ldfld __state
             // stloc.0
             // ldloc.0
-            index = body.Instructions.IndexOf(firstUsageOfState) - 1;
+            index = body.Instructions.IndexOf(firstStateUsage) - 1;
         }
         else
         {
-            // Fall back to old mechanism
-            var exceptionHandler = body.ExceptionHandlers.First();
-            index = body.Instructions.IndexOf(exceptionHandler.TryStart);
+            // Probably compiled without roslyn, inject at first line
+            index = 0;
         }
 
         InjectStopwatch(index, body.Instructions[index]);

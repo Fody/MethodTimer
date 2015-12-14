@@ -8,6 +8,8 @@ public partial class ModuleWeaver
 
     public void FindInterceptor()
     {
+        LogDebug(string.Format("Searching for an intercepter"));
+
         var interceptor = types.FirstOrDefault(x => x.IsInterceptor());
         if (interceptor != null)
         {
@@ -21,13 +23,25 @@ public partial class ModuleWeaver
             LogMethod = logMethod;
             return;
         }
+
         foreach (var referencePath in ReferenceCopyLocalPaths)
         {
             if (!referencePath.EndsWith(".dll") && !referencePath.EndsWith(".exe"))
             {
                 continue;
             }
-            var moduleDefinition = ReadModule(referencePath);
+
+            ModuleDefinition moduleDefinition;
+
+            try
+            {
+                moduleDefinition = ReadModule(referencePath);
+            }
+            catch (Exception)
+            {
+                LogDebug(string.Format("Failed to read module from '{0}', probably a .net native assembly", referencePath));
+                continue;
+            }
 
             interceptor = moduleDefinition
                 .GetTypes()

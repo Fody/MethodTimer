@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using Mono.Cecil;
 
@@ -31,17 +32,27 @@ public partial class ModuleWeaver
                 continue;
             }
 
+            var stopwatch = Stopwatch.StartNew();
+
             ModuleDefinition moduleDefinition;
 
             try
             {
+                LogDebug(string.Format("Reading module from '{0}'", referencePath));
+
                 moduleDefinition = ReadModule(referencePath);
             }
             catch (Exception)
             {
-                LogDebug(string.Format("Failed to read module from '{0}', probably a .net native assembly", referencePath));
+                stopwatch.Stop();
+
+                LogDebug(string.Format("Failed to read module, probably a .net native assembly, took {0} ms", stopwatch.ElapsedMilliseconds));
                 continue;
             }
+
+            stopwatch.Stop();
+
+            //LogDebug(string.Format("Read module, took {0} ms", stopwatch.ElapsedMilliseconds));
 
             interceptor = moduleDefinition
                 .GetTypes()

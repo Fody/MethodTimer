@@ -19,7 +19,7 @@ public class MethodProcessor
         }
         catch (Exception exception)
         {
-            throw new WeavingException(string.Format("An error occurred processing '{0}'. Error: {1}", Method.FullName, exception.Message));
+            throw new WeavingException($"An error occurred processing '{Method.FullName}'. Error: {exception.Message}");
         }
     }
 

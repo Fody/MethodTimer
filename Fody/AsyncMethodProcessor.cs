@@ -25,7 +25,7 @@ public class AsyncMethodProcessor
         }
         catch (Exception exception)
         {
-            throw new Exception(string.Format("An error occurred processing '{0}'. Error: {1}", Method.FullName, exception.Message), exception);
+            throw new Exception($"An error occurred processing '{Method.FullName}'. Error: {exception.Message}", exception);
         }
     }
 

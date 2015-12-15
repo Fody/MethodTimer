@@ -9,7 +9,7 @@
             {
                 if (method.ContainsTimeAttribute())
                 {
-                    LogError(string.Format("Method '{0}' is abstract but has a [TimeAttribute]. Remove this attribute.", method.FullName));
+                    LogError($"Method '{method.FullName}' is abstract but has a [TimeAttribute]. Remove this attribute.");
                 }
             }
         }

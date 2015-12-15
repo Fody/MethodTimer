@@ -45,9 +45,9 @@ public static class CecilExtensions
     {
         if (method.IsConstructor)
         {
-            return string.Format("{0}{1} ", method.DeclaringType.Name, method.Name);
+            return $"{method.DeclaringType.Name}{method.Name} ";
         }
-        return string.Format("{0}.{1} ", method.DeclaringType.Name, method.Name);
+        return $"{method.DeclaringType.Name}.{method.Name} ";
     }
 
     public static void Insert(this MethodBody body, int index, IEnumerable<Instruction> instructions)
@@ -77,7 +77,7 @@ public static class CecilExtensions
         {
             return false;
         }
-        var stateMachinePrefix = string.Format("<{0}>", method.Name);
+        var stateMachinePrefix = $"<{method.Name}>";
         var nestedTypes = method.DeclaringType.NestedTypes;
         return nestedTypes.Any(x => x.Name.StartsWith(stateMachinePrefix));
     }

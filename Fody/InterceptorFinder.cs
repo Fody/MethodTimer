@@ -17,7 +17,7 @@ public partial class ModuleWeaver
             var logMethod = interceptor.Methods.FirstOrDefault(x => x.Name == "Log");
             if (logMethod == null)
             {
-                throw new WeavingException(string.Format("Could not find 'Log' method on '{0}'.", interceptor.FullName));
+                throw new WeavingException($"Could not find 'Log' method on '{interceptor.FullName}'.");
             }
             VerifyHasCorrectParameters(logMethod);
             VerifyMethodIsPublicStatic(logMethod);
@@ -38,7 +38,7 @@ public partial class ModuleWeaver
 
             try
             {
-                LogDebug(string.Format("Reading module from '{0}'", referencePath));
+                LogDebug($"Reading module from '{referencePath}'");
 
                 moduleDefinition = ReadModule(referencePath);
             }
@@ -46,13 +46,11 @@ public partial class ModuleWeaver
             {
                 stopwatch.Stop();
 
-                LogDebug(string.Format("Failed to read module, probably a .net native assembly, took {0} ms", stopwatch.ElapsedMilliseconds));
+                LogDebug($"Failed to read module, probably a .net native assembly, took {stopwatch.ElapsedMilliseconds} ms");
                 continue;
             }
 
             stopwatch.Stop();
-
-            //LogDebug(string.Format("Read module, took {0} ms", stopwatch.ElapsedMilliseconds));
 
             interceptor = moduleDefinition
                 .GetTypes()
@@ -63,13 +61,13 @@ public partial class ModuleWeaver
             }
             if (!interceptor.IsPublic)
             {
-                LogInfo(string.Format("Did not use '{0}' since it is not public.", interceptor.FullName));
+                LogInfo($"Did not use '{interceptor.FullName}' since it is not public.");
                 continue;
             }
             var logMethod = interceptor.Methods.FirstOrDefault(x => x.Name == "Log");
             if (logMethod == null)
             {
-                throw new WeavingException(string.Format("Could not find 'Log' method on '{0}'.", interceptor.FullName));
+                throw new WeavingException($"Could not find 'Log' method on '{interceptor.FullName}'.");
             }
             VerifyHasCorrectParameters(logMethod);
             VerifyMethodIsPublicStatic(logMethod);
@@ -109,7 +107,7 @@ public partial class ModuleWeaver
         }
         if (!logMethodHasCorrectParameters)
         {
-            throw new WeavingException(string.Format("Method '{0}' must have 2 parameters of type 'System.Reflection.MethodBase' and 'System.Int64'.", logMethod.FullName));
+            throw new WeavingException($"Method '{logMethod.FullName}' must have 2 parameters of type 'System.Reflection.MethodBase' and 'System.Int64'.");
         }
     }
 
@@ -125,7 +123,7 @@ public partial class ModuleWeaver
         }
         catch (Exception exception)
         {
-            var message = string.Format("Failed to read {0}. {1}", referencePath, exception.Message);
+            var message = $"Failed to read {referencePath}. {exception.Message}";
             throw new Exception(message, exception);
         }
     }

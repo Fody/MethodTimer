@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using Mono.Cecil;
 
@@ -8,6 +9,8 @@ public partial class ModuleWeaver
 
     public void FindInterceptor()
     {
+        LogDebug(string.Format("Searching for an intercepter"));
+
         var interceptor = types.FirstOrDefault(x => x.IsInterceptor());
         if (interceptor != null)
         {
@@ -21,13 +24,35 @@ public partial class ModuleWeaver
             LogMethod = logMethod;
             return;
         }
+
         foreach (var referencePath in ReferenceCopyLocalPaths)
         {
             if (!referencePath.EndsWith(".dll") && !referencePath.EndsWith(".exe"))
             {
                 continue;
             }
-            var moduleDefinition = ReadModule(referencePath);
+
+            var stopwatch = Stopwatch.StartNew();
+
+            ModuleDefinition moduleDefinition;
+
+            try
+            {
+                LogDebug(string.Format("Reading module from '{0}'", referencePath));
+
+                moduleDefinition = ReadModule(referencePath);
+            }
+            catch (Exception)
+            {
+                stopwatch.Stop();
+
+                LogDebug(string.Format("Failed to read module, probably a .net native assembly, took {0} ms", stopwatch.ElapsedMilliseconds));
+                continue;
+            }
+
+            stopwatch.Stop();
+
+            //LogDebug(string.Format("Read module, took {0} ms", stopwatch.ElapsedMilliseconds));
 
             interceptor = moduleDefinition
                 .GetTypes()

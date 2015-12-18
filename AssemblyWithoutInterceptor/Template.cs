@@ -8,7 +8,7 @@ public class Template
 
     public async Task MethodWithAwaitExpected()
     {
-        Stopwatch stopwatch = stopwatch = Stopwatch.StartNew();
+        var stopwatch = Stopwatch.StartNew();
         try
         {
             await Task.Delay(500);
@@ -16,12 +16,12 @@ public class Template
         finally
         {
             stopwatch.Stop();
-            Debug.WriteLine("ClassWithAsyncMethod.MethodWithAwaitExpected " + stopwatch.ElapsedMilliseconds + "ms");
+            Trace.WriteLine("ClassWithAsyncMethod.MethodWithAwaitExpected " + stopwatch.ElapsedMilliseconds + "ms");
         }
     }
     public void MethodAndCatchReThrow()
     {
-        Stopwatch stopwatch = stopwatch = Stopwatch.StartNew();
+        var stopwatch = Stopwatch.StartNew();
         try
         {
 
@@ -31,7 +31,7 @@ public class Template
         }
         catch (Exception)
         {
-            Debug.WriteLine("sdf");
+                Trace.WriteLine("sdf");
             throw;
         }
         }
@@ -51,7 +51,7 @@ public class Template
         if (expectedReturn)
         {
             stopwatch.Stop();
-            Debug.WriteLine("ClassWithAsyncMethod.MethodWithAwaitExpected " + stopwatch.ElapsedMilliseconds + "ms");
+            Trace.WriteLine("ClassWithAsyncMethod.MethodWithAwaitExpected " + stopwatch.ElapsedMilliseconds + "ms");
 
             return false;
         }
@@ -59,7 +59,7 @@ public class Template
         await Task.Delay(500);
 
         stopwatch.Stop();
-        Debug.WriteLine("ClassWithAsyncMethod.MethodWithAwaitExpected " + stopwatch.ElapsedMilliseconds + "ms");
+        Trace.WriteLine("ClassWithAsyncMethod.MethodWithAwaitExpected " + stopwatch.ElapsedMilliseconds + "ms");
 
         return true;
     }

@@ -55,7 +55,12 @@ public class AsyncMethodProcessor
                                      fieldReference != null &&
                                      fieldReference.Name.Contains("__state")
                                select instruction).FirstOrDefault();
-        if (firstStateUsage != null)
+        if (firstStateUsage == null)
+        {
+            // Probably compiled without roslyn, inject at first line
+            index = 0;
+        }
+        else
         {
             // Initial code looks like this (hence the -1):
             //
@@ -65,11 +70,6 @@ public class AsyncMethodProcessor
             // stloc.0
             // ldloc.0
             index = body.Instructions.IndexOf(firstStateUsage) - 1;
-        }
-        else
-        {
-            // Probably compiled without roslyn, inject at first line
-            index = 0;
         }
 
         InjectStopwatch(index, body.Instructions[index]);

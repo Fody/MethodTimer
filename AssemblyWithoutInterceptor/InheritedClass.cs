@@ -1,4 +1,5 @@
 using MethodTimer;
+// ReSharper disable UnusedMember.Local
 
 [Time]
 public class InheritedClass : BaseClass
@@ -17,10 +18,7 @@ public class InheritedClassDoingPropertyCall : BaseClass
     {
     }
 
-    static string Property
-    {
-        get { return "aaa"; }
-    }
+    static string Property => "aaa";
 }
 [Time]
 public class InheritedClassDoingConstructionCall : BaseClass
@@ -30,16 +28,13 @@ public class InheritedClassDoingConstructionCall : BaseClass
     {
     }
 
-    static string Property
-    {
-        get { return "aaa"; }
-    }
+    static string Property => "aaa";
 }
 
 public class SomeOtherClass
 {
-    public string Instance { get { return "aaa"; } }
-    public static string Static { get { return "aaa"; } }
+    public string Instance => "aaa";
+    public static string Static => "aaa";
 }
 
 public class BaseClass

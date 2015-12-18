@@ -9,7 +9,7 @@ public partial class ModuleWeaver
 
     public void FindInterceptor()
     {
-        LogDebug(string.Format("Searching for an intercepter"));
+        LogDebug("Searching for an intercepter");
 
         var interceptor = types.FirstOrDefault(x => x.IsInterceptor());
         if (interceptor != null)
@@ -34,21 +34,13 @@ public partial class ModuleWeaver
 
             var stopwatch = Stopwatch.StartNew();
 
-            ModuleDefinition moduleDefinition;
-
-            try
+            if (!Image.IsAssembly(referencePath))
             {
-                LogDebug($"Reading module from '{referencePath}'");
-
-                moduleDefinition = ReadModule(referencePath);
-            }
-            catch (Exception)
-            {
-                stopwatch.Stop();
-
-                LogDebug($"Failed to read module, probably a .net native assembly, took {stopwatch.ElapsedMilliseconds} ms");
+                LogDebug($"Skipped checking '{referencePath}' since it is not a .net assembly.");
                 continue;
             }
+            LogDebug($"Reading module from '{referencePath}'");
+            var moduleDefinition = ReadModule(referencePath);
 
             stopwatch.Stop();
 
@@ -117,6 +109,7 @@ public partial class ModuleWeaver
             {
                 AssemblyResolver = AssemblyResolver
             };
+
         try
         {
             return ModuleDefinition.ReadModule(referencePath, readerParameters);

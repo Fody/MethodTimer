@@ -26,7 +26,6 @@ public partial class ModuleWeaver
         LogWarningPoint = (s, p) => { Debug.WriteLine(s); };
         LogError = s => { Debug.WriteLine(s); };
         LogErrorPoint = (s, p) => { Debug.WriteLine(s); };
-
         ReferenceCopyLocalPaths = new List<string>();
     }
 
@@ -35,6 +34,13 @@ public partial class ModuleWeaver
         types = ModuleDefinition.GetTypes().ToList();
         FindReferences();
         FindInterceptor();
+        if (LogMethodIsNop)
+        {
+            LogDebug($"'{LogMethod.FullName}' is a Nop so skipping weaving");
+            RemoveAttributes();
+            RemoveReference();
+            return;
+        }
         CheckForBadAttributes();
         ProcessAssembly();
         RemoveAttributes();

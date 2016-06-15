@@ -68,6 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyTestersests\ExperimentTests.cs" />
+    <Compile Include="AssemblyTestersests\WithNopInterceptorTests.cs" />
     <Compile Include="AssemblyWeaver.cs" />
     <Compile Include="AssemblyTestersests\AssemblyWithAttributeOnAssemblyTests.cs" />
     <Compile Include="AssemblyTestersests\AssemblyWithAttributeOnModuleTests.cs" />

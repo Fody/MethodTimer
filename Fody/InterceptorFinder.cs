@@ -2,10 +2,12 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using Mono.Cecil;
+using Mono.Cecil.Cil;
 
 public partial class ModuleWeaver
 {
     public MethodReference LogMethod;
+    public bool LogMethodIsNop;
 
     public void FindInterceptor()
     {
@@ -21,6 +23,7 @@ public partial class ModuleWeaver
             }
             VerifyHasCorrectParameters(logMethod);
             VerifyMethodIsPublicStatic(logMethod);
+            CheckNop(logMethod);
             LogMethod = logMethod;
             return;
         }
@@ -64,8 +67,17 @@ public partial class ModuleWeaver
             VerifyHasCorrectParameters(logMethod);
             VerifyMethodIsPublicStatic(logMethod);
             LogMethod = ModuleDefinition.ImportReference(logMethod);
+            CheckNop(logMethod);
             return;
         }
+    }
+
+    void CheckNop(MethodDefinition logMethod)
+    {
+        LogMethodIsNop = logMethod.Body.Instructions.All(x =>
+                x.OpCode == OpCodes.Nop ||
+                x.OpCode == OpCodes.Ret
+                );
     }
 
 // ReSharper disable once UnusedParameter.Local

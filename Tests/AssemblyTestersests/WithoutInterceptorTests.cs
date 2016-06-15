@@ -12,7 +12,7 @@ public class WithoutInterceptorTests
 
     public WithoutInterceptorTests()
     {
-        var assemblyPath = Path.GetFullPath(@"..\..\..\AssemblyWithoutInterceptor\bin\Debug\AssemblyWithoutInterceptor.dll");
+        var assemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\AssemblyWithoutInterceptor\bin\Debug\AssemblyWithoutInterceptor.dll");
         assemblyWeaver = new AssemblyWeaver(assemblyPath);
     }
 

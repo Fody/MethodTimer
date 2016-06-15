@@ -13,8 +13,9 @@ public class WithInterceptorInReferenceTests
 
     public WithInterceptorInReferenceTests()
     {
-        var assemblyPath = Path.GetFullPath(@"..\..\..\AssemblyWIthInterceptorInReference\bin\Debug\AssemblyWIthInterceptorInReference.dll");
-        var assemblyToReference = AssemblyWeaver.FixAssemblyPath(Path.GetFullPath(@"..\..\..\AssemblyToReference\bin\Debug\AssemblyToReference.dll"));
+        var assemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\AssemblyWIthInterceptorInReference\bin\Debug\AssemblyWIthInterceptorInReference.dll");
+        var assemblyToReferencePath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\AssemblyToReference\bin\Debug\AssemblyToReference.dll");
+        var assemblyToReference = AssemblyWeaver.FixAssemblyPath(assemblyToReferencePath);
         assemblyWeaver = new AssemblyWeaver(assemblyPath, new List<string> { assemblyToReference });
 
         var interceptorAssembly = Assembly.LoadFrom(assemblyToReference);

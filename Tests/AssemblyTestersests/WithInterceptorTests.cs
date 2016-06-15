@@ -14,7 +14,7 @@ public class WithInterceptorTests
 
     public WithInterceptorTests()
     {
-        var assemblyPath = Path.GetFullPath(@"..\..\..\AssemblyWithInterceptor\bin\Debug\AssemblyWithInterceptor.dll");
+        var assemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\AssemblyWithInterceptor\bin\Debug\AssemblyWithInterceptor.dll");
         assemblyWeaver = new AssemblyWeaver(assemblyPath);
         var methodTimeLogger = assemblyWeaver.Assembly.GetType("MethodTimeLogger");
         methodBaseField = methodTimeLogger.GetField("MethodBase");

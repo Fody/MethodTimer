@@ -1,7 +1,7 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
+using Microsoft.Build.Utilities;
 using NUnit.Framework;
 
 public static class Verifier
@@ -34,13 +34,7 @@ public static class Verifier
 
     static string GetPathToPeVerify()
     {
-        var exePath = Environment.ExpandEnvironmentVariables(@"%programfiles(x86)%\Microsoft SDKs\Windows\v7.0A\Bin\NETFX 4.0 Tools\PEVerify.exe");
-
-        if (!File.Exists(exePath))
-        {
-            exePath = Environment.ExpandEnvironmentVariables(@"%programfiles(x86)%\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\PEVerify.exe");
-        }
-        return exePath;
+        return ToolLocationHelper.GetPathToDotNetFrameworkFile("peverify.exe",TargetDotNetFrameworkVersion.VersionLatest);
     }
 
     static string TrimLineNumbers(string foo)

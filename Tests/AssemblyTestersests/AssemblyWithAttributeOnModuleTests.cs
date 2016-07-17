@@ -9,11 +9,12 @@ using NUnit.Framework;
 public class AssemblyWithAttributeOnModuleTests
 {
     AssemblyWeaver assemblyWeaver;
+    string beforeAssemblyPath;
 
     public AssemblyWithAttributeOnModuleTests()
     {
-        var assemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\AssemblyWithAttributeOnModule\bin\Debug\AssemblyWithAttributeOnModule.dll");
-        assemblyWeaver = new AssemblyWeaver(assemblyPath);
+        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\AssemblyWithAttributeOnModule\bin\Debug\AssemblyWithAttributeOnModule.dll");
+        assemblyWeaver = new AssemblyWeaver(beforeAssemblyPath);
     }
 
     [Test]
@@ -63,7 +64,7 @@ public class AssemblyWithAttributeOnModuleTests
     [Test]
     public void PeVerify()
     {
-        Verifier.Verify(assemblyWeaver.Assembly.CodeBase.Remove(0, 8));
+        Verifier.Verify(beforeAssemblyPath,assemblyWeaver.Assembly.CodeBase.Remove(0, 8));
     }
 
 }

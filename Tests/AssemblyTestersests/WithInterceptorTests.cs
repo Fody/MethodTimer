@@ -11,11 +11,12 @@ public class WithInterceptorTests
 {
     AssemblyWeaver assemblyWeaver;
     FieldInfo methodBaseField;
+    string beforeAssemblyPath;
 
     public WithInterceptorTests()
     {
-        var assemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\AssemblyWithInterceptor\bin\Debug\AssemblyWithInterceptor.dll");
-        assemblyWeaver = new AssemblyWeaver(assemblyPath);
+        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\AssemblyWithInterceptor\bin\Debug\AssemblyWithInterceptor.dll");
+        assemblyWeaver = new AssemblyWeaver(beforeAssemblyPath);
         var methodTimeLogger = assemblyWeaver.Assembly.GetType("MethodTimeLogger");
         methodBaseField = methodTimeLogger.GetField("MethodBase");
     }
@@ -49,7 +50,7 @@ public class WithInterceptorTests
     [Test]
     public void PeVerify()
     {
-        Verifier.Verify(assemblyWeaver.Assembly.CodeBase.Remove(0, 8));
+        Verifier.Verify(beforeAssemblyPath,assemblyWeaver.Assembly.CodeBase.Remove(0, 8));
     }
 
     [Test]

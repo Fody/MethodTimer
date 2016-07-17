@@ -6,11 +6,12 @@ using NUnit.Framework;
 public class WithNopInterceptorTests
 {
     AssemblyWeaver assemblyWeaver;
+    string beforeAssemblyPath;
 
     public WithNopInterceptorTests()
     {
-        var assemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\AssemblyWithNopInterceptor\bin\Debug\AssemblyWithNopInterceptor.dll");
-        assemblyWeaver = new AssemblyWeaver(assemblyPath);
+        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\AssemblyWithNopInterceptor\bin\Debug\AssemblyWithNopInterceptor.dll");
+        assemblyWeaver = new AssemblyWeaver(beforeAssemblyPath);
     }
 
     [Test]
@@ -31,7 +32,7 @@ public class WithNopInterceptorTests
     [Test]
     public void PeVerify()
     {
-        Verifier.Verify(assemblyWeaver.Assembly.CodeBase.Remove(0, 8));
+        Verifier.Verify(beforeAssemblyPath, assemblyWeaver.Assembly.CodeBase.Remove(0, 8));
     }
 
 }

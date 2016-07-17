@@ -54,12 +54,6 @@ public class StopwatchCreatorTests : IDisposable
         Assert.GreaterOrEqual(elapsed, 1000);
     }
 
-    [Test]
-    public void PeVerify()
-    {
-        Verifier.Verify("temp.dll");
-    }
-
     public void Dispose()
     {
         if (File.Exists("temp.dll"))

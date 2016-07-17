@@ -9,11 +9,12 @@ using NUnit.Framework;
 public class WithoutInterceptorTests
 {
     AssemblyWeaver assemblyWeaver;
+    string beforeAssemblyPath;
 
     public WithoutInterceptorTests()
     {
-        var assemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\AssemblyWithoutInterceptor\bin\Debug\AssemblyWithoutInterceptor.dll");
-        assemblyWeaver = new AssemblyWeaver(assemblyPath);
+        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\AssemblyWithoutInterceptor\bin\Debug\AssemblyWithoutInterceptor.dll");
+        assemblyWeaver = new AssemblyWeaver(beforeAssemblyPath);
     }
 
     [Test]
@@ -298,7 +299,7 @@ public class WithoutInterceptorTests
     [Test]
     public void PeVerify()
     {
-        Verifier.Verify(assemblyWeaver.Assembly.CodeBase.Remove(0, 8));
+        Verifier.Verify(beforeAssemblyPath,assemblyWeaver.Assembly.CodeBase.Remove(0, 8));
     }
 
 }

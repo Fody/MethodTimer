@@ -118,13 +118,13 @@ public class AsyncMethodProcessor
     static IEnumerable<Instruction> GetAsyncReturns(Collection<Instruction> instructions)
     {
         // There are 3 possible return points:
-        // 
+        //
         // 1) async code:
         //      awaiter.GetResult();
         //      awaiter = new TaskAwaiter();
         //
         // 2) exception handling
-        //      L_00d5: ldloc.1 
+        //      L_00d5: ldloc.1
         //      L_00d6: call instance void [mscorlib]System.Runtime.CompilerServices.AsyncTaskMethodBuilder::SetException(class [mscorlib]System.Exception)
         //
         // 3) all other returns

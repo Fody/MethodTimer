@@ -10,13 +10,14 @@ public class WithInterceptorInReferenceTests
 {
     AssemblyWeaver assemblyWeaver;
     FieldInfo methodBaseField;
+    string beforeAssemblyPath;
 
     public WithInterceptorInReferenceTests()
     {
-        var assemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\AssemblyWIthInterceptorInReference\bin\Debug\AssemblyWIthInterceptorInReference.dll");
+        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\AssemblyWIthInterceptorInReference\bin\Debug\AssemblyWIthInterceptorInReference.dll");
         var assemblyToReferencePath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\AssemblyToReference\bin\Debug\AssemblyToReference.dll");
         var assemblyToReference = AssemblyWeaver.FixAssemblyPath(assemblyToReferencePath);
-        assemblyWeaver = new AssemblyWeaver(assemblyPath, new List<string> { assemblyToReference });
+        assemblyWeaver = new AssemblyWeaver(beforeAssemblyPath, new List<string> { assemblyToReference });
 
         var interceptorAssembly = Assembly.LoadFrom(assemblyToReference);
         var methodTimeLogger = interceptorAssembly.GetType("MethodTimeLogger");
@@ -50,7 +51,7 @@ public class WithInterceptorInReferenceTests
     [Test]
     public void PeVerify()
     {
-        Verifier.Verify(assemblyWeaver.Assembly.CodeBase.Remove(0, 8));
+        Verifier.Verify(beforeAssemblyPath,assemblyWeaver.Assembly.CodeBase.Remove(0, 8));
     }
 
 }

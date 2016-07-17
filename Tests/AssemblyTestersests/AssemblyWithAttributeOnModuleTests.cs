@@ -21,11 +21,11 @@ public class AssemblyWithAttributeOnModuleTests
     public void ClassWithNoAttribute()
     {
         var message = DebugRunner.CaptureDebug(() =>
-            {
-                var type = assemblyWeaver.Assembly.GetType("ClassWithNoAttribute");
-                var instance = (dynamic) Activator.CreateInstance(type);
-                instance.Method();
-            });
+        {
+            var type = assemblyWeaver.Assembly.GetType("ClassWithNoAttribute");
+            var instance = (dynamic) Activator.CreateInstance(type);
+            instance.Method();
+        });
         Assert.AreEqual(1, message.Count);
         Assert.IsTrue(message.First().StartsWith("ClassWithNoAttribute.Method "));
     }
@@ -34,10 +34,10 @@ public class AssemblyWithAttributeOnModuleTests
     public void ClassWithAsyncMethod()
     {
         var type = assemblyWeaver.Assembly.GetType("ClassWithCompilerGeneratedTypes");
-        var instance = (dynamic)Activator.CreateInstance(type);
+        var instance = (dynamic) Activator.CreateInstance(type);
         var message = DebugRunner.CaptureDebug(() =>
         {
-            var task = (Task)instance.AsyncMethod();
+            var task = (Task) instance.AsyncMethod();
             task.Wait();
         });
 
@@ -49,10 +49,10 @@ public class AssemblyWithAttributeOnModuleTests
     public void ClassWithYieldMethod()
     {
         var type = assemblyWeaver.Assembly.GetType("ClassWithCompilerGeneratedTypes");
-        var instance = (dynamic)Activator.CreateInstance(type);
+        var instance = (dynamic) Activator.CreateInstance(type);
         var message = DebugRunner.CaptureDebug(() =>
         {
-            var task = (IEnumerable<string>)instance.YieldMethod();
+            var task = (IEnumerable<string>) instance.YieldMethod();
             task.ToList();
         });
 
@@ -64,7 +64,7 @@ public class AssemblyWithAttributeOnModuleTests
     [Test]
     public void PeVerify()
     {
-        Verifier.Verify(beforeAssemblyPath,assemblyWeaver.Assembly.CodeBase.Remove(0, 8));
+        Verifier.Verify(beforeAssemblyPath, assemblyWeaver.AfterAssemblyPath);
     }
 
 }

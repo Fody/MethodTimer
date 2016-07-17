@@ -6,6 +6,7 @@ using Mono.Cecil;
 public class AssemblyWeaver
 {
     public Assembly Assembly;
+    public string AfterAssemblyPath;
     public AssemblyWeaver(string assemblyPath, List<string> referenceAssemblyPaths = null)
     {
 
@@ -15,10 +16,10 @@ public class AssemblyWeaver
         }
         assemblyPath = FixAssemblyPath(assemblyPath);
 
-        var newAssembly = assemblyPath.Replace(".dll", "2.dll");
-        File.Copy(assemblyPath, newAssembly, true);
+        AfterAssemblyPath = assemblyPath.Replace(".dll", "2.dll");
+        File.Copy(assemblyPath, AfterAssemblyPath, true);
         var oldPdb = Path.ChangeExtension(assemblyPath, "pdb");
-        var newPdb = Path.ChangeExtension(newAssembly,"pdb");
+        var newPdb = Path.ChangeExtension(AfterAssemblyPath, "pdb");
         File.Copy(oldPdb, newPdb, true);
 
         var assemblyResolver = new MockAssemblyResolver();
@@ -32,7 +33,7 @@ public class AssemblyWeaver
             AssemblyResolver = assemblyResolver,
             ReadSymbols = true,
         };
-        var moduleDefinition = ModuleDefinition.ReadModule(newAssembly, readerParameters);
+        var moduleDefinition = ModuleDefinition.ReadModule(AfterAssemblyPath, readerParameters);
         var weavingTask = new ModuleWeaver
         {
             ModuleDefinition = moduleDefinition,
@@ -42,9 +43,9 @@ public class AssemblyWeaver
         };
 
         weavingTask.Execute();
-        moduleDefinition.Write(newAssembly);
+        moduleDefinition.Write(AfterAssemblyPath);
 
-        Assembly = Assembly.LoadFrom(newAssembly);
+        Assembly = Assembly.LoadFrom(AfterAssemblyPath);
     }
 
     public static string FixAssemblyPath(string assemblyPath)

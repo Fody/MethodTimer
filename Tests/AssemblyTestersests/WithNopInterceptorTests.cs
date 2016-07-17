@@ -32,7 +32,7 @@ public class WithNopInterceptorTests
     [Test]
     public void PeVerify()
     {
-        Verifier.Verify(beforeAssemblyPath, assemblyWeaver.Assembly.CodeBase.Remove(0, 8));
+        Verifier.Verify(beforeAssemblyPath, assemblyWeaver.AfterAssemblyPath);
     }
 
 }

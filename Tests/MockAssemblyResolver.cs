@@ -3,10 +3,9 @@ using Mono.Cecil;
 
 public class MockAssemblyResolver : DefaultAssemblyResolver
 {
-    
-    public override AssemblyDefinition Resolve(string fullName)
+    public override AssemblyDefinition Resolve(AssemblyNameReference name)
     {
-        if (fullName == "System")
+        if (name.Name == "System")
         {
             var codeBase = typeof(Debug).Assembly.CodeBase.Replace("file:///", "");
             return AssemblyDefinition.ReadAssembly(codeBase);
@@ -14,7 +13,7 @@ public class MockAssemblyResolver : DefaultAssemblyResolver
         else
         {
             var codeBase = typeof(string).Assembly.CodeBase.Replace("file:///", "");
-            return AssemblyDefinition.ReadAssembly(codeBase);   
+            return AssemblyDefinition.ReadAssembly(codeBase);
         }
 
     }

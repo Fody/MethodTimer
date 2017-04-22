@@ -9,7 +9,6 @@ public class AssemblyWeaver
     public string AfterAssemblyPath;
     public AssemblyWeaver(string assemblyPath, List<string> referenceAssemblyPaths = null)
     {
-
         if (referenceAssemblyPaths == null)
         {
             referenceAssemblyPaths = new List<string>();
@@ -33,17 +32,19 @@ public class AssemblyWeaver
             AssemblyResolver = assemblyResolver,
             ReadSymbols = true,
         };
-        var moduleDefinition = ModuleDefinition.ReadModule(AfterAssemblyPath, readerParameters);
-        var weavingTask = new ModuleWeaver
+        using (var moduleDefinition = ModuleDefinition.ReadModule(assemblyPath, readerParameters))
         {
-            ModuleDefinition = moduleDefinition,
-            AssemblyResolver = assemblyResolver,
-            LogError = LogError,
-            ReferenceCopyLocalPaths = referenceAssemblyPaths
-        };
+            var weavingTask = new ModuleWeaver
+            {
+                ModuleDefinition = moduleDefinition,
+                AssemblyResolver = assemblyResolver,
+                LogError = LogError,
+                ReferenceCopyLocalPaths = referenceAssemblyPaths
+            };
 
-        weavingTask.Execute();
-        moduleDefinition.Write(AfterAssemblyPath);
+            weavingTask.Execute();
+            moduleDefinition.Write(AfterAssemblyPath);
+        }
 
         Assembly = Assembly.LoadFrom(AfterAssemblyPath);
     }

@@ -8,14 +8,14 @@ using NUnit.Framework;
 [TestFixture]
 public class AssemblyWithAttributeOnAssemblyTests
 {
-	AssemblyWeaver assemblyWeaver;
+    AssemblyWeaver assemblyWeaver;
     string beforeAssemblyPath;
 
     public AssemblyWithAttributeOnAssemblyTests()
-	{
+    {
         beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\AssemblyWithAttributeOnAssembly\bin\Debug\AssemblyWithAttributeOnAssembly.dll");
-		assemblyWeaver = new AssemblyWeaver(beforeAssemblyPath);
-	}
+        assemblyWeaver = new AssemblyWeaver(beforeAssemblyPath);
+    }
 
     [Test]
     public void ClassWithNoAttribute()
@@ -23,7 +23,7 @@ public class AssemblyWithAttributeOnAssemblyTests
         var message = DebugRunner.CaptureDebug(() =>
         {
             var type = assemblyWeaver.Assembly.GetType("ClassWithNoAttribute");
-            var instance = (dynamic)Activator.CreateInstance(type);
+            var instance = (dynamic) Activator.CreateInstance(type);
             instance.Method();
         });
         Assert.AreEqual(1, message.Count);
@@ -34,10 +34,10 @@ public class AssemblyWithAttributeOnAssemblyTests
     public void ClassWithAsyncMethod()
     {
         var type = assemblyWeaver.Assembly.GetType("ClassWithCompilerGeneratedTypes");
-        var instance = (dynamic)Activator.CreateInstance(type);
+        var instance = (dynamic) Activator.CreateInstance(type);
         var message = DebugRunner.CaptureDebug(() =>
         {
-            var task = (Task)instance.AsyncMethod();
+            var task = (Task) instance.AsyncMethod();
             task.Wait();
         });
 
@@ -49,10 +49,10 @@ public class AssemblyWithAttributeOnAssemblyTests
     public void ClassWithYieldMethod()
     {
         var type = assemblyWeaver.Assembly.GetType("ClassWithCompilerGeneratedTypes");
-        var instance = (dynamic)Activator.CreateInstance(type);
+        var instance = (dynamic) Activator.CreateInstance(type);
         var message = DebugRunner.CaptureDebug(() =>
         {
-            var task = (IEnumerable<string>)instance.YieldMethod();
+            var task = (IEnumerable<string>) instance.YieldMethod();
             task.ToList();
         });
 
@@ -61,10 +61,9 @@ public class AssemblyWithAttributeOnAssemblyTests
         //Assert.IsTrue(message.First().StartsWith("ClassWithCompilerGeneratedTypes.YieldMethod "));
     }
 
-	[Test]
-	public void PeVerify()
-	{
-		Verifier.Verify(beforeAssemblyPath,assemblyWeaver.AfterAssemblyPath);
-	}
-
+    [Test]
+    public void PeVerify()
+    {
+        Verifier.Verify(beforeAssemblyPath, assemblyWeaver.AfterAssemblyPath);
+    }
 }

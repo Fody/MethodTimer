@@ -8,8 +8,6 @@ using Mono.Collections.Generic;
 
 public class AsyncMethodProcessor
 {
-    const string CheckStopwatchVariableName = "__fody__checkStopwatch";
-
     public ModuleWeaver ModuleWeaver;
     public MethodDefinition Method;
     MethodBody body;
@@ -81,7 +79,7 @@ public class AsyncMethodProcessor
 
     void InjectStopwatch(int index, Instruction nextInstruction)
     {
-        var boolVariable = new VariableDefinition(CheckStopwatchVariableName, ModuleWeaver.BooleanType.Resolve());
+        var boolVariable = new VariableDefinition(ModuleWeaver.BooleanType.Resolve());
         body.Variables.Add(boolVariable);
 
         stopwatchField = new FieldDefinition("methodTimerStopwatch", new FieldAttributes(), ModuleWeaver.StopwatchType);
@@ -201,7 +199,7 @@ public class AsyncMethodProcessor
 
         indexOf++;
 
-        if ((opCode == OpCodes.Leave) || (opCode == OpCodes.Leave_S))
+        if (opCode == OpCodes.Leave || opCode == OpCodes.Leave_S)
         {
             instructions.Insert(indexOf, Instruction.Create(opCode, operand));
         }

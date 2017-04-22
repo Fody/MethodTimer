@@ -75,7 +75,7 @@ public partial class ModuleWeaver
 
     void AppendTypes(string name, List<TypeDefinition> coreTypes)
     {
-        var definition = AssemblyResolver.Resolve(name);
+        var definition = AssemblyResolver.Resolve(new AssemblyNameReference(name, null));
         if (definition != null)
         {
             coreTypes.AddRange(definition.MainModule.Types);
@@ -90,7 +90,7 @@ public partial class ModuleWeaver
         {
             return debugType;
         }
-        var systemDiagnosticsDebug = AssemblyResolver.Resolve("System.Diagnostics.Debug");
+        var systemDiagnosticsDebug = AssemblyResolver.Resolve(new AssemblyNameReference("System.Diagnostics.Debug", null));
         if (systemDiagnosticsDebug != null)
         {
             debugType = systemDiagnosticsDebug.MainModule.Types.FirstOrDefault(x => x.Name == "Debug");

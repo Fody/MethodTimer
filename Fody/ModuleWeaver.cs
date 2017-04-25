@@ -18,6 +18,8 @@ public partial class ModuleWeaver
     List<TypeDefinition> types;
     public List<string> ReferenceCopyLocalPaths { get; set; }
 
+    ParameterFormattingProcessor parameterFormattingProcessor = new ParameterFormattingProcessor();
+
     public ModuleWeaver()
     {
         LogDebug = s => { Debug.WriteLine(s); };
@@ -36,7 +38,8 @@ public partial class ModuleWeaver
         FindInterceptor();
         if (LogMethodIsNop)
         {
-            LogDebug($"'{LogMethod.FullName}' is a Nop so skipping weaving");
+            var logMethod = LogMethod ?? LogWithMessageMethod;
+            LogDebug($"'{logMethod?.FullName}' is a Nop so skipping weaving");
             RemoveAttributes();
             RemoveReference();
             return;

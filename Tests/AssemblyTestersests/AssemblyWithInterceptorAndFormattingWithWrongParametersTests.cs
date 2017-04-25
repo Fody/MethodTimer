@@ -21,6 +21,6 @@ public class AssemblyWithInterceptorAndFormattingWithWrongParametersTests
         Assert.AreNotEqual(0, assemblyWeaver.Errors);
 
         var error = assemblyWeaver.Errors.First();
-        Assert.AreEqual("Feature with parameter formatting is being used, but no useable log method can be found. Either disable the feature usage or update the logger signature to 'public static void Log(MethodBase methodBase, long milliseconds, string message)'", error);
+        Assert.AreEqual("Could not process 'System.Void ClassWithMethod::Method(System.String,System.Int32)' because the format uses 'nonExistingParameterName' which is not available as method parameter.", error);
     }
 }

@@ -73,33 +73,36 @@ public partial class ModuleWeaver
         }
 
         var timeAttribute = method.GetTimeAttribute();
-        var format = timeAttribute.ConstructorArguments.FirstOrDefault().Value as string;
-        if (!string.IsNullOrWhiteSpace(format))
+        if (timeAttribute != null)
         {
-            var hasErrors = false;
-
-            var logWithMessageMethod = LogWithMessageMethod;
-            if (logWithMessageMethod == null)
+            var format = timeAttribute.ConstructorArguments.FirstOrDefault().Value as string;
+            if (!string.IsNullOrWhiteSpace(format))
             {
-                hasErrors = true;
-                LogError("Feature with parameter formatting is being used, but no useable log method can be found. Either disable the feature usage or update the logger signature to 'public static void Log(MethodBase methodBase, long milliseconds, string message)'");
-            }
+                var hasErrors = false;
 
-            var info = parameterFormattingProcessor.ParseParameterFormatting(format);
-            for (var i = 0; i < info.ParameterNames.Count; i++)
-            {
-                var parameterName = info.ParameterNames[i];
-                var containsParameter  = method.Parameters.Any(x => x.Name.Equals(parameterName));
-                if (!containsParameter)
+                var logWithMessageMethod = LogWithMessageMethod;
+                if (logWithMessageMethod == null)
                 {
                     hasErrors = true;
-                    LogError(string.Format("Could not process '" + method.FullName + "' because the format uses '{0}' which is not available as method parameter.", parameterName));
+                    LogError("Feature with parameter formatting is being used, but no useable log method can be found. Either disable the feature usage or update the logger signature to 'public static void Log(MethodBase methodBase, long milliseconds, string message)'");
                 }
-            }
 
-            if (hasErrors)
-            {
-                return;
+                var info = parameterFormattingProcessor.ParseParameterFormatting(format);
+                for (var i = 0; i < info.ParameterNames.Count; i++)
+                {
+                    var parameterName = info.ParameterNames[i];
+                    var containsParameter = method.Parameters.Any(x => x.Name.Equals(parameterName));
+                    if (!containsParameter)
+                    {
+                        hasErrors = true;
+                        LogError(string.Format("Could not process '" + method.FullName + "' because the format uses '{0}' which is not available as method parameter.", parameterName));
+                    }
+                }
+
+                if (hasErrors)
+                {
+                    return;
+                }
             }
         }
 

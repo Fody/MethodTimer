@@ -75,6 +75,7 @@
     <Compile Include="AssemblyWeaver.cs" />
     <Compile Include="AssemblyTestersests\AssemblyWithAttributeOnAssemblyTests.cs" />
     <Compile Include="AssemblyTestersests\AssemblyWithAttributeOnModuleTests.cs" />
+    <Compile Include="ParameterFormattingProcessorTests.cs" />
     <Compile Include="StopwatchCreatorTests.cs" />
     <Compile Include="Stopwatch.cs" />
     <Compile Include="AssemblyTestersests\WithInterceptorTests.cs" />

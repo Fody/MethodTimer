@@ -8,5 +8,16 @@ namespace MethodTimer
     [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Module | AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Constructor)]
     public class TimeAttribute : Attribute
     {
+        public TimeAttribute()
+        {
+            
+        }
+
+        public TimeAttribute(string format)
+        {
+            Format = format;
+        }
+
+        public string Format { get; set; }
     }
 }

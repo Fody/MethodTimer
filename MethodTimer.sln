@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 14.0.22823.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fody", "Fody\Fody.csproj", "{C3578A7B-09A6-4444-9383-0DEAFA4958BD}"
 EndProject
@@ -26,6 +26,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyWithAttributeOnAssembly", "AssemblyWithAttributeOnAssembly\AssemblyWithAttributeOnAssembly.csproj", "{6C028879-7E51-44E3-A3C4-0A01353EEF19}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyWithNopInterceptor", "AssemblyWithNopInterceptor\AssemblyWithNopInterceptor.csproj", "{FB284053-FFAA-4866-820B-CED00B3CB4C2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyWithInterceptorAndFormattingWithoutOverload", "AssemblyWithInterceptorAndFormattingWithoutOverload\AssemblyWithInterceptorAndFormattingWithoutOverload.csproj", "{6AD809B4-8589-4B03-9D9C-7524C774F425}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyWithInterceptorAndFormatting", "AssemblyWithInterceptorAndFormatting\AssemblyWithInterceptorAndFormatting.csproj", "{A98F0A2C-6707-49E1-8D3F-ACFF0321B4F3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyWithInterceptorAndFormattingWithWrongParameters", "AssemblyWithInterceptorAndFormattingWithWrongParameters\AssemblyWithInterceptorAndFormattingWithWrongParameters.csproj", "{BD3C1F7C-DBEE-4C57-86D2-0074145A7566}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -97,6 +103,30 @@ Global
 		{FB284053-FFAA-4866-820B-CED00B3CB4C2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FB284053-FFAA-4866-820B-CED00B3CB4C2}.Release|x86.ActiveCfg = Release|Any CPU
 		{FB284053-FFAA-4866-820B-CED00B3CB4C2}.Release|x86.Build.0 = Release|Any CPU
+		{6AD809B4-8589-4B03-9D9C-7524C774F425}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AD809B4-8589-4B03-9D9C-7524C774F425}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AD809B4-8589-4B03-9D9C-7524C774F425}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6AD809B4-8589-4B03-9D9C-7524C774F425}.Debug|x86.Build.0 = Debug|Any CPU
+		{6AD809B4-8589-4B03-9D9C-7524C774F425}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AD809B4-8589-4B03-9D9C-7524C774F425}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AD809B4-8589-4B03-9D9C-7524C774F425}.Release|x86.ActiveCfg = Release|Any CPU
+		{6AD809B4-8589-4B03-9D9C-7524C774F425}.Release|x86.Build.0 = Release|Any CPU
+		{A98F0A2C-6707-49E1-8D3F-ACFF0321B4F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A98F0A2C-6707-49E1-8D3F-ACFF0321B4F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A98F0A2C-6707-49E1-8D3F-ACFF0321B4F3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A98F0A2C-6707-49E1-8D3F-ACFF0321B4F3}.Debug|x86.Build.0 = Debug|Any CPU
+		{A98F0A2C-6707-49E1-8D3F-ACFF0321B4F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A98F0A2C-6707-49E1-8D3F-ACFF0321B4F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A98F0A2C-6707-49E1-8D3F-ACFF0321B4F3}.Release|x86.ActiveCfg = Release|Any CPU
+		{A98F0A2C-6707-49E1-8D3F-ACFF0321B4F3}.Release|x86.Build.0 = Release|Any CPU
+		{BD3C1F7C-DBEE-4C57-86D2-0074145A7566}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD3C1F7C-DBEE-4C57-86D2-0074145A7566}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD3C1F7C-DBEE-4C57-86D2-0074145A7566}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BD3C1F7C-DBEE-4C57-86D2-0074145A7566}.Debug|x86.Build.0 = Debug|Any CPU
+		{BD3C1F7C-DBEE-4C57-86D2-0074145A7566}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD3C1F7C-DBEE-4C57-86D2-0074145A7566}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD3C1F7C-DBEE-4C57-86D2-0074145A7566}.Release|x86.ActiveCfg = Release|Any CPU
+		{BD3C1F7C-DBEE-4C57-86D2-0074145A7566}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

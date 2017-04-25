@@ -14,6 +14,7 @@ public class AsyncMethodProcessor
     FieldDefinition stopwatchField;
     TypeDefinition stateMachineType;
     List<Instruction> returnPoints;
+    ParameterFormattingProcessor parameterFormattingProcessor = new ParameterFormattingProcessor();
 
     public void Process()
     {
@@ -191,7 +192,7 @@ public class AsyncMethodProcessor
 
         var instructions = body.Instructions;
         var indexOf = instructions.IndexOf(returnPoint);
-        foreach (var instruction in GetWriteTimeInstruction())
+        foreach (var instruction in GetWriteTimeInstruction(Method))
         {
             indexOf++;
             instructions.Insert(indexOf, instruction);
@@ -210,7 +211,7 @@ public class AsyncMethodProcessor
     }
 
 
-    IEnumerable<Instruction> GetWriteTimeInstruction()
+    IEnumerable<Instruction> GetWriteTimeInstruction(MethodDefinition methodDefinition)
     {
         yield return Instruction.Create(OpCodes.Ldarg_0);
         yield return Instruction.Create(OpCodes.Ldfld, stopwatchField);
@@ -221,12 +222,78 @@ public class AsyncMethodProcessor
 
         if (logWithMessageMethod != null)
         {
-            // TODO: Implement
+            // Important notes:
+            // 1. Because async works with state machines, use the state machine & fields instead of method & variables.
+            // 2. The ldarg_0 calls are required to load the state machine class and is required before every field call.
+
+            //var moveNextMethodDefinition = stateMachineType.Methods.First(x => x.Name == "MoveNext");
+            //var formattedVariableDefinition = new VariableDefinition(ModuleWeaver.ModuleDefinition.TypeSystem.String);
+            //moveNextMethodDefinition.Body.Variables.Add(formattedVariableDefinition);
+
+            var formattedFieldDefinition = stateMachineType.Fields.FirstOrDefault(x => x.Name.Equals("methodTimerMessage"));
+            if (formattedFieldDefinition == null)
+            {
+                formattedFieldDefinition = new FieldDefinition("methodTimerMessage", FieldAttributes.Private | FieldAttributes.CompilerControlled, ModuleWeaver.ModuleDefinition.TypeSystem.String);
+                stateMachineType.Fields.Add(formattedFieldDefinition);
+            }
+
+            // Load everything for a string format
+            var timeAttribute = methodDefinition.GetTimeAttribute();
+            if (timeAttribute != null)
+            {
+                var value = timeAttribute.ConstructorArguments.FirstOrDefault().Value as string;
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    var info = parameterFormattingProcessor.ParseParameterFormatting(value);
+
+                    yield return Instruction.Create(OpCodes.Ldarg_0);
+                    yield return Instruction.Create(OpCodes.Ldstr, info.Format);
+                    yield return Instruction.Create(OpCodes.Ldc_I4, info.ParameterNames.Count);
+                    yield return Instruction.Create(OpCodes.Newarr, ModuleWeaver.ModuleDefinition.TypeSystem.Object);
+
+                    for (var i = 0; i < info.ParameterNames.Count; i++)
+                    {
+                        var field = stateMachineType.Fields.First(x => x.Name.Equals(info.ParameterNames[i]));
+
+                        yield return Instruction.Create(OpCodes.Dup);
+                        yield return Instruction.Create(OpCodes.Ldc_I4, i);
+                        yield return Instruction.Create(OpCodes.Ldarg_0);
+                        yield return Instruction.Create(OpCodes.Ldfld, field);
+
+                        if (field.FieldType.IsBoxingRequired(ModuleWeaver.ModuleDefinition.TypeSystem.Object))
+                        {
+                            yield return Instruction.Create(OpCodes.Box, ModuleWeaver.ModuleDefinition.ImportReference(field.FieldType));
+                        }
+
+                        yield return Instruction.Create(OpCodes.Stelem_Ref);
+                    }
+
+                    yield return Instruction.Create(OpCodes.Call, ModuleWeaver.StringFormatWithArray);
+                }
+                else
+                {
+                    // Load null a string
+                    yield return Instruction.Create(OpCodes.Ldnull);
+                }
+
+                yield return Instruction.Create(OpCodes.Stfld, formattedFieldDefinition);
+            }
+
+            // Handle call to log method
+            yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition);
+            yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition.DeclaringType);
+            yield return Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle);
+            yield return Instruction.Create(OpCodes.Ldarg_0);
+            yield return Instruction.Create(OpCodes.Ldfld, stopwatchField);
+            yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);
+            yield return Instruction.Create(OpCodes.Ldarg_0);
+            yield return Instruction.Create(OpCodes.Ldfld, formattedFieldDefinition);
+            yield return Instruction.Create(OpCodes.Call, logWithMessageMethod);
         }
         else if (logMethod != null)
         {
-            yield return Instruction.Create(OpCodes.Ldtoken, Method);
-            yield return Instruction.Create(OpCodes.Ldtoken, Method.DeclaringType);
+            yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition);
+            yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition.DeclaringType);
             yield return Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle);
             yield return Instruction.Create(OpCodes.Ldarg_0);
             yield return Instruction.Create(OpCodes.Ldfld, stopwatchField);
@@ -235,7 +302,7 @@ public class AsyncMethodProcessor
         }
         else
         {
-            yield return Instruction.Create(OpCodes.Ldstr, Method.MethodName());
+            yield return Instruction.Create(OpCodes.Ldstr, methodDefinition.MethodName());
             yield return Instruction.Create(OpCodes.Ldarg_0);
             yield return Instruction.Create(OpCodes.Ldfld, stopwatchField);
             yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);

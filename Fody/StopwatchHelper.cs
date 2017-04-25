@@ -66,7 +66,7 @@ public partial class ModuleWeaver
             yield return Instruction.Create(OpCodes.Ldloc, stopwatchVariableDefinition);
             yield return Instruction.Create(OpCodes.Call, ElapsedMilliseconds);
             yield return Instruction.Create(OpCodes.Ldloc, formattedVariableDefinition);
-            yield return Instruction.Create(OpCodes.Call, logMethod);
+            yield return Instruction.Create(OpCodes.Call, logWithMessageMethod);
         }
         else if (logMethod != null)
         {

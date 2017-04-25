@@ -66,9 +66,12 @@ public class WithInterceptorAndFormattingTests
         Assert.AreEqual(0, messages.Count);
     }
 
+    [RequiresSTA]
     [Test]
     public void ClassWithAsyncMethod()
     {
+        ClearMessage();
+
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
         DebugRunner.CaptureDebug(() =>
@@ -90,9 +93,12 @@ public class WithInterceptorAndFormattingTests
         Assert.AreEqual(message, "File name '123' with id '42'");
     }
 
+    [RequiresSTA]
     [Test]
     public void ClassWithAsyncMethodThatThrowsException()
     {
+        ClearMessage();
+
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
         DebugRunner.CaptureDebug(() =>
@@ -124,6 +130,8 @@ public class WithInterceptorAndFormattingTests
     [TestCase(false)]
     public void ClassWithAsyncMethodWithFastPath(bool recurse)
     {
+        ClearMessage();
+
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
         DebugRunner.CaptureDebug(() =>
@@ -141,7 +149,7 @@ public class WithInterceptorAndFormattingTests
         Assert.AreEqual("MethodWithFastPathAsync", methodBase.Name);
 
         var messages = GetMessagesField();
-        Assert.AreEqual(1, messages.Count);
+        Assert.AreEqual(recurse ? 2 : 1, messages.Count);
 
         var message = messages.First();
         Assert.AreEqual(message, "File name '123' with id '42'");

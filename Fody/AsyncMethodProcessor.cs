@@ -253,16 +253,26 @@ public class AsyncMethodProcessor
 
                     for (var i = 0; i < info.ParameterNames.Count; i++)
                     {
-                        var field = stateMachineType.Fields.First(x => x.Name.Equals(info.ParameterNames[i]));
-
                         yield return Instruction.Create(OpCodes.Dup);
                         yield return Instruction.Create(OpCodes.Ldc_I4, i);
-                        yield return Instruction.Create(OpCodes.Ldarg_0);
-                        yield return Instruction.Create(OpCodes.Ldfld, field);
 
-                        if (field.FieldType.IsBoxingRequired(ModuleWeaver.ModuleDefinition.TypeSystem.Object))
+                        var field = stateMachineType.Fields.FirstOrDefault(x => x.Name.Equals(info.ParameterNames[i]));
+                        if (field == null)
                         {
-                            yield return Instruction.Create(OpCodes.Box, ModuleWeaver.ModuleDefinition.ImportReference(field.FieldType));
+                            ModuleWeaver.LogError($"Parameter '{info.ParameterNames[i]}' is not available on the async state machine. Probably it has been optimized away by the compiler. Please update the format so it excludes this parameter.");
+
+                            yield return Instruction.Create(OpCodes.Ldnull);
+                        }
+                        else
+                        {
+
+                            yield return Instruction.Create(OpCodes.Ldarg_0);
+                            yield return Instruction.Create(OpCodes.Ldfld, field);
+
+                            if (field.FieldType.IsBoxingRequired(ModuleWeaver.ModuleDefinition.TypeSystem.Object))
+                            {
+                                yield return Instruction.Create(OpCodes.Box, ModuleWeaver.ModuleDefinition.ImportReference(field.FieldType));
+                            }
                         }
 
                         yield return Instruction.Create(OpCodes.Stelem_Ref);

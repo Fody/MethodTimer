@@ -8,6 +8,7 @@ public partial class ModuleWeaver
     public MethodReference StartNewMethod;
     public MethodReference StopMethod;
     public TypeReference StopwatchType;
+    public MethodReference StringFormatWithArray;
     public MethodReference ConcatMethod;
     public MethodReference ElapsedMilliseconds;
     public MethodReference GetMethodFromHandle;
@@ -69,8 +70,13 @@ public partial class ModuleWeaver
             ElapsedMilliseconds = ModuleDefinition.ImportReference(stopwatchType.Methods.First(x => x.Name == "get_ElapsedMilliseconds"));   
         }
 
-        var stringType = ModuleDefinition.TypeSystem.String;
-        ConcatMethod = ModuleDefinition.ImportReference(stringType.Resolve().Methods.First(x => x.Name == "Concat" && x.Parameters.Count == 3));
+        var stringType = ModuleDefinition.TypeSystem.String.Resolve();
+        StringFormatWithArray = ModuleDefinition.ImportReference(stringType.Methods.First(x =>
+            x.Name == "Format" &&
+            x.Parameters.Count == 2 &&
+            x.Parameters[0].ParameterType.Name == "String" &&
+            x.Parameters[1].ParameterType.Name == "Object[]"));
+        ConcatMethod = ModuleDefinition.ImportReference(stringType.Methods.First(x => x.Name == "Concat" && x.Parameters.Count == 3));
     }
 
     void AppendTypes(string name, List<TypeDefinition> coreTypes)

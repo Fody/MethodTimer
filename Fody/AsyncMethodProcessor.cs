@@ -215,7 +215,25 @@ public class AsyncMethodProcessor
         yield return Instruction.Create(OpCodes.Ldarg_0);
         yield return Instruction.Create(OpCodes.Ldfld, stopwatchField);
         yield return Instruction.Create(OpCodes.Call, ModuleWeaver.StopMethod);
-        if (ModuleWeaver.LogMethod == null)
+
+        var logWithMessageMethod = ModuleWeaver.LogWithMessageMethod;
+        var logMethod = ModuleWeaver.LogMethod;
+
+        if (logWithMessageMethod != null)
+        {
+            // TODO: Implement
+        }
+        else if (logMethod != null)
+        {
+            yield return Instruction.Create(OpCodes.Ldtoken, Method);
+            yield return Instruction.Create(OpCodes.Ldtoken, Method.DeclaringType);
+            yield return Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle);
+            yield return Instruction.Create(OpCodes.Ldarg_0);
+            yield return Instruction.Create(OpCodes.Ldfld, stopwatchField);
+            yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);
+            yield return Instruction.Create(OpCodes.Call, logMethod);
+        }
+        else
         {
             yield return Instruction.Create(OpCodes.Ldstr, Method.MethodName());
             yield return Instruction.Create(OpCodes.Ldarg_0);
@@ -225,16 +243,6 @@ public class AsyncMethodProcessor
             yield return Instruction.Create(OpCodes.Ldstr, "ms");
             yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ConcatMethod);
             yield return Instruction.Create(OpCodes.Call, ModuleWeaver.DebugWriteLineMethod);
-        }
-        else
-        {
-            yield return Instruction.Create(OpCodes.Ldtoken, Method);
-            yield return Instruction.Create(OpCodes.Ldtoken, Method.DeclaringType);
-            yield return Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle);
-            yield return Instruction.Create(OpCodes.Ldarg_0);
-            yield return Instruction.Create(OpCodes.Ldfld, stopwatchField);
-            yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);
-            yield return Instruction.Create(OpCodes.Call, ModuleWeaver.LogMethod);
         }
     }
 }

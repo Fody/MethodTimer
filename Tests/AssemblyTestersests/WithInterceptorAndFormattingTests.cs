@@ -46,9 +46,111 @@ public class WithInterceptorAndFormattingTests
         Assert.AreEqual(message, "File name '123' with id '42'");
     }
 
+    [Test]
+    public void ClassWithMethodWithoutFormatting()
+    {
+        ClearMessage();
+
+        var type = assemblyWeaver.Assembly.GetType("ClassWithMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        instance.MethodWithoutFormatting("123", 42);
+
+        var methodBases = GetMethodInfoField();
+        Assert.AreEqual(1, methodBases.Count);
+
+        var methodBase = methodBases.First();
+        Assert.AreEqual(methodBase.Name, "MethodWithoutFormatting");
+        Assert.AreEqual(methodBase.DeclaringType, type);
+
+        var messages = GetMessagesField();
+        Assert.AreEqual(0, messages.Count);
+    }
+
+    [Test]
+    public void ClassWithAsyncMethod()
+    {
+        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        DebugRunner.CaptureDebug(() =>
+        {
+            var task = (Task)instance.MethodWithAwaitAsync("123", 42);
+            task.Wait();
+        });
+
+        var methodBases = GetMethodInfoField();
+        Assert.AreEqual(1, methodBases.Count);
+
+        var methodBase = methodBases.First();
+        Assert.AreEqual(methodBase.Name, "MethodWithAwaitAsync");
+
+        var messages = GetMessagesField();
+        Assert.AreEqual(1, messages.Count);
+
+        var message = messages.First();
+        Assert.AreEqual(message, "File name '123' with id '42'");
+    }
+
+    [Test]
+    public void ClassWithAsyncMethodThatThrowsException()
+    {
+        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        DebugRunner.CaptureDebug(() =>
+        {
+            try
+            {
+                var task = (Task)instance.MethodWithAwaitAndExceptionAsync("123", 42);
+                task.Wait();
+            }
+            catch (Exception)
+            {
+                // Expected
+            }
+        });
+
+        var methodBases = GetMethodInfoField();
+        var methodBase = methodBases.Last();
+        Assert.AreEqual(methodBase.Name, "MethodWithAwaitAndExceptionAsync");
+
+        var messages = GetMessagesField();
+        Assert.AreEqual(1, messages.Count);
+
+        var message = messages.First();
+        Assert.AreEqual(message, "File name '123' with id '42'");
+    }
+
+    [RequiresSTA]
+    [TestCase(true)]
+    [TestCase(false)]
+    public void ClassWithAsyncMethodWithFastPath(bool recurse)
+    {
+        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        DebugRunner.CaptureDebug(() =>
+        {
+            var task = (Task)instance.MethodWithFastPathAsync(recurse, "123", 42);
+            task.Wait();
+        });
+
+        var methodBases = GetMethodInfoField();
+
+        // Interceptor can't deal with 2 test cases
+        //Assert.AreEqual(recurse ? 2 : 1, methodBases.Count);
+
+        var methodBase = methodBases.Last();
+        Assert.AreEqual("MethodWithFastPathAsync", methodBase.Name);
+
+        var messages = GetMessagesField();
+        Assert.AreEqual(1, messages.Count);
+
+        var message = messages.First();
+        Assert.AreEqual(message, "File name '123' with id '42'");
+    }
+
     void ClearMessage()
     {
         methodBaseField.SetValue(null, new List<MethodBase>());
+        messagesField.SetValue(null, new List<string>());
     }
 
     List<MethodBase> GetMethodInfoField()

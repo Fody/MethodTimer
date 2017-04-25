@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClassWithAsyncMethod.cs" />
     <Compile Include="ClassWithMethod.cs" />
     <Compile Include="MethodTimeLogger.cs" />
   </ItemGroup>

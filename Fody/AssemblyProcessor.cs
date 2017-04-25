@@ -78,6 +78,13 @@ public partial class ModuleWeaver
         {
             var hasErrors = false;
 
+            var logWithMessageMethod = LogWithMessageMethod;
+            if (logWithMessageMethod == null)
+            {
+                hasErrors = true;
+                LogError("Feature with parameter formatting is being used, but no useable log method can be found. Either disable the feature usage or update the logger signature to 'public static void Log(MethodBase methodBase, long milliseconds, string message)'");
+            }
+
             var info = parameterFormattingProcessor.ParseParameterFormatting(format);
             for (var i = 0; i < info.ParameterNames.Count; i++)
             {

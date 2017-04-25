@@ -95,6 +95,26 @@ public class WithInterceptorAndFormattingTests
 
     [RequiresSTA]
     [Test]
+    public void ClassWithAsyncMethodWithUnusedParameters()
+    {
+        ClearMessage();
+
+        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        DebugRunner.CaptureDebug(() =>
+        {
+            var task = (Task)instance.MethodWithAwaitButUnusedParametersAsync("123", 42);
+            task.Wait();
+        });
+
+        Assert.AreNotEqual(0, assemblyWeaver.Errors);
+
+        var error = assemblyWeaver.Errors.First();
+        Assert.AreEqual("Parameter 'fileName' is not available on the async state machine. Probably it has been optimized away by the compiler. Please update the format so it excludes this parameter.", error);
+    }
+
+    [RequiresSTA]
+    [Test]
     public void ClassWithAsyncMethodThatThrowsException()
     {
         ClearMessage();

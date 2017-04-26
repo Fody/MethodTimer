@@ -14,7 +14,7 @@ public class AsyncMethodProcessor
     FieldDefinition stopwatchField;
     TypeDefinition stateMachineType;
     List<Instruction> returnPoints;
-    ParameterFormattingProcessor parameterFormattingProcessor = new ParameterFormattingProcessor();
+    readonly ParameterFormattingProcessor parameterFormattingProcessor = new ParameterFormattingProcessor();
 
     public void Process()
     {
@@ -283,6 +283,7 @@ public class AsyncMethodProcessor
                 else
                 {
                     // Load null a string
+                    yield return Instruction.Create(OpCodes.Ldarg_0);
                     yield return Instruction.Create(OpCodes.Ldnull);
                 }
 

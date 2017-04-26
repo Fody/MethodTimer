@@ -95,6 +95,32 @@ public class WithInterceptorAndFormattingTests
 
     [RequiresSTA]
     [Test]
+    public void ClassWithAsyncWithoutFormattingMethod()
+    {
+        ClearMessage();
+
+        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        DebugRunner.CaptureDebug(() =>
+        {
+            var task = (Task)instance.MethodWithAwaitWithoutFormattingAsync("123", 42);
+            task.Wait();
+        });
+
+        var methodBases = GetMethodInfoField();
+        Assert.AreEqual(1, methodBases.Count);
+
+        var methodBase = methodBases.First();
+        Assert.AreEqual(methodBase.Name, "MethodWithAwaitWithoutFormattingAsync");
+
+        var messages = GetMessagesField();
+        Assert.AreEqual(0, messages.Count);
+    }
+
+    // Note: in DEBUG because this only needs to run against optimized libraries
+#if !DEBUG
+    [RequiresSTA]
+    [Test]
     public void ClassWithAsyncMethodWithUnusedParameters()
     {
         ClearMessage();
@@ -112,6 +138,7 @@ public class WithInterceptorAndFormattingTests
         var error = assemblyWeaver.Errors.First();
         Assert.AreEqual("Parameter 'fileName' is not available on the async state machine. Probably it has been optimized away by the compiler. Please update the format so it excludes this parameter.", error);
     }
+#endif
 
     [RequiresSTA]
     [Test]

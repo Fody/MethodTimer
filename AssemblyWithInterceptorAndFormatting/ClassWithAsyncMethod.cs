@@ -8,11 +8,21 @@ public class ClassWithAsyncMethod
     [Time("File name '{fileName}' with id '{id}'")]
     public async Task MethodWithAwaitAsync(string fileName, int id)
     {
+        await Task.Delay(500);
+
         // Use so the compiler won't optimize
         Console.Write(fileName);
         Console.Write(id);
+    }
 
+    [Time]
+    public async Task MethodWithAwaitWithoutFormattingAsync(string fileName, int id)
+    {
         await Task.Delay(500);
+
+        // Use so the compiler won't optimize
+        Console.Write(fileName);
+        Console.Write(id);
     }
 
     [Time("File name '{fileName}' with id '{id}'")]

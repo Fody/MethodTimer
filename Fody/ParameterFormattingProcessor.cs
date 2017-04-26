@@ -31,7 +31,7 @@ public class ParameterFormattingProcessor
 
                 finalFormat = finalFormat.Remove(match.Index, match.Length);
 
-                var textToInsert = string.Format("{{{0}}}", info.ParameterNames.IndexOf(matchValue));
+                var textToInsert = $"{{{info.ParameterNames.IndexOf(matchValue)}}}";
                 finalFormat = finalFormat.Insert(match.Index, textToInsert);
             }
 

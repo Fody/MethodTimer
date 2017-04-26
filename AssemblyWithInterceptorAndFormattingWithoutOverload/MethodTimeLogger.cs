@@ -9,8 +9,13 @@ public static class MethodTimeLogger
 
     public static void Log(MethodBase methodBase, long milliseconds)
     {
-        Console.WriteLine(methodBase.Name + " " + milliseconds);
+        Log(methodBase.DeclaringType, methodBase.Name, milliseconds);
         MethodBase.Add(methodBase);
+    }
+
+    public static void Log(Type type, string methodName, long milliseconds)
+    {
+        Console.WriteLine(methodName + " " + milliseconds);
     }
 
 }

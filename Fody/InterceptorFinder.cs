@@ -84,13 +84,18 @@ public partial class ModuleWeaver
 
     MethodDefinition FindLogMethod(TypeDefinition interceptorType)
     {
-        var logMethod = interceptorType.Methods.FirstOrDefault(x => x.Name == "Log" && x.Parameters.Count == 2);
+        var requiredParameterTypes = new[] { "System.Reflection.MethodBase", "System.Int64" };
+
+        var logMethod = interceptorType.Methods.FirstOrDefault(x => x.Name == "Log" &&
+                                                               x.Parameters.Count == 2 &&
+                                                               x.Parameters[0].ParameterType.FullName == requiredParameterTypes[0] &&
+                                                               x.Parameters[1].ParameterType.FullName == requiredParameterTypes[1]);
         if (logMethod == null)
         {
             return null;
         }
 
-        VerifyHasCorrectParameters(logMethod, new [] { "System.Reflection.MethodBase", "System.Int64" });
+        VerifyHasCorrectParameters(logMethod, requiredParameterTypes);
         VerifyMethodIsPublicStatic(logMethod);
         LogMethod = ModuleDefinition.ImportReference(logMethod);
         CheckNop(logMethod);
@@ -100,13 +105,19 @@ public partial class ModuleWeaver
 
     MethodDefinition FindLogWithMessageMethod(TypeDefinition interceptorType)
     {
-        var logMethod = interceptorType.Methods.FirstOrDefault(x => x.Name == "Log" && x.Parameters.Count == 3);
+        var requiredParameterTypes = new[] { "System.Reflection.MethodBase", "System.Int64", "System.String" };
+
+        var logMethod = interceptorType.Methods.FirstOrDefault(x => x.Name == "Log" &&
+                                                                    x.Parameters.Count == 3 &&
+                                                                    x.Parameters[0].ParameterType.FullName == requiredParameterTypes[0] &&
+                                                                    x.Parameters[1].ParameterType.FullName == requiredParameterTypes[1] &&
+                                                                    x.Parameters[2].ParameterType.FullName == requiredParameterTypes[2]);
         if (logMethod == null)
         {
             return null;
         }
 
-        VerifyHasCorrectParameters(logMethod, new[] { "System.Reflection.MethodBase", "System.Int64", "System.String" });
+        VerifyHasCorrectParameters(logMethod, requiredParameterTypes);
         VerifyMethodIsPublicStatic(logMethod);
         LogMethod = ModuleDefinition.ImportReference(logMethod);
         CheckNop(logMethod);

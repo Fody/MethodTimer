@@ -6,6 +6,22 @@ using Mono.Collections.Generic;
 
 public static class CecilExtensions
 {
+    public static bool IsBoxingRequired(this TypeReference typeReference, TypeReference expectedType)
+    {
+        if (expectedType.IsValueType && string.Equals(typeReference.FullName, expectedType.FullName))
+        {
+            // Boxing is never required if type is expected
+            return false;
+        }
+
+        if (typeReference.IsValueType || typeReference.IsGenericParameter)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     public static IEnumerable<MethodDefinition> AbstractMethods(this TypeDefinition type)
     {
         return type.Methods.Where(x => x.IsAbstract);

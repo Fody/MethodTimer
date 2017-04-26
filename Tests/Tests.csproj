@@ -68,10 +68,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssemblyTestersests\AssemblyWithInterceptorAndFormattingWithoutOverloadTests.cs" />
+    <Compile Include="AssemblyTestersests\AssemblyWithInterceptorAndFormattingWithWrongParametersTests.cs" />
+    <Compile Include="AssemblyTestersests\WithInterceptorAndFormattingTests.cs" />
     <Compile Include="AssemblyTestersests\WithNopInterceptorTests.cs" />
     <Compile Include="AssemblyWeaver.cs" />
     <Compile Include="AssemblyTestersests\AssemblyWithAttributeOnAssemblyTests.cs" />
     <Compile Include="AssemblyTestersests\AssemblyWithAttributeOnModuleTests.cs" />
+    <Compile Include="ParameterFormattingProcessorTests.cs" />
     <Compile Include="StopwatchCreatorTests.cs" />
     <Compile Include="Stopwatch.cs" />
     <Compile Include="AssemblyTestersests\WithInterceptorTests.cs" />
@@ -85,6 +89,18 @@
     <Compile Include="AssemblyExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AssemblyWithInterceptorAndFormattingWithoutOverload\AssemblyWithInterceptorAndFormattingWithoutOverload.csproj">
+      <Project>{6ad809b4-8589-4b03-9d9c-7524c774f425}</Project>
+      <Name>AssemblyWithInterceptorAndFormattingWithoutOverload</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AssemblyWithInterceptorAndFormattingWithWrongParameters\AssemblyWithInterceptorAndFormattingWithWrongParameters.csproj">
+      <Project>{bd3c1f7c-dbee-4c57-86d2-0074145a7566}</Project>
+      <Name>AssemblyWithInterceptorAndFormattingWithWrongParameters</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AssemblyWithInterceptorAndFormatting\AssemblyWithInterceptorAndFormatting.csproj">
+      <Project>{a98f0a2c-6707-49e1-8d3f-acff0321b4f3}</Project>
+      <Name>AssemblyWithInterceptorAndFormatting</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AssemblyWithoutInterceptor\AssemblyWithoutInterceptor.csproj">
       <Project>{dfe56c18-3504-4265-a3fe-7f434b1fd38d}</Project>
       <Name>AssemblyWithoutInterceptor</Name>

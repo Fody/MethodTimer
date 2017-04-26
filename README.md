@@ -78,6 +78,45 @@ Then this will be compiled
         }
     }
     
+### Using parameters inside the logging
+
+If you want to get the parameter values inside the logging, you can use a string format in the attribute definition.
+
+	public class MyClass
+	{
+		[Time("File name: '{fileName}'")]
+		public void MyMethod(string fileName)
+		{
+			//Some code u are curious how long it takes
+			Console.WriteLine("Hello");
+		}
+	}
+
+Then this will be compiled
+
+    public class MyClass
+    {
+        public void MyMethod(string fileName)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                //Some code u are curious how long it takes
+                Console.WriteLine("Hello");
+            }
+            finally
+            {
+                stopwatch.Stop();
+                var message = string.Format("File name: '{0}'", fileName);
+                MethodTimeLogger.Log(methodof(MyClass.MyMethod), stopwatch.ElapsedMilliseconds, message);
+            }
+        }
+    }
+
+**Note that this feature requires an updated Log method call with the definition below. If this method (with the *message* parameter) is not found, the weaver will raise an error.**
+
+	public static void Log(MethodBase methodBase, long milliseconds, string message)
+
 ## Whats in the nuget
 
 In addition to the actual weaving assembly the nuget package will also add a file `TimeAttribute.cs` to the target project.

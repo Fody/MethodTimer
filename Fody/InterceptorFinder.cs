@@ -7,6 +7,8 @@ using Mono.Cecil.Cil;
 public partial class ModuleWeaver
 {
     public MethodReference LogMethod;
+    public MethodReference LogWithMessageMethod;
+
     public bool LogMethodIsNop;
 
     public void FindInterceptor()
@@ -16,15 +18,13 @@ public partial class ModuleWeaver
         var interceptor = types.FirstOrDefault(x => x.IsInterceptor());
         if (interceptor != null)
         {
-            var logMethod = interceptor.Methods.FirstOrDefault(x => x.Name == "Log");
-            if (logMethod == null)
+            LogMethod = FindLogMethod(interceptor);
+            LogWithMessageMethod = FindLogWithMessageMethod(interceptor);
+
+            if (LogMethod == null && LogWithMessageMethod == null)
             {
                 throw new WeavingException($"Could not find 'Log' method on '{interceptor.FullName}'.");
             }
-            VerifyHasCorrectParameters(logMethod);
-            VerifyMethodIsPublicStatic(logMethod);
-            CheckNop(logMethod);
-            LogMethod = logMethod;
             return;
         }
 
@@ -42,6 +42,7 @@ public partial class ModuleWeaver
                 LogDebug($"Skipped checking '{referencePath}' since it is not a .net assembly.");
                 continue;
             }
+
             LogDebug($"Reading module from '{referencePath}'");
             var moduleDefinition = ReadModule(referencePath);
 
@@ -54,33 +55,80 @@ public partial class ModuleWeaver
             {
                 continue;
             }
+
             if (!interceptor.IsPublic)
             {
                 LogInfo($"Did not use '{interceptor.FullName}' since it is not public.");
                 continue;
             }
-            var logMethod = interceptor.Methods.FirstOrDefault(x => x.Name == "Log");
-            if (logMethod == null)
+
+            var logMethod = FindLogMethod(interceptor);
+            if (logMethod != null)
+            {
+                LogMethod = ModuleDefinition.ImportReference(logMethod);
+            }
+
+            var logWithMessageMethod = FindLogWithMessageMethod(interceptor);
+            if (logWithMessageMethod != null)
+            {
+                LogWithMessageMethod = ModuleDefinition.ImportReference(logWithMessageMethod);
+            }
+
+            if (LogMethod == null && LogWithMessageMethod == null)
             {
                 throw new WeavingException($"Could not find 'Log' method on '{interceptor.FullName}'.");
             }
-            VerifyHasCorrectParameters(logMethod);
-            VerifyMethodIsPublicStatic(logMethod);
-            LogMethod = ModuleDefinition.ImportReference(logMethod);
-            CheckNop(logMethod);
             return;
         }
     }
 
+    MethodDefinition FindLogMethod(TypeDefinition interceptorType)
+    {
+        var logMethod = interceptorType.Methods.FirstOrDefault(x => x.Name == "Log" && x.Parameters.Count == 2);
+        if (logMethod == null)
+        {
+            return null;
+        }
+
+        VerifyHasCorrectParameters(logMethod, new [] { "System.Reflection.MethodBase", "System.Int64" });
+        VerifyMethodIsPublicStatic(logMethod);
+        LogMethod = ModuleDefinition.ImportReference(logMethod);
+        CheckNop(logMethod);
+
+        return logMethod;
+    }
+
+    MethodDefinition FindLogWithMessageMethod(TypeDefinition interceptorType)
+    {
+        var logMethod = interceptorType.Methods.FirstOrDefault(x => x.Name == "Log" && x.Parameters.Count == 3);
+        if (logMethod == null)
+        {
+            return null;
+        }
+
+        VerifyHasCorrectParameters(logMethod, new[] { "System.Reflection.MethodBase", "System.Int64", "System.String" });
+        VerifyMethodIsPublicStatic(logMethod);
+        LogMethod = ModuleDefinition.ImportReference(logMethod);
+        CheckNop(logMethod);
+
+        return logMethod;
+    }
+
     void CheckNop(MethodDefinition logMethod)
     {
+        // Never reset
+        if (LogMethodIsNop)
+        {
+            return;
+        }
+
         LogMethodIsNop = logMethod.Body.Instructions.All(x =>
                 x.OpCode == OpCodes.Nop ||
                 x.OpCode == OpCodes.Ret
                 );
     }
 
-// ReSharper disable once UnusedParameter.Local
+    // ReSharper disable once UnusedParameter.Local
     static void VerifyMethodIsPublicStatic(MethodDefinition logMethod)
     {
         if (!logMethod.IsPublic)
@@ -93,22 +141,25 @@ public partial class ModuleWeaver
         }
     }
 
-    static void VerifyHasCorrectParameters(MethodDefinition logMethod)
+    static void VerifyHasCorrectParameters(MethodDefinition logMethod, string[] expectedParameterTypes)
     {
         var logMethodHasCorrectParameters = true;
         var parameters = logMethod.Parameters;
-        if (parameters.Count != 2)
+        if (parameters.Count != expectedParameterTypes.Length)
         {
             logMethodHasCorrectParameters = false;
         }
-        if (parameters[0].ParameterType.FullName != "System.Reflection.MethodBase")
+        else
         {
-            logMethodHasCorrectParameters = false;
+            for (var i = 0; i < logMethod.Parameters.Count; i++)
+            {
+                if (parameters[i].ParameterType.FullName != expectedParameterTypes[i])
+                {
+                    logMethodHasCorrectParameters = false;
+                }
+            }
         }
-        if (parameters[1].ParameterType.FullName != "System.Int64")
-        {
-            logMethodHasCorrectParameters = false;
-        }
+
         if (!logMethodHasCorrectParameters)
         {
             throw new WeavingException($"Method '{logMethod.FullName}' must have 2 parameters of type 'System.Reflection.MethodBase' and 'System.Int64'.");
@@ -118,9 +169,9 @@ public partial class ModuleWeaver
     ModuleDefinition ReadModule(string referencePath)
     {
         var readerParameters = new ReaderParameters
-            {
-                AssemblyResolver = AssemblyResolver
-            };
+        {
+            AssemblyResolver = AssemblyResolver
+        };
 
         try
         {

@@ -79,6 +79,8 @@
     <Compile Include="CecilExtensions.cs" />
     <Compile Include="AsyncMethodProcessor.cs" />
     <Compile Include="Image.cs" />
+    <Compile Include="ParameterFormattingInfo.cs" />
+    <Compile Include="ParameterFormattingProcessor.cs" />
     <Compile Include="StopwatchHelper.cs" />
     <Compile Include="StopwatchCreator.cs" />
     <Compile Include="InterceptorFinder.cs" />

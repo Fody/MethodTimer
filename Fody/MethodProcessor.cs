@@ -123,6 +123,7 @@ public class MethodProcessor
         {
             body.InsertBefore(beforeThis, instruction);
         }
+
         body.InsertBefore(beforeThis, Instruction.Create(OpCodes.Endfinally));
     }
 

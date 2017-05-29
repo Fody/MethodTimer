@@ -1,3 +1,7 @@
+[![Chat on Gitter Status](https://img.shields.io/gitter/room/fody/fody.svg?style=flat)](https://gitter.im/Fody)
+[![NuGet Status](http://img.shields.io/nuget/v/MethodTimer.Fody.svg?style=flat)](https://www.nuget.org/packages/MethodTimer.Fody/)
+
+
 ## This is an add-in for [Fody](https://github.com/Fody/Fody/) 
 
 ![Icon](https://raw.github.com/Fody/MethodTimer/master/Icons/package_icon.png)
@@ -6,12 +10,14 @@ Injects some very basic method timing code.
 
 [Introduction to Fody](http://github.com/Fody/Fody/wiki/SampleUsage)
 
-## The nuget package  [![NuGet Status](http://img.shields.io/nuget/v/MethodTimer.Fody.svg?style=flat)](https://www.nuget.org/packages/MethodTimer.Fody/)
+
+## The nuget package 
 
 https://nuget.org/packages/MethodTimer.Fody/
 
     PM> Install-Package MethodTimer.Fody
-    
+
+
 ### Your Code
 
 	public class MyClass
@@ -23,6 +29,7 @@ https://nuget.org/packages/MethodTimer.Fody/
 			Console.WriteLine("Hello");
 		}
 	}
+
 
 ### What gets compiled without an Interceptor
 
@@ -43,7 +50,8 @@ https://nuget.org/packages/MethodTimer.Fody/
             }
         }
     }
-	
+
+
 ### What gets compiled with an Interceptor
 
 If you want to handle the logging you can define a static class to intercept the logging. 
@@ -77,7 +85,8 @@ Then this will be compiled
             }
         }
     }
-    
+
+
 ### Using parameters inside the logging
 
 If you want to get the parameter values inside the logging, you can use a string format in the attribute definition.
@@ -117,6 +126,7 @@ Then this will be compiled
 
 	public static void Log(MethodBase methodBase, long milliseconds, string message)
 
+
 ## Whats in the nuget
 
 In addition to the actual weaving assembly the nuget package will also add a file `TimeAttribute.cs` to the target project.
@@ -127,6 +137,7 @@ In addition to the actual weaving assembly the nuget package will also add a fil
 	}
 
 At compile time this attribute and all usages to it will be removed from the target assembly. If you want to re-use the class in a common assembly change the class from `internal` to `public`. This will result in the class not being removed at compile time.
+
 
 ## Icon
 

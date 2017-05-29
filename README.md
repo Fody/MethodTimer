@@ -1,4 +1,4 @@
-[![Chat on Gitter Status](https://img.shields.io/gitter/room/fody/fody.svg?style=flat)](https://gitter.im/Fody)
+[![Chat on Gitter](https://img.shields.io/gitter/room/fody/fody.svg?style=flat)](https://gitter.im/Fody/Fody)
 [![NuGet Status](http://img.shields.io/nuget/v/MethodTimer.Fody.svg?style=flat)](https://www.nuget.org/packages/MethodTimer.Fody/)
 
 

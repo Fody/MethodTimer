@@ -120,7 +120,7 @@ public class WithInterceptorAndFormattingTests
 
     // Note: in DEBUG because this only needs to run against optimized libraries
 #if !DEBUG
-    [RequiresSTA]
+    [Apartment(ApartmentState.STA)]
     [Test]
     public void ClassWithAsyncMethodWithUnusedParameters()
     {

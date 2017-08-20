@@ -21,43 +21,44 @@ public partial class ModuleWeaver
     
     public void FindReferences()
     {
-        var coreTypes = new List<TypeDefinition>();
-        AppendTypes("System.Runtime.Extensions", coreTypes);
-        AppendTypes("System", coreTypes);
-        AppendTypes("mscorlib", coreTypes);
-        AppendTypes("System.Runtime", coreTypes);
-        AppendTypes("System.Reflection", coreTypes);
+        var refTypes = new List<TypeDefinition>();
+        AddAssemblyIfExists("System.Runtime.Extensions", refTypes);
+        AddAssemblyIfExists("System", refTypes);
+        AddAssemblyIfExists("mscorlib", refTypes);
+        AddAssemblyIfExists("System.Runtime", refTypes);
+        AddAssemblyIfExists("System.Reflection", refTypes);
+        AddAssemblyIfExists("System.Diagnostics.Debug", refTypes);
 
-        var debugType = GetDebugType(coreTypes);
+        var debugType = refTypes.First(x => x.Name == "Debug");
 
         DebugWriteLineMethod = ModuleDefinition.ImportReference(debugType.Methods.First(x => 
             x.Name == "WriteLine" && 
             x.Parameters.Count == 1 && 
             x.Parameters[0].ParameterType.Name == "String"));
 
-        ObjectConstructorMethod = ModuleDefinition.ImportReference(coreTypes.First(x=>x.Name=="Object").Methods.First(x => x.Name == ".ctor"));
+        ObjectConstructorMethod = ModuleDefinition.ImportReference(refTypes.First(x=>x.Name=="Object").Methods.First(x => x.Name == ".ctor"));
 
-        var mathType = coreTypes.First(x => x.Name == "Math");
+        var mathType = refTypes.First(x => x.Name == "Math");
         MaxMethod = ModuleDefinition.ImportReference(mathType.Methods.First(x => 
             x.Name == "Max" && 
             x.Parameters[0].ParameterType.Name == "Int64"));
 
-        var dateTimeType = coreTypes.First(x => x.Name == "DateTime");
+        var dateTimeType = refTypes.First(x => x.Name == "DateTime");
         DateTimeType = ModuleDefinition.ImportReference(dateTimeType);
         UtcNowMethod = ModuleDefinition.ImportReference(dateTimeType.Methods.First(x => x.Name == "get_UtcNow"));
         GetTicksMethod = ModuleDefinition.ImportReference(dateTimeType.Methods.First(x => x.Name == "get_Ticks"));
 
-        var methodBaseType = coreTypes.First(x => x.Name == "MethodBase");
+        var methodBaseType = refTypes.First(x => x.Name == "MethodBase");
         GetMethodFromHandle = ModuleDefinition.ImportReference(methodBaseType.Methods.First(x =>
             x.Name == "GetMethodFromHandle" &&
             x.Parameters.Count == 2 &&
             x.Parameters[0].ParameterType.Name == "RuntimeMethodHandle" &&
             x.Parameters[1].ParameterType.Name == "RuntimeTypeHandle"));
 
-        var booleanType = coreTypes.First(x => x.Name == "Boolean");
+        var booleanType = refTypes.First(x => x.Name == "Boolean");
         BooleanType = ModuleDefinition.ImportReference(booleanType);
 
-        var stopwatchType = coreTypes.FirstOrDefault(x => x.Name == "Stopwatch");
+        var stopwatchType = refTypes.FirstOrDefault(x => x.Name == "Stopwatch");
         if (stopwatchType == null)
         {
             InjectStopwatchType();
@@ -79,34 +80,20 @@ public partial class ModuleWeaver
         ConcatMethod = ModuleDefinition.ImportReference(stringType.Methods.First(x => x.Name == "Concat" && x.Parameters.Count == 3));
     }
 
-    void AppendTypes(string name, List<TypeDefinition> coreTypes)
+    void AddAssemblyIfExists(string name, List<TypeDefinition> refTypes)
     {
-        var definition = AssemblyResolver.Resolve(new AssemblyNameReference(name, null));
-        if (definition != null)
+        try
         {
-            coreTypes.AddRange(definition.MainModule.Types);
-        }
-    }
+            var assembly = AssemblyResolver.Resolve(new AssemblyNameReference(name, null));
 
-    TypeDefinition GetDebugType(List<TypeDefinition> coreTypes)
-    {
-        var debugType = coreTypes.FirstOrDefault(x => x.Name == "Debug");
-
-        if (debugType != null)
-        {
-            return debugType;
-        }
-        var systemDiagnosticsDebug = AssemblyResolver.Resolve(new AssemblyNameReference("System.Diagnostics.Debug", null));
-        if (systemDiagnosticsDebug != null)
-        {
-            debugType = systemDiagnosticsDebug.MainModule.Types.FirstOrDefault(x => x.Name == "Debug");
-            if (debugType != null)
+            if (assembly != null)
             {
-                return debugType;
+                refTypes.AddRange(assembly.MainModule.Types);
             }
         }
-
-        throw new WeavingException("Could not find the 'Debug' type. PLease raise an issue and include the wacky version of .net MS has forced upon you.");
+        catch (AssemblyResolutionException)
+        {
+            LogInfo($"Failed to resolve '{name}'. So skipping its types.");
+        }
     }
-
 }

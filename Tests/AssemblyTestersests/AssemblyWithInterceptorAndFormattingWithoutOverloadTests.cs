@@ -15,7 +15,7 @@ public class AssemblyWithInterceptorAndFormattingWithoutOverloadTests
     [Test]
     public void RaisesErrorForMissingOverload()
     {
-        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\AssemblyWithInterceptorAndFormattingWithoutOverload\bin\Debug\AssemblyWithInterceptorAndFormattingWithoutOverload.dll");
+        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\AssemblyWithInterceptorAndFormattingWithoutOverload\bin\Debug\net462\AssemblyWithInterceptorAndFormattingWithoutOverload.dll");
         assemblyWeaver = new AssemblyWeaver(beforeAssemblyPath);
 
         Assert.AreNotEqual(0, assemblyWeaver.Errors);

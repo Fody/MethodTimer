@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 
@@ -15,7 +16,7 @@ public class WithInterceptorTests
 
     public WithInterceptorTests()
     {
-        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\AssemblyWithInterceptor\bin\Debug\AssemblyWithInterceptor.dll");
+        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\AssemblyWithInterceptor\bin\Debug\net462\AssemblyWithInterceptor.dll");
         assemblyWeaver = new AssemblyWeaver(beforeAssemblyPath);
         var methodTimeLogger = assemblyWeaver.Assembly.GetType("MethodTimeLogger");
         methodBaseField = methodTimeLogger.GetField("MethodBase");
@@ -108,7 +109,7 @@ public class WithInterceptorTests
         Assert.AreEqual(methodBase.Name, "MethodWithAwaitAndExceptionAsync");
     }
 
-    [RequiresSTA]
+    [Apartment(ApartmentState.STA)]
     [TestCase(true)]
     [TestCase(false)]
     public void ClassWithAsyncMethodWithFastPath(bool recurse)

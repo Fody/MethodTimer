@@ -4,6 +4,7 @@ using System.Linq;
 using Mono.Cecil;
 using NUnit.Framework;
 // ReSharper disable UnusedMember.Global
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
 [TestFixture]
 public class Template

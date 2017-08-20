@@ -15,7 +15,7 @@ public class AssemblyWithInterceptorAndFormattingWithWrongParametersTests
     [Test]
     public void RaisesErrorForWrongParameterNames()
     {
-        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\AssemblyWithInterceptorAndFormattingWithWrongParameters\bin\Debug\AssemblyWithInterceptorAndFormattingWithWrongParameters.dll");
+        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\AssemblyWithInterceptorAndFormattingWithWrongParameters\bin\Debug\net462\AssemblyWithInterceptorAndFormattingWithWrongParameters.dll");
         assemblyWeaver = new AssemblyWeaver(beforeAssemblyPath);
 
         Assert.AreNotEqual(0, assemblyWeaver.Errors);

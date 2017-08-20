@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 
@@ -13,7 +14,7 @@ public class WithoutInterceptorTests
 
     public WithoutInterceptorTests()
     {
-        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\AssemblyWithoutInterceptor\bin\Debug\AssemblyWithoutInterceptor.dll");
+        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\AssemblyWithoutInterceptor\bin\Debug\net462\AssemblyWithoutInterceptor.dll");
         assemblyWeaver = new AssemblyWeaver(beforeAssemblyPath);
     }
 
@@ -99,7 +100,7 @@ public class WithoutInterceptorTests
         Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.MethodWithAwaitAndExceptionAsync "));
     }
 
-    [RequiresSTA]
+    [Apartment(ApartmentState.STA)]
     [TestCase(true)]
     [TestCase(false)]
     public void ClassWithAsyncMethodWithFastPath(bool recurse)

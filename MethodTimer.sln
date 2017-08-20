@@ -1,37 +1,45 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26403.7
+VisualStudioVersion = 15.0.26730.8
 MinimumVisualStudioVersion = 14.0.22823.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fody", "Fody\Fody.csproj", "{C3578A7B-09A6-4444-9383-0DEAFA4958BD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{5A86453B-96FB-4B6E-A283-225BB9F753D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{5A86453B-96FB-4B6E-A283-225BB9F753D3}"
 	ProjectSection(ProjectDependencies) = postProject
+		{EB33F608-2124-4128-820F-DC4E07E88028} = {EB33F608-2124-4128-820F-DC4E07E88028}
 		{DFE56C18-3504-4265-A3FE-7F434B1FD38D} = {DFE56C18-3504-4265-A3FE-7F434B1FD38D}
+		{A98F0A2C-6707-49E1-8D3F-ACFF0321B4F3} = {A98F0A2C-6707-49E1-8D3F-ACFF0321B4F3}
 		{FB284053-FFAA-4866-820B-CED00B3CB4C2} = {FB284053-FFAA-4866-820B-CED00B3CB4C2}
+		{8A015E68-6B29-4E20-879A-3E3F47B34A0B} = {8A015E68-6B29-4E20-879A-3E3F47B34A0B}
+		{6C028879-7E51-44E3-A3C4-0A01353EEF19} = {6C028879-7E51-44E3-A3C4-0A01353EEF19}
+		{BD3C1F7C-DBEE-4C57-86D2-0074145A7566} = {BD3C1F7C-DBEE-4C57-86D2-0074145A7566}
+		{35205183-E7A9-4584-9BAC-D5D103346C84} = {35205183-E7A9-4584-9BAC-D5D103346C84}
+		{918E4285-60A4-4C1A-8CAA-E257F6A0C564} = {918E4285-60A4-4C1A-8CAA-E257F6A0C564}
+		{6AD809B4-8589-4B03-9D9C-7524C774F425} = {6AD809B4-8589-4B03-9D9C-7524C774F425}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyWithoutInterceptor", "AssemblyWithoutInterceptor\AssemblyWithoutInterceptor.csproj", "{DFE56C18-3504-4265-A3FE-7F434B1FD38D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssemblyWithoutInterceptor", "AssemblyWithoutInterceptor\AssemblyWithoutInterceptor.csproj", "{DFE56C18-3504-4265-A3FE-7F434B1FD38D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReferenceAssembly", "ReferenceAssembly\ReferenceAssembly.csproj", "{B5AEB0E8-28F4-4955-A055-9C200F7113F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyToReference", "AssemblyToReference\AssemblyToReference.csproj", "{8A015E68-6B29-4E20-879A-3E3F47B34A0B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssemblyToReference", "AssemblyToReference\AssemblyToReference.csproj", "{8A015E68-6B29-4E20-879A-3E3F47B34A0B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyWithInterceptorInReference", "AssemblyWIthInterceptorInReference\AssemblyWithInterceptorInReference.csproj", "{918E4285-60A4-4C1A-8CAA-E257F6A0C564}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssemblyWithInterceptorInReference", "AssemblyWIthInterceptorInReference\AssemblyWithInterceptorInReference.csproj", "{918E4285-60A4-4C1A-8CAA-E257F6A0C564}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyWithInterceptor", "AssemblyWithInterceptor\AssemblyWithInterceptor.csproj", "{EB33F608-2124-4128-820F-DC4E07E88028}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssemblyWithInterceptor", "AssemblyWithInterceptor\AssemblyWithInterceptor.csproj", "{EB33F608-2124-4128-820F-DC4E07E88028}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyWithAttributeOnModule", "AssemblyWithAttributeOnModule\AssemblyWithAttributeOnModule.csproj", "{35205183-E7A9-4584-9BAC-D5D103346C84}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssemblyWithAttributeOnModule", "AssemblyWithAttributeOnModule\AssemblyWithAttributeOnModule.csproj", "{35205183-E7A9-4584-9BAC-D5D103346C84}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyWithAttributeOnAssembly", "AssemblyWithAttributeOnAssembly\AssemblyWithAttributeOnAssembly.csproj", "{6C028879-7E51-44E3-A3C4-0A01353EEF19}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssemblyWithAttributeOnAssembly", "AssemblyWithAttributeOnAssembly\AssemblyWithAttributeOnAssembly.csproj", "{6C028879-7E51-44E3-A3C4-0A01353EEF19}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyWithNopInterceptor", "AssemblyWithNopInterceptor\AssemblyWithNopInterceptor.csproj", "{FB284053-FFAA-4866-820B-CED00B3CB4C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssemblyWithNopInterceptor", "AssemblyWithNopInterceptor\AssemblyWithNopInterceptor.csproj", "{FB284053-FFAA-4866-820B-CED00B3CB4C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyWithInterceptorAndFormattingWithoutOverload", "AssemblyWithInterceptorAndFormattingWithoutOverload\AssemblyWithInterceptorAndFormattingWithoutOverload.csproj", "{6AD809B4-8589-4B03-9D9C-7524C774F425}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssemblyWithInterceptorAndFormattingWithoutOverload", "AssemblyWithInterceptorAndFormattingWithoutOverload\AssemblyWithInterceptorAndFormattingWithoutOverload.csproj", "{6AD809B4-8589-4B03-9D9C-7524C774F425}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyWithInterceptorAndFormatting", "AssemblyWithInterceptorAndFormatting\AssemblyWithInterceptorAndFormatting.csproj", "{A98F0A2C-6707-49E1-8D3F-ACFF0321B4F3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssemblyWithInterceptorAndFormatting", "AssemblyWithInterceptorAndFormatting\AssemblyWithInterceptorAndFormatting.csproj", "{A98F0A2C-6707-49E1-8D3F-ACFF0321B4F3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyWithInterceptorAndFormattingWithWrongParameters", "AssemblyWithInterceptorAndFormattingWithWrongParameters\AssemblyWithInterceptorAndFormattingWithWrongParameters.csproj", "{BD3C1F7C-DBEE-4C57-86D2-0074145A7566}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssemblyWithInterceptorAndFormattingWithWrongParameters", "AssemblyWithInterceptorAndFormattingWithWrongParameters\AssemblyWithInterceptorAndFormattingWithWrongParameters.csproj", "{BD3C1F7C-DBEE-4C57-86D2-0074145A7566}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -130,5 +138,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BC0A1DC8-E17F-454A-8138-8460313CE269}
 	EndGlobalSection
 EndGlobal

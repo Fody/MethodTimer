@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using MethodTimer;
+#pragma warning disable 414
 
 public class ClassWithAsyncMethod
 {

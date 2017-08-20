@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using MethodTimer;
+#pragma warning disable 414
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
 public class ClassWithAsyncMethod
 {
@@ -63,7 +65,9 @@ public class ClassWithAsyncMethod
         if (instructionsToHandle < 0)
         {
             // Note: important not to await
+#pragma warning disable 4014
             MethodWithExceptionAsync();
+#pragma warning restore 4014
         }
 
         var instructionCounter = 0;

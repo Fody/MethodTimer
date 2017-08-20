@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 
@@ -16,7 +17,7 @@ public class WithInterceptorAndFormattingTests
 
     public WithInterceptorAndFormattingTests()
     {
-        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\AssemblyWithInterceptorAndFormatting\bin\Debug\AssemblyWithInterceptorAndFormatting.dll");
+        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\AssemblyWithInterceptorAndFormatting\bin\Debug\net462\AssemblyWithInterceptorAndFormatting.dll");
         assemblyWeaver = new AssemblyWeaver(beforeAssemblyPath);
         var methodTimeLogger = assemblyWeaver.Assembly.GetType("MethodTimeLogger");
         methodBaseField = methodTimeLogger.GetField("MethodBase");
@@ -66,7 +67,7 @@ public class WithInterceptorAndFormattingTests
         Assert.AreEqual(0, messages.Count);
     }
 
-    [RequiresSTA]
+    [Apartment(ApartmentState.STA)]
     [Test]
     public void ClassWithAsyncMethod()
     {
@@ -93,7 +94,7 @@ public class WithInterceptorAndFormattingTests
         Assert.AreEqual(message, "File name '123' with id '42'");
     }
 
-    [RequiresSTA]
+    [Apartment(ApartmentState.STA)]
     [Test]
     public void ClassWithAsyncWithoutFormattingMethod()
     {
@@ -140,7 +141,7 @@ public class WithInterceptorAndFormattingTests
     }
 #endif
 
-    [RequiresSTA]
+    [Apartment(ApartmentState.STA)]
     [Test]
     public void ClassWithAsyncMethodThatThrowsException()
     {
@@ -172,7 +173,7 @@ public class WithInterceptorAndFormattingTests
         Assert.AreEqual(message, "File name '123' with id '42'");
     }
 
-    [RequiresSTA]
+    [Apartment(ApartmentState.STA)]
     [TestCase(true)]
     [TestCase(false)]
     public void ClassWithAsyncMethodWithFastPath(bool recurse)

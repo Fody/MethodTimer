@@ -10,7 +10,7 @@ public class WithNopInterceptorTests
 
     public WithNopInterceptorTests()
     {
-        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\AssemblyWithNopInterceptor\bin\Debug\AssemblyWithNopInterceptor.dll");
+        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\AssemblyWithNopInterceptor\bin\Debug\net462\AssemblyWithNopInterceptor.dll");
         assemblyWeaver = new AssemblyWeaver(beforeAssemblyPath);
     }
 

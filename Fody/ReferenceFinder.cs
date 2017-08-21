@@ -18,7 +18,7 @@ public partial class ModuleWeaver
     public MethodReference UtcNowMethod;
     public TypeReference DateTimeType;
     public TypeReference BooleanType;
-    
+
     public void FindReferences()
     {
         var refTypes = new List<TypeDefinition>();
@@ -28,34 +28,29 @@ public partial class ModuleWeaver
         AddAssemblyIfExists("System.Runtime", refTypes);
         AddAssemblyIfExists("System.Reflection", refTypes);
         AddAssemblyIfExists("System.Diagnostics.Debug", refTypes);
+        AddAssemblyIfExists("netstandard", refTypes);
 
-        var debugType = refTypes.First(x => x.Name == "Debug");
+        var debugType = refTypes.Type("Debug");
 
-        DebugWriteLineMethod = ModuleDefinition.ImportReference(debugType.Methods.First(x => 
-            x.Name == "WriteLine" && 
-            x.Parameters.Count == 1 && 
-            x.Parameters[0].ParameterType.Name == "String"));
+        var writeLine = debugType.Method("WriteLine", "String");
+        DebugWriteLineMethod = ModuleDefinition.ImportReference(writeLine);
 
-        ObjectConstructorMethod = ModuleDefinition.ImportReference(refTypes.First(x=>x.Name=="Object").Methods.First(x => x.Name == ".ctor"));
+        var objectConstructor = refTypes.Type("Object").Method(".ctor");
+        ObjectConstructorMethod = ModuleDefinition.ImportReference(objectConstructor);
 
-        var mathType = refTypes.First(x => x.Name == "Math");
-        MaxMethod = ModuleDefinition.ImportReference(mathType.Methods.First(x => 
-            x.Name == "Max" && 
-            x.Parameters[0].ParameterType.Name == "Int64"));
+        var mathType = refTypes.Type("Math");
+        MaxMethod = ModuleDefinition.ImportReference(mathType.Method("Max", "Int64", "Int64"));
 
-        var dateTimeType = refTypes.First(x => x.Name == "DateTime");
+        var dateTimeType = refTypes.Type("DateTime");
         DateTimeType = ModuleDefinition.ImportReference(dateTimeType);
-        UtcNowMethod = ModuleDefinition.ImportReference(dateTimeType.Methods.First(x => x.Name == "get_UtcNow"));
-        GetTicksMethod = ModuleDefinition.ImportReference(dateTimeType.Methods.First(x => x.Name == "get_Ticks"));
+        UtcNowMethod = ModuleDefinition.ImportReference(dateTimeType.Method("get_UtcNow"));
+        GetTicksMethod = ModuleDefinition.ImportReference(dateTimeType.Method("get_Ticks"));
 
-        var methodBaseType = refTypes.First(x => x.Name == "MethodBase");
-        GetMethodFromHandle = ModuleDefinition.ImportReference(methodBaseType.Methods.First(x =>
-            x.Name == "GetMethodFromHandle" &&
-            x.Parameters.Count == 2 &&
-            x.Parameters[0].ParameterType.Name == "RuntimeMethodHandle" &&
-            x.Parameters[1].ParameterType.Name == "RuntimeTypeHandle"));
+        var methodBaseType = refTypes.Type("MethodBase");
+        var methodBase = methodBaseType.Method("GetMethodFromHandle", "RuntimeMethodHandle", "RuntimeTypeHandle");
+        GetMethodFromHandle = ModuleDefinition.ImportReference(methodBase);
 
-        var booleanType = refTypes.First(x => x.Name == "Boolean");
+        var booleanType = refTypes.Type("Boolean");
         BooleanType = ModuleDefinition.ImportReference(booleanType);
 
         var stopwatchType = refTypes.FirstOrDefault(x => x.Name == "Stopwatch");
@@ -66,18 +61,16 @@ public partial class ModuleWeaver
         else
         {
             StopwatchType = ModuleDefinition.ImportReference(stopwatchType);
-            StartNewMethod = ModuleDefinition.ImportReference(stopwatchType.Methods.First(x => x.Name == "StartNew"));
-            StopMethod = ModuleDefinition.ImportReference(stopwatchType.Methods.First(x => x.Name == "Stop"));
-            ElapsedMilliseconds = ModuleDefinition.ImportReference(stopwatchType.Methods.First(x => x.Name == "get_ElapsedMilliseconds"));   
+            StartNewMethod = ModuleDefinition.ImportReference(stopwatchType.Method("StartNew"));
+            StopMethod = ModuleDefinition.ImportReference(stopwatchType.Method("Stop"));
+            ElapsedMilliseconds = ModuleDefinition.ImportReference(stopwatchType.Method("get_ElapsedMilliseconds"));
         }
 
         var stringType = ModuleDefinition.TypeSystem.String.Resolve();
-        StringFormatWithArray = ModuleDefinition.ImportReference(stringType.Methods.First(x =>
-            x.Name == "Format" &&
-            x.Parameters.Count == 2 &&
-            x.Parameters[0].ParameterType.Name == "String" &&
-            x.Parameters[1].ParameterType.Name == "Object[]"));
-        ConcatMethod = ModuleDefinition.ImportReference(stringType.Methods.First(x => x.Name == "Concat" && x.Parameters.Count == 3));
+        var formatMethod = stringType.Method("Format", "String", "Object[]");
+        StringFormatWithArray = ModuleDefinition.ImportReference(formatMethod);
+        var concatMethod = stringType.Method("Concat", "Object", "Object", "Object");
+        ConcatMethod = ModuleDefinition.ImportReference(concatMethod);
     }
 
     void AddAssemblyIfExists(string name, List<TypeDefinition> refTypes)

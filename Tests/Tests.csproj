@@ -10,8 +10,6 @@
     <PackageReference Include="FluentDateTime" Version="*" />
     <PackageReference Include="FodyCecil" Version="2.*" />
     <PackageReference Include="NUnit" Version="3.*" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Fody\Fody.csproj" />
   </ItemGroup>
 </Project>

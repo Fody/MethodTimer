@@ -1,9 +1,8 @@
-﻿using System;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 public class ParameterFormattingProcessor
 {
-    private readonly Regex _regex = new Regex("{.*?}");
+    Regex regex = new Regex("{.*?}");
 
     public ParameterFormattingInfo ParseParameterFormatting(string formatting)
     {
@@ -11,7 +10,7 @@ public class ParameterFormattingProcessor
 
         if (formatting != null)
         {
-            var matches = _regex.Matches(formatting);
+            var matches = regex.Matches(formatting);
 
             foreach (Match match in matches)
             {

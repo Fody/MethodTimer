@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -111,6 +112,41 @@ public static class CecilExtensions
     public static bool IsLeaveInstruction(this Instruction instruction)
     {
         return instruction.OpCode == OpCodes.Leave || instruction.OpCode == OpCodes.Leave_S;
+    }
+
+    public static MethodDefinition Method(this TypeDefinition type, string name)
+    {
+        var method = type.Methods.FirstOrDefault(x => x.Name == name);
+        if (method == null)
+        {
+            throw new Exception($"Could not find method '{name}' on type {type.FullName}.");
+        }
+        return method;
+    }
+
+    public static MethodDefinition Method(this TypeDefinition type, string name, params string[] parameters)
+    {
+        var method = type.Methods.FirstOrDefault(x =>
+        {
+            return x.Name == name &&
+                   parameters.Length == x.Parameters.Count &&
+                   x.Parameters.Select(y => y.ParameterType.Name).SequenceEqual(parameters);
+        });
+        if (method == null)
+        {
+            throw new Exception($"Could not find method '{name}' on type {type.FullName}.");
+        }
+        return method;
+    }
+
+    public static TypeDefinition Type(this List<TypeDefinition> types, string name)
+    {
+        var type = types.FirstOrDefault(x => x.Name == name);
+        if (type == null)
+        {
+            throw new Exception($"Could not find type '{name}'.");
+        }
+        return type;
     }
 
 }

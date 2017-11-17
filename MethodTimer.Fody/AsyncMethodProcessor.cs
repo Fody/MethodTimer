@@ -318,7 +318,7 @@ public class AsyncMethodProcessor
             yield return Instruction.Create(OpCodes.Box, ModuleWeaver.ModuleDefinition.TypeSystem.Int64);
             yield return Instruction.Create(OpCodes.Ldstr, "ms");
             yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ConcatMethod);
-            yield return Instruction.Create(OpCodes.Call, ModuleWeaver.DebugWriteLineMethod);
+            yield return Instruction.Create(OpCodes.Call, ModuleWeaver.TraceWriteLineMethod);
         }
     }
 }

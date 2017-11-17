@@ -75,7 +75,7 @@ public class WithInterceptorAndFormattingTests
 
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
-        DebugRunner.CaptureDebug(() =>
+        TraceRunner.Capture(() =>
         {
             var task = (Task)instance.MethodWithAwaitAsync("123", 42);
             task.Wait();
@@ -102,7 +102,7 @@ public class WithInterceptorAndFormattingTests
 
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
-        DebugRunner.CaptureDebug(() =>
+        TraceRunner.Capture(() =>
         {
             var task = (Task)instance.MethodWithAwaitWithoutFormattingAsync("123", 42);
             task.Wait();
@@ -128,7 +128,7 @@ public class WithInterceptorAndFormattingTests
 
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
-        DebugRunner.CaptureDebug(() =>
+        TraceRunner.Capture(() =>
         {
             var task = (Task)instance.MethodWithAwaitButUnusedParametersAsync("123", 42);
             task.Wait();
@@ -149,7 +149,7 @@ public class WithInterceptorAndFormattingTests
 
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
-        DebugRunner.CaptureDebug(() =>
+        TraceRunner.Capture(() =>
         {
             try
             {
@@ -182,7 +182,7 @@ public class WithInterceptorAndFormattingTests
 
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
-        DebugRunner.CaptureDebug(() =>
+        TraceRunner.Capture(() =>
         {
             var task = (Task)instance.MethodWithFastPathAsync(recurse, "123", 42);
             task.Wait();

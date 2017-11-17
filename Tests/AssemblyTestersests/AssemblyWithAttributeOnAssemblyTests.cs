@@ -20,7 +20,7 @@ public class AssemblyWithAttributeOnAssemblyTests
     [Test]
     public void ClassWithNoAttribute()
     {
-        var message = DebugRunner.CaptureDebug(() =>
+        var message = TraceRunner.Capture(() =>
         {
             var type = assemblyWeaver.Assembly.GetType("ClassWithNoAttribute");
             var instance = (dynamic) Activator.CreateInstance(type);
@@ -35,7 +35,7 @@ public class AssemblyWithAttributeOnAssemblyTests
     {
         var type = assemblyWeaver.Assembly.GetType("ClassWithCompilerGeneratedTypes");
         var instance = (dynamic) Activator.CreateInstance(type);
-        var message = DebugRunner.CaptureDebug(() =>
+        var message = TraceRunner.Capture(() =>
         {
             var task = (Task) instance.AsyncMethod();
             task.Wait();
@@ -50,7 +50,7 @@ public class AssemblyWithAttributeOnAssemblyTests
     {
         var type = assemblyWeaver.Assembly.GetType("ClassWithCompilerGeneratedTypes");
         var instance = (dynamic) Activator.CreateInstance(type);
-        var message = DebugRunner.CaptureDebug(() =>
+        var message = TraceRunner.Capture(() =>
         {
             var task = (IEnumerable<string>) instance.YieldMethod();
             task.ToList();

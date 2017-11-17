@@ -23,7 +23,7 @@ public class MiscMethods
         }
         catch (Exception)
         {
-            Debug.WriteLine("sdf");
+            Trace.WriteLine("sdf");
             throw;
         }
     }
@@ -35,7 +35,7 @@ public class MiscMethods
         }
         catch (Exception)
         {
-            Debug.WriteLine("sdf");
+            Trace.WriteLine("sdf");
             throw;
         }
 
@@ -72,12 +72,12 @@ public class MiscMethods
         }
         catch (Exception)
         {
-            Debug.WriteLine("sdf");
+            Trace.WriteLine("sdf");
             throw;
         }
         finally
         {
-            Debug.WriteLine("sdf");
+            Trace.WriteLine("sdf");
         }
     }
     //public void MethodAndCatchFinallyReThrow()
@@ -88,15 +88,15 @@ public class MiscMethods
     //    }
     //    catch (Exception)
     //    {
-    //        Debug.WriteLine("sdf");
+    //        Trace.WriteLine("sdf");
     //        throw;
     //    }
     //    finally
     //    {
-    //        Debug.WriteLine("sdf");
+    //        Trace.WriteLine("sdf");
     //    }
     //}
-    
+
     //public void MethodAndCatchSwallow()
     //{
     //    try

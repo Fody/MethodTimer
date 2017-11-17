@@ -85,7 +85,7 @@ public partial class ModuleWeaver
             yield return Instruction.Create(OpCodes.Box, ModuleDefinition.TypeSystem.Int64);
             yield return Instruction.Create(OpCodes.Ldstr, "ms");
             yield return Instruction.Create(OpCodes.Call, ConcatMethod);
-            yield return Instruction.Create(OpCodes.Call, DebugWriteLineMethod);
+            yield return Instruction.Create(OpCodes.Call, TraceWriteLineMethod);
         }
     }
 

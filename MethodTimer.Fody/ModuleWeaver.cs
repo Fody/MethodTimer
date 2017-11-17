@@ -22,12 +22,12 @@ public partial class ModuleWeaver
 
     public ModuleWeaver()
     {
-        LogDebug = s => { Debug.WriteLine(s); };
-        LogInfo = s => { Debug.WriteLine(s); };
-        LogWarning = s => { Debug.WriteLine(s); };
-        LogWarningPoint = (s, p) => { Debug.WriteLine(s); };
-        LogError = s => { Debug.WriteLine(s); };
-        LogErrorPoint = (s, p) => { Debug.WriteLine(s); };
+        LogDebug = s => { Trace.WriteLine(s); };
+        LogInfo = s => { Trace.WriteLine(s); };
+        LogWarning = s => { Trace.WriteLine(s); };
+        LogWarningPoint = (s, p) => { Trace.WriteLine(s); };
+        LogError = s => { Trace.WriteLine(s); };
+        LogErrorPoint = (s, p) => { Trace.WriteLine(s); };
         ReferenceCopyLocalPaths = new List<string>();
     }
 

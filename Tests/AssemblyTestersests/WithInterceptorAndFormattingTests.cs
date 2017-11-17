@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 
@@ -17,7 +16,7 @@ public class WithInterceptorAndFormattingTests
 
     public WithInterceptorAndFormattingTests()
     {
-        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\AssemblyWithInterceptorAndFormatting\bin\Debug\net462\AssemblyWithInterceptorAndFormatting.dll");
+        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "AssemblyWithInterceptorAndFormatting.dll");
         assemblyWeaver = new AssemblyWeaver(beforeAssemblyPath);
         var methodTimeLogger = assemblyWeaver.Assembly.GetType("MethodTimeLogger");
         methodBaseField = methodTimeLogger.GetField("MethodBase");
@@ -67,7 +66,6 @@ public class WithInterceptorAndFormattingTests
         Assert.AreEqual(0, messages.Count);
     }
 
-    [Apartment(ApartmentState.STA)]
     [Test]
     public void ClassWithAsyncMethod()
     {
@@ -75,7 +73,7 @@ public class WithInterceptorAndFormattingTests
 
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
-        DebugRunner.CaptureDebug(() =>
+        TraceRunner.Capture(() =>
         {
             var task = (Task)instance.MethodWithAwaitAsync("123", 42);
             task.Wait();
@@ -94,7 +92,6 @@ public class WithInterceptorAndFormattingTests
         Assert.AreEqual(message, "File name '123' with id '42'");
     }
 
-    [Apartment(ApartmentState.STA)]
     [Test]
     public void ClassWithAsyncWithoutFormattingMethod()
     {
@@ -102,7 +99,7 @@ public class WithInterceptorAndFormattingTests
 
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
-        DebugRunner.CaptureDebug(() =>
+        TraceRunner.Capture(() =>
         {
             var task = (Task)instance.MethodWithAwaitWithoutFormattingAsync("123", 42);
             task.Wait();
@@ -120,7 +117,6 @@ public class WithInterceptorAndFormattingTests
 
     // Note: in DEBUG because this only needs to run against optimized libraries
 #if !DEBUG
-    [Apartment(ApartmentState.STA)]
     [Test]
     public void ClassWithAsyncMethodWithUnusedParameters()
     {
@@ -128,7 +124,7 @@ public class WithInterceptorAndFormattingTests
 
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
-        DebugRunner.CaptureDebug(() =>
+        TraceRunner.Capture(() =>
         {
             var task = (Task)instance.MethodWithAwaitButUnusedParametersAsync("123", 42);
             task.Wait();
@@ -141,7 +137,6 @@ public class WithInterceptorAndFormattingTests
     }
 #endif
 
-    [Apartment(ApartmentState.STA)]
     [Test]
     public void ClassWithAsyncMethodThatThrowsException()
     {
@@ -149,7 +144,7 @@ public class WithInterceptorAndFormattingTests
 
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
-        DebugRunner.CaptureDebug(() =>
+        TraceRunner.Capture(() =>
         {
             try
             {
@@ -173,7 +168,6 @@ public class WithInterceptorAndFormattingTests
         Assert.AreEqual(message, "File name '123' with id '42'");
     }
 
-    [Apartment(ApartmentState.STA)]
     [TestCase(true)]
     [TestCase(false)]
     public void ClassWithAsyncMethodWithFastPath(bool recurse)
@@ -182,7 +176,7 @@ public class WithInterceptorAndFormattingTests
 
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
-        DebugRunner.CaptureDebug(() =>
+        TraceRunner.Capture(() =>
         {
             var task = (Task)instance.MethodWithFastPathAsync(recurse, "123", 42);
             task.Wait();

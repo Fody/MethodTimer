@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 
@@ -16,7 +15,7 @@ public class WithInterceptorTests
 
     public WithInterceptorTests()
     {
-        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\AssemblyWithInterceptor\bin\Debug\net462\AssemblyWithInterceptor.dll");
+        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "AssemblyWithInterceptor.dll");
         assemblyWeaver = new AssemblyWeaver(beforeAssemblyPath);
         var methodTimeLogger = assemblyWeaver.Assembly.GetType("MethodTimeLogger");
         methodBaseField = methodTimeLogger.GetField("MethodBase");
@@ -74,7 +73,7 @@ public class WithInterceptorTests
     {
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic) Activator.CreateInstance(type);
-        DebugRunner.CaptureDebug(() =>
+        TraceRunner.Capture(() =>
         {
             var task = (Task) instance.MethodWithAwaitAsync();
             task.Wait();
@@ -91,7 +90,7 @@ public class WithInterceptorTests
     {
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic) Activator.CreateInstance(type);
-        DebugRunner.CaptureDebug(() =>
+        TraceRunner.Capture(() =>
         {
             try
             {
@@ -109,14 +108,13 @@ public class WithInterceptorTests
         Assert.AreEqual(methodBase.Name, "MethodWithAwaitAndExceptionAsync");
     }
 
-    [Apartment(ApartmentState.STA)]
     [TestCase(true)]
     [TestCase(false)]
     public void ClassWithAsyncMethodWithFastPath(bool recurse)
     {
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic) Activator.CreateInstance(type);
-        DebugRunner.CaptureDebug(() =>
+        TraceRunner.Capture(() =>
         {
             var task = (Task) instance.MethodWithFastPathAsync(recurse);
             task.Wait();

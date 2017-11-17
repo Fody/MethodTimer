@@ -7,7 +7,7 @@ public class MockAssemblyResolver : DefaultAssemblyResolver
     {
         if (name.Name == "System")
         {
-            var codeBase = typeof(Debug).Assembly.CodeBase.Replace("file:///", "");
+            var codeBase = typeof(Trace).Assembly.CodeBase.Replace("file:///", "");
             return AssemblyDefinition.ReadAssembly(codeBase);
         }
         else

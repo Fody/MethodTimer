@@ -7,7 +7,7 @@ using NUnit.Framework;
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
 [TestFixture]
-public class Template
+class Template
 {
     [Test]
     [Explicit]
@@ -15,9 +15,10 @@ public class Template
     {
         var moduleDefinition = ModuleDefinition.ReadModule(GetType().Assembly.Location);
         var methods = moduleDefinition.GetType("Template").Methods;
-        var noWeaving = methods.First(x=>x.Name=="NoWeaving").Body;
+        var noWeaving = methods.First(x => x.Name == "NoWeaving").Body;
         var withWeaving = methods.First(x => x.Name == "WithWeaving").Body;
         Trace.WriteLine(noWeaving);
+        Trace.WriteLine(withWeaving);
     }
 
     public void NoWeaving()
@@ -67,7 +68,7 @@ public class Template
         finally
         {
             stopwatch.Stop();
-            MethodTimeLogger.Log(typeof(Template),stopwatch.ElapsedMilliseconds);
+            MethodTimeLogger.Log(typeof(Template), stopwatch.ElapsedMilliseconds);
         }
     }
 
@@ -91,10 +92,11 @@ public class Template
             Console.WriteLine(string.Concat("Template.WithWeaving", stopwatch.ElapsedMilliseconds));
         }
     }
-}
-public static class MethodTimeLogger
-{
-    public static void Log(Type methodInfo, long milliseconds)
+
+    public static class MethodTimeLogger
     {
+        public static void Log(Type methodInfo, long milliseconds)
+        {
+        }
     }
 }

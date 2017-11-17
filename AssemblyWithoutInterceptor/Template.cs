@@ -3,9 +3,8 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-public class Template
+class Template
 {
-
     public async Task MethodWithAwaitExpected()
     {
         var stopwatch = Stopwatch.StartNew();

@@ -4,7 +4,7 @@ using Mono.Cecil;
 
 public partial class ModuleWeaver
 {
-    public MethodReference DebugWriteLineMethod;
+    public MethodReference TraceWriteLineMethod;
     public MethodReference StartNewMethod;
     public MethodReference StopMethod;
     public TypeReference StopwatchType;
@@ -27,13 +27,12 @@ public partial class ModuleWeaver
         AddAssemblyIfExists("mscorlib", refTypes);
         AddAssemblyIfExists("System.Runtime", refTypes);
         AddAssemblyIfExists("System.Reflection", refTypes);
-        AddAssemblyIfExists("System.Diagnostics.Debug", refTypes);
         AddAssemblyIfExists("netstandard", refTypes);
 
-        var debugType = refTypes.Type("Debug");
+        var traceType = refTypes.Type("Trace");
 
-        var writeLine = debugType.Method("WriteLine", "String");
-        DebugWriteLineMethod = ModuleDefinition.ImportReference(writeLine);
+        var writeLine = traceType.Method("WriteLine", "String");
+        TraceWriteLineMethod = ModuleDefinition.ImportReference(writeLine);
 
         var objectConstructor = refTypes.Type("Object").Method(".ctor");
         ObjectConstructorMethod = ModuleDefinition.ImportReference(objectConstructor);

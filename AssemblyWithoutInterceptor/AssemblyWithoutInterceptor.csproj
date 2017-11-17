@@ -1,12 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net462</TargetFrameworks>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DebugType>full</DebugType>
-    <DebugSymbols>True</DebugSymbols>
+    <TargetFrameworks>net452;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ReferenceAssembly\ReferenceAssembly.csproj"/>
+    <ProjectReference Include="..\MethodTimer\MethodTimer.csproj" />
   </ItemGroup>
 </Project>

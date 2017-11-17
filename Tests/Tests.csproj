@@ -1,15 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net462</TargetFrameworks>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TargetFrameworks>net462;netcoreapp2.0</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Build.Utilities.v4.0" />
     <Reference Include="Microsoft.CSharp" />
     <PackageReference Include="FluentDateTime" Version="*" />
-    <PackageReference Include="FodyCecil" Version="2.*" />
     <PackageReference Include="NUnit" Version="3.*" />
-    <ProjectReference Include="..\Fody\Fody.csproj" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.*" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.*" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AssemblyToReference\AssemblyToReference.csproj" />
+    <ProjectReference Include="..\AssemblyWithAttributeOnAssembly\AssemblyWithAttributeOnAssembly.csproj" />
+    <ProjectReference Include="..\AssemblyWithAttributeOnModule\AssemblyWithAttributeOnModule.csproj" />
+    <ProjectReference Include="..\AssemblyWithInterceptorAndFormattingWithoutOverload\AssemblyWithInterceptorAndFormattingWithoutOverload.csproj" />
+    <ProjectReference Include="..\AssemblyWithInterceptorAndFormattingWithWrongParameters\AssemblyWithInterceptorAndFormattingWithWrongParameters.csproj" />
+    <ProjectReference Include="..\AssemblyWithInterceptorAndFormatting\AssemblyWithInterceptorAndFormatting.csproj" />
+    <ProjectReference Include="..\AssemblyWIthInterceptorInReference\AssemblyWithInterceptorInReference.csproj" />
+    <ProjectReference Include="..\AssemblyWithInterceptor\AssemblyWithInterceptor.csproj" />
+    <ProjectReference Include="..\AssemblyWithNopInterceptor\AssemblyWithNopInterceptor.csproj" />
+    <ProjectReference Include="..\AssemblyWithoutInterceptor\AssemblyWithoutInterceptor.csproj" />
+    <ProjectReference Include="..\MethodTimer.Fody\MethodTimer.Fody.csproj" />
+    <ProjectReference Include="..\MethodTimer\MethodTimer.csproj" />
   </ItemGroup>
 </Project>

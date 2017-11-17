@@ -13,14 +13,14 @@ public class AssemblyWithAttributeOnModuleTests
 
     public AssemblyWithAttributeOnModuleTests()
     {
-        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\AssemblyWithAttributeOnModule\bin\Debug\net462\AssemblyWithAttributeOnModule.dll");
+        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "AssemblyWithAttributeOnModule.dll");
         assemblyWeaver = new AssemblyWeaver(beforeAssemblyPath);
     }
 
     [Test]
     public void ClassWithNoAttribute()
     {
-        var message = DebugRunner.CaptureDebug(() =>
+        var message = TraceRunner.Capture(() =>
         {
             var type = assemblyWeaver.Assembly.GetType("ClassWithNoAttribute");
             var instance = (dynamic) Activator.CreateInstance(type);
@@ -35,7 +35,7 @@ public class AssemblyWithAttributeOnModuleTests
     {
         var type = assemblyWeaver.Assembly.GetType("ClassWithCompilerGeneratedTypes");
         var instance = (dynamic) Activator.CreateInstance(type);
-        var message = DebugRunner.CaptureDebug(() =>
+        var message = TraceRunner.Capture(() =>
         {
             var task = (Task) instance.AsyncMethod();
             task.Wait();
@@ -50,7 +50,7 @@ public class AssemblyWithAttributeOnModuleTests
     {
         var type = assemblyWeaver.Assembly.GetType("ClassWithCompilerGeneratedTypes");
         var instance = (dynamic) Activator.CreateInstance(type);
-        var message = DebugRunner.CaptureDebug(() =>
+        var message = TraceRunner.Capture(() =>
         {
             var task = (IEnumerable<string>) instance.YieldMethod();
             task.ToList();

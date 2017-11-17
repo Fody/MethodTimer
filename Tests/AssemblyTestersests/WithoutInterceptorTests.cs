@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 
@@ -14,7 +13,7 @@ public class WithoutInterceptorTests
 
     public WithoutInterceptorTests()
     {
-        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\AssemblyWithoutInterceptor\bin\Debug\net462\AssemblyWithoutInterceptor.dll");
+        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "AssemblyWithoutInterceptor.dll");
         assemblyWeaver = new AssemblyWeaver(beforeAssemblyPath);
     }
 
@@ -37,7 +36,7 @@ public class WithoutInterceptorTests
     {
         var type = assemblyWeaver.Assembly.GetType("ClassWithYieldMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
-        var message = DebugRunner.CaptureDebug(() =>
+        var message = TraceRunner.Capture(() =>
         {
             var task = (IEnumerable<string>)instance.YieldMethod();
             task.ToList();
@@ -53,7 +52,7 @@ public class WithoutInterceptorTests
     {
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
-        var message = DebugRunner.CaptureDebug(() =>
+        var message = TraceRunner.Capture(() =>
         {
             var task = (Task)instance.MethodWithEmptyAsync();
             task.Wait();
@@ -68,7 +67,7 @@ public class WithoutInterceptorTests
     {
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic) Activator.CreateInstance(type);
-        var message = DebugRunner.CaptureDebug(() =>
+        var message = TraceRunner.Capture(() =>
         {
             var task = (Task) instance.MethodWithAwaitAsync();
             task.Wait();
@@ -83,7 +82,7 @@ public class WithoutInterceptorTests
     {
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
-        var message = DebugRunner.CaptureDebug(() =>
+        var message = TraceRunner.Capture(() =>
         {
             try
             {
@@ -100,14 +99,13 @@ public class WithoutInterceptorTests
         Assert.IsTrue(message.First().StartsWith("ClassWithAsyncMethod.MethodWithAwaitAndExceptionAsync "));
     }
 
-    [Apartment(ApartmentState.STA)]
     [TestCase(true)]
     [TestCase(false)]
     public void ClassWithAsyncMethodWithFastPath(bool recurse)
     {
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
-        var message = DebugRunner.CaptureDebug(() =>
+        var message = TraceRunner.Capture(() =>
         {
             var task = (Task)instance.MethodWithFastPathAsync(recurse);
             task.Wait();
@@ -122,7 +120,7 @@ public class WithoutInterceptorTests
     {
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic) Activator.CreateInstance(type);
-        var message = DebugRunner.CaptureDebug(() =>
+        var message = TraceRunner.Capture(() =>
         {
             var task = (Task) instance.ComplexMethodWithAwaitAsync(-1);
             task.Wait();
@@ -137,7 +135,7 @@ public class WithoutInterceptorTests
     {
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic) Activator.CreateInstance(type);
-        var message = DebugRunner.CaptureDebug(() =>
+        var message = TraceRunner.Capture(() =>
         {
             var task = (Task) instance.ComplexMethodWithAwaitAsync(0);
             task.Wait();
@@ -152,7 +150,7 @@ public class WithoutInterceptorTests
     {
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic) Activator.CreateInstance(type);
-        var message = DebugRunner.CaptureDebug(() =>
+        var message = TraceRunner.Capture(() =>
         {
             var task = (Task) instance.ComplexMethodWithAwaitAsync(2);
             task.Wait();
@@ -167,7 +165,7 @@ public class WithoutInterceptorTests
     {
         var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic) Activator.CreateInstance(type);
-        var message = DebugRunner.CaptureDebug(() =>
+        var message = TraceRunner.Capture(() =>
         {
             var task = (Task) instance.ComplexMethodWithAwaitAsync(100);
             task.Wait();
@@ -181,7 +179,7 @@ public class WithoutInterceptorTests
     public void ClassWithConstructor()
     {
         var type = assemblyWeaver.Assembly.GetType("ClassWithConstructor");
-        var message = DebugRunner.CaptureDebug(() => Activator.CreateInstance(type));
+        var message = TraceRunner.Capture(() => Activator.CreateInstance(type));
         Assert.AreEqual(2, message.Count);
         Assert.IsTrue(message[0].StartsWith("ClassWithConstructor.cctor "));
         Assert.IsTrue(message[1].StartsWith("ClassWithConstructor.ctor "));
@@ -192,7 +190,7 @@ public class WithoutInterceptorTests
     {
         var type = assemblyWeaver.Assembly.GetType("ClassWithAttribute");
         var instance = (dynamic) Activator.CreateInstance(type);
-        var message = DebugRunner.CaptureDebug(() => instance.Method());
+        var message = TraceRunner.Capture(() => instance.Method());
         Assert.AreEqual(1, message.Count);
         Assert.IsTrue(message.First().StartsWith("ClassWithAttribute.Method "));
     }
@@ -202,7 +200,7 @@ public class WithoutInterceptorTests
     {
         var type = assemblyWeaver.Assembly.GetType("MiscMethods");
         var instance = (dynamic) Activator.CreateInstance(type);
-        var message = DebugRunner.CaptureDebug(() => instance.MethodWithReturnAndCatchReThrow());
+        var message = TraceRunner.Capture(() => instance.MethodWithReturnAndCatchReThrow());
         Assert.AreEqual(1, message.Count);
         Assert.IsTrue(message.First().StartsWith("MiscMethods.MethodWithReturnAndCatchReThrow "));
     }
@@ -212,7 +210,7 @@ public class WithoutInterceptorTests
     {
         var type = assemblyWeaver.Assembly.GetType("ClassWithMethod");
         var instance = (dynamic) Activator.CreateInstance(type);
-        var message = DebugRunner.CaptureDebug(() => instance.Method());
+        var message = TraceRunner.Capture(() => instance.Method());
         Assert.AreEqual(1, message.Count);
         Assert.IsTrue(message.First().StartsWith("ClassWithMethod.Method "));
     }
@@ -222,7 +220,7 @@ public class WithoutInterceptorTests
     {
         var type = assemblyWeaver.Assembly.GetType("GenericClassWithMethod`1[[System.String, mscorlib]]");
         var instance = (dynamic) Activator.CreateInstance(type);
-        var message = DebugRunner.CaptureDebug(() => instance.Method());
+        var message = TraceRunner.Capture(() => instance.Method());
         Assert.AreEqual(1, message.Count);
         Assert.IsTrue(message.First().StartsWith("GenericClassWithMethod`1.Method "));
 
@@ -233,7 +231,7 @@ public class WithoutInterceptorTests
     //[Test]
     //public void MethodWithAwait()
     //{
-    //    var message = DebugRunner.CaptureDebug(() =>
+    //    var message = TraceRunner.Capture(() =>
     //        {
     //            var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
     //            var instance = (dynamic) Activator.CreateInstance(type);
@@ -250,7 +248,7 @@ public class WithoutInterceptorTests
     {
         var type = assemblyWeaver.Assembly.GetType("MiscMethods");
         var instance = (dynamic) Activator.CreateInstance(type);
-        var message = DebugRunner.CaptureDebug(() => instance.MethodWithReturn());
+        var message = TraceRunner.Capture(() => instance.MethodWithReturn());
         Assert.AreEqual(1, message.Count);
         Assert.IsTrue(message.First().StartsWith("MiscMethods.MethodWithReturn "));
     }
@@ -259,7 +257,7 @@ public class WithoutInterceptorTests
     public void InheritedClass()
     {
         var type = assemblyWeaver.Assembly.GetType("InheritedClass");
-        var message = DebugRunner.CaptureDebug(() => Activator.CreateInstance(type));
+        var message = TraceRunner.Capture(() => Activator.CreateInstance(type));
         Assert.AreEqual(1, message.Count);
         var first = message.First();
         Assert.IsTrue(first.StartsWith("InheritedClass.ctor "), first);
@@ -269,7 +267,7 @@ public class WithoutInterceptorTests
     public void InheritedClassDoingPropertyCall()
     {
         var type = assemblyWeaver.Assembly.GetType("InheritedClassDoingPropertyCall");
-        var message = DebugRunner.CaptureDebug(() => Activator.CreateInstance(type));
+        var message = TraceRunner.Capture(() => Activator.CreateInstance(type));
         Assert.AreEqual(1, message.Count);
         Assert.IsTrue(message[0].StartsWith("InheritedClassDoingPropertyCall.ctor "), message[0]);
     }
@@ -277,7 +275,7 @@ public class WithoutInterceptorTests
     public void InheritedClassDoingConstructionCall()
     {
         var type = assemblyWeaver.Assembly.GetType("InheritedClassDoingConstructionCall");
-        var message = DebugRunner.CaptureDebug(() => Activator.CreateInstance(type));
+        var message = TraceRunner.Capture(() => Activator.CreateInstance(type));
         Assert.AreEqual(1, message.Count);
         Assert.IsTrue(message[0].StartsWith("InheritedClassDoingConstructionCall.ctor "), message[0]);
     }
@@ -286,7 +284,7 @@ public class WithoutInterceptorTests
     //[Test]
     //public void MethodWithAsyncReturn()
     //{
-    //    var message = DebugRunner.CaptureDebug(() =>
+    //    var message = TraceRunner.Capture(() =>
     //        {
     //            var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
     //            var instance = (dynamic) Activator.CreateInstance(type);

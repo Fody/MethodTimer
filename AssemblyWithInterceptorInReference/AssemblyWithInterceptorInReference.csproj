@@ -2,12 +2,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net462</TargetFrameworks>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DebugType>full</DebugType>
-    <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AssemblyToReference\AssemblyToReference.csproj"/>
-    <ProjectReference Include="..\ReferenceAssembly\ReferenceAssembly.csproj"/>
+    <ProjectReference Include="..\AssemblyToReference\AssemblyToReference.csproj" />
+    <ProjectReference Include="..\MethodTimer\MethodTimer.csproj" />
   </ItemGroup>
 </Project>

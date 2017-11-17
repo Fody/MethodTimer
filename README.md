@@ -2,9 +2,9 @@
 [![NuGet Status](http://img.shields.io/nuget/v/MethodTimer.Fody.svg?style=flat)](https://www.nuget.org/packages/MethodTimer.Fody/)
 
 
-## This is an add-in for [Fody](https://github.com/Fody/Fody/) 
+## This is an add-in for [Fody](https://github.com/Fody/Fody/)
 
-![Icon](https://raw.github.com/Fody/MethodTimer/master/Icons/package_icon.png)
+![Icon](https://raw.github.com/Fody/MethodTimer/master/package_icon.png)
 
 Injects some very basic method timing code.
 
@@ -127,9 +127,9 @@ Then this will be compiled
 	public static void Log(MethodBase methodBase, long milliseconds, string message)
 
 
-## Whats in the nuget
+## Whats in the NuGet
 
-In addition to the actual weaving assembly the nuget package will also add a file `TimeAttribute.cs` to the target project.
+In addition to the actual weaving assembly the NuGet package will also add a file `TimeAttribute.cs` to the target project.
 
 	[AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Module | AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Constructor,AllowMultiple = false)]
 	internal class TimeAttribute : Attribute

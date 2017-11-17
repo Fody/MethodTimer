@@ -15,8 +15,8 @@
     <Delete Files="@(FilesToDelete)" />
     <MakeDir Directories="$(SolutionDir)nugets" />
     <Copy SourceFiles="$(ProjectDir)MethodTimer.Fody.nuspec" DestinationFolder="$(SolutionDir)nugets" />
-    <Copy SourceFiles="$(OutputPath)MethodTimer.Fody.dll" DestinationFolder="$(SolutionDir)nugets" />
-    <Copy SourceFiles="$(OutputPath)MethodTimer.Fody.pdb" DestinationFolder="$(SolutionDir)nugets" />
+    <Copy SourceFiles="$(ProjectDir)bin\$(ConfigurationName)\net452\MethodTimer.Fody.dll" DestinationFolder="$(SolutionDir)nugets" />
+    <Copy SourceFiles="$(ProjectDir)bin\$(ConfigurationName)\net452\MethodTimer.Fody.pdb" DestinationFolder="$(SolutionDir)nugets" />
     <Copy SourceFiles="$(SolutionDir)MethodTimer\bin\$(ConfigurationName)\netstandard1.0\MethodTimer.dll" DestinationFolder="$(SolutionDir)nugets\lib\netstandard1.0" />
     <Copy SourceFiles="$(SolutionDir)MethodTimer\bin\$(ConfigurationName)\netstandard1.0\MethodTimer.xml" DestinationFolder="$(SolutionDir)nugets\lib\netstandard1.0" />
     <Copy SourceFiles="$(SolutionDir)MethodTimer\bin\$(ConfigurationName)\net452\MethodTimer.dll" DestinationFolder="$(SolutionDir)nugets\lib\net452" />

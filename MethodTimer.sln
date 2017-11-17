@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 14.0.22823.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MethodTimer.Fody", "MethodTimer.Fody\MethodTimer.Fody.csproj", "{C3578A7B-09A6-4444-9383-0DEAFA4958BD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B5AEB0E8-28F4-4955-A055-9C200F7113F0} = {B5AEB0E8-28F4-4955-A055-9C200F7113F0}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{5A86453B-96FB-4B6E-A283-225BB9F753D3}"
 	ProjectSection(ProjectDependencies) = postProject

@@ -8,9 +8,6 @@
     <PackageReference Include="PepitaPackage" Version="1.*" />
     <Compile Include="..\CommonAssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\MethodTimer\MethodTimer.csproj" />
-  </ItemGroup>
   <Target Name="BuildNugets" AfterTargets="CopyFilesToOutputDirectory">
     <ItemGroup>
       <FilesToDelete Include="$(SolutionDir)nugets\**\*.*" />

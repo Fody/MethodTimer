@@ -4,7 +4,6 @@
     <TargetFrameworks>net462</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Build.Utilities.v4.0" />
     <Reference Include="Microsoft.CSharp" />
     <PackageReference Include="FluentDateTime" Version="*" />
     <PackageReference Include="FodyCecil" Version="2.*" />

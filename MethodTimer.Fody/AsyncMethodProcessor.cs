@@ -14,7 +14,7 @@ public class AsyncMethodProcessor
     FieldDefinition stopwatchField;
     TypeDefinition stateMachineType;
     List<Instruction> returnPoints;
-    readonly ParameterFormattingProcessor parameterFormattingProcessor = new ParameterFormattingProcessor();
+    ParameterFormattingProcessor parameterFormattingProcessor = new ParameterFormattingProcessor();
 
     public void Process()
     {

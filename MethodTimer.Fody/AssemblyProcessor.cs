@@ -3,7 +3,6 @@ using Mono.Cecil;
 
 public partial class ModuleWeaver
 {
-
     void ProcessAssembly()
     {
         if (ModuleDefinition.Assembly.ContainsTimeAttribute() || ModuleDefinition.ContainsTimeAttribute())

@@ -25,6 +25,7 @@ public partial class ModuleWeaver
         AddAssemblyIfExists("System.Runtime.Extensions", refTypes);
         AddAssemblyIfExists("System", refTypes);
         AddAssemblyIfExists("mscorlib", refTypes);
+        AddAssemblyIfExists("System.Diagnostics.TraceSource", refTypes);
         AddAssemblyIfExists("System.Runtime", refTypes);
         AddAssemblyIfExists("System.Reflection", refTypes);
         AddAssemblyIfExists("netstandard", refTypes);
@@ -77,15 +78,24 @@ public partial class ModuleWeaver
         try
         {
             var assembly = AssemblyResolver.Resolve(new AssemblyNameReference(name, null));
-
-            if (assembly != null)
+            if (assembly == null)
             {
-                refTypes.AddRange(assembly.MainModule.Types);
+                return;
             }
+            var module = assembly.MainModule;
+            refTypes.AddRange(module.Types);
+            refTypes.AddRange(ResolveExportedTypes(module));
         }
         catch (AssemblyResolutionException)
         {
             LogInfo($"Failed to resolve '{name}'. So skipping its types.");
         }
+    }
+
+    static IEnumerable<TypeDefinition> ResolveExportedTypes(ModuleDefinition module)
+    {
+        return module.ExportedTypes
+            .Select(exportedType => exportedType.Resolve())
+            .Where(typeDefinition => typeDefinition != null);
     }
 }

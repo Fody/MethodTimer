@@ -13,7 +13,7 @@ public class AssemblyWithAttributeOnModuleTests
 
     public AssemblyWithAttributeOnModuleTests()
     {
-        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\AssemblyWithAttributeOnModule\bin\Debug\net462\AssemblyWithAttributeOnModule.dll");
+        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "AssemblyWithAttributeOnModule.dll");
         assemblyWeaver = new AssemblyWeaver(beforeAssemblyPath);
     }
 

@@ -11,6 +11,17 @@
     <PackageReference Include="NUnit" Version="3.*" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AssemblyToReference\AssemblyToReference.csproj" />
+    <ProjectReference Include="..\AssemblyWithAttributeOnAssembly\AssemblyWithAttributeOnAssembly.csproj" />
+    <ProjectReference Include="..\AssemblyWithAttributeOnModule\AssemblyWithAttributeOnModule.csproj" />
+    <ProjectReference Include="..\AssemblyWithInterceptorAndFormattingWithoutOverload\AssemblyWithInterceptorAndFormattingWithoutOverload.csproj" />
+    <ProjectReference Include="..\AssemblyWithInterceptorAndFormattingWithWrongParameters\AssemblyWithInterceptorAndFormattingWithWrongParameters.csproj" />
+    <ProjectReference Include="..\AssemblyWithInterceptorAndFormatting\AssemblyWithInterceptorAndFormatting.csproj" />
+    <ProjectReference Include="..\AssemblyWIthInterceptorInReference\AssemblyWithInterceptorInReference.csproj" />
+    <ProjectReference Include="..\AssemblyWithInterceptor\AssemblyWithInterceptor.csproj" />
+    <ProjectReference Include="..\AssemblyWithNopInterceptor\AssemblyWithNopInterceptor.csproj" />
+    <ProjectReference Include="..\AssemblyWithoutInterceptor\AssemblyWithoutInterceptor.csproj" />
     <ProjectReference Include="..\MethodTimer.Fody\MethodTimer.Fody.csproj" />
+    <ProjectReference Include="..\MethodTimer\MethodTimer.csproj" />
   </ItemGroup>
 </Project>

@@ -14,7 +14,7 @@ public class WithoutInterceptorTests
 
     public WithoutInterceptorTests()
     {
-        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\AssemblyWithoutInterceptor\bin\Debug\net462\AssemblyWithoutInterceptor.dll");
+        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "AssemblyWithoutInterceptor.dll");
         assemblyWeaver = new AssemblyWeaver(beforeAssemblyPath);
     }
 

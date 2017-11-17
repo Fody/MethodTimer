@@ -17,7 +17,7 @@ public class WithInterceptorAndFormattingTests
 
     public WithInterceptorAndFormattingTests()
     {
-        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\AssemblyWithInterceptorAndFormatting\bin\Debug\net462\AssemblyWithInterceptorAndFormatting.dll");
+        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "AssemblyWithInterceptorAndFormatting.dll");
         assemblyWeaver = new AssemblyWeaver(beforeAssemblyPath);
         var methodTimeLogger = assemblyWeaver.Assembly.GetType("MethodTimeLogger");
         methodBaseField = methodTimeLogger.GetField("MethodBase");

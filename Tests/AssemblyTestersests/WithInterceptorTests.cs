@@ -109,7 +109,6 @@ public class WithInterceptorTests
         Assert.AreEqual(methodBase.Name, "MethodWithAwaitAndExceptionAsync");
     }
 
-    [Apartment(ApartmentState.STA)]
     [TestCase(true)]
     [TestCase(false)]
     public void ClassWithAsyncMethodWithFastPath(bool recurse)

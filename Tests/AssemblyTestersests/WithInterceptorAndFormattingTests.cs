@@ -67,7 +67,6 @@ public class WithInterceptorAndFormattingTests
         Assert.AreEqual(0, messages.Count);
     }
 
-    [Apartment(ApartmentState.STA)]
     [Test]
     public void ClassWithAsyncMethod()
     {
@@ -94,7 +93,6 @@ public class WithInterceptorAndFormattingTests
         Assert.AreEqual(message, "File name '123' with id '42'");
     }
 
-    [Apartment(ApartmentState.STA)]
     [Test]
     public void ClassWithAsyncWithoutFormattingMethod()
     {
@@ -120,7 +118,6 @@ public class WithInterceptorAndFormattingTests
 
     // Note: in DEBUG because this only needs to run against optimized libraries
 #if !DEBUG
-    [Apartment(ApartmentState.STA)]
     [Test]
     public void ClassWithAsyncMethodWithUnusedParameters()
     {
@@ -141,7 +138,6 @@ public class WithInterceptorAndFormattingTests
     }
 #endif
 
-    [Apartment(ApartmentState.STA)]
     [Test]
     public void ClassWithAsyncMethodThatThrowsException()
     {
@@ -173,7 +169,6 @@ public class WithInterceptorAndFormattingTests
         Assert.AreEqual(message, "File name '123' with id '42'");
     }
 
-    [Apartment(ApartmentState.STA)]
     [TestCase(true)]
     [TestCase(false)]
     public void ClassWithAsyncMethodWithFastPath(bool recurse)

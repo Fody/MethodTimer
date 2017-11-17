@@ -24,8 +24,7 @@ public class ReturnFixer
 
         foreach (var instruction in instructions)
         {
-            var operand = instruction.Operand as Instruction;
-            if (operand != null)
+            if (instruction.Operand is Instruction operand)
             {
                 if (operand.OpCode == OpCodes.Ret)
                 {

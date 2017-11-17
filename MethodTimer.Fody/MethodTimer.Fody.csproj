@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net452</TargetFrameworks>
+    <TargetFrameworks>net452;netcoreapp2.0</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="FodyCecil" Version="2.*" />
@@ -22,6 +22,8 @@
     <Copy SourceFiles="$(OutputPath)MethodTimer.Fody.pdb" DestinationFolder="$(SolutionDir)nugets" />
     <Copy SourceFiles="$(SolutionDir)MethodTimer\bin\$(ConfigurationName)\netstandard1.0\MethodTimer.dll" DestinationFolder="$(SolutionDir)nugets\lib\netstandard1.0" />
     <Copy SourceFiles="$(SolutionDir)MethodTimer\bin\$(ConfigurationName)\netstandard1.0\MethodTimer.xml" DestinationFolder="$(SolutionDir)nugets\lib\netstandard1.0" />
+    <Copy SourceFiles="$(SolutionDir)MethodTimer\bin\$(ConfigurationName)\net452\MethodTimer.dll" DestinationFolder="$(SolutionDir)nugets\lib\net452" />
+    <Copy SourceFiles="$(SolutionDir)MethodTimer\bin\$(ConfigurationName)\net452\MethodTimer.xml" DestinationFolder="$(SolutionDir)nugets\lib\net452" />
     <PepitaPackage.CreatePackageTask NuGetBuildDirectory="$(SolutionDir)nugets" MetadataAssembly="$(OutputPath)MethodTimer.Fody.dll" />
   </Target>
 </Project>

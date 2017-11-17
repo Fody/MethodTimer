@@ -44,8 +44,7 @@ public class AsyncMethodProcessor
             .ToList();
 
         // First, fall back to old mechanism
-        var exceptionHandler = body.ExceptionHandlers.First();
-        var index = body.Instructions.IndexOf(exceptionHandler.TryStart);
+        int index;
 
         // Check roslyn usage
         var firstStateUsage = (from instruction in body.Instructions
@@ -164,8 +163,7 @@ public class AsyncMethodProcessor
                         var previousInstruction = instructions[j];
                         if (previousInstruction.OpCode == OpCodes.Call)
                         {
-                            var methodReference = previousInstruction.Operand as MethodReference;
-                            if (methodReference != null)
+                            if (previousInstruction.Operand is MethodReference methodReference)
                             {
                                 if (methodReference.Name.Equals("SetException"))
                                 {

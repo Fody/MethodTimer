@@ -18,6 +18,7 @@ public class Template
         var noWeaving = methods.First(x=>x.Name=="NoWeaving").Body;
         var withWeaving = methods.First(x => x.Name == "WithWeaving").Body;
         Trace.WriteLine(noWeaving);
+        Trace.WriteLine(withWeaving);
     }
 
     public void NoWeaving()

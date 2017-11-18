@@ -13,7 +13,7 @@ public static class Verifier
     {
         var windowsSdk = Environment.ExpandEnvironmentVariables(@"%programfiles(x86)%\Microsoft SDKs\Windows\");
         exePath = Directory.EnumerateFiles(windowsSdk, "PEVerify.exe", SearchOption.AllDirectories)
-            .OrderBy(x =>
+            .OrderByDescending(x =>
             {
                 var fileVersionInfo = FileVersionInfo.GetVersionInfo(x);
                 return new Version(fileVersionInfo.FileMajorPart, fileVersionInfo.FileMinorPart, fileVersionInfo.FileBuildPart);

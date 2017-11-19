@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Mono.Cecil;
@@ -26,11 +27,21 @@ public partial class ModuleWeaver
         AddAssemblyIfExists("System", refTypes);
         AddAssemblyIfExists("mscorlib", refTypes);
         AddAssemblyIfExists("System.Diagnostics.TraceSource", refTypes);
+        AddAssemblyIfExists("System.Diagnostics.Debug", refTypes);
         AddAssemblyIfExists("System.Runtime", refTypes);
         AddAssemblyIfExists("System.Reflection", refTypes);
         AddAssemblyIfExists("netstandard", refTypes);
 
-        var traceType = refTypes.Type("Trace");
+        var traceType = refTypes.FirstOrDefault(x => x.Name == "Trace");
+        if (traceType == null)
+        {
+            traceType = refTypes.FirstOrDefault(x => x.Name == "Debug");
+        }
+
+        if (traceType == null)
+        {
+            throw new WeavingException("Could not find either Trace Or Debug");
+        }
 
         var writeLine = traceType.Method("WriteLine", "String");
         TraceWriteLineMethod = ModuleDefinition.ImportReference(writeLine);

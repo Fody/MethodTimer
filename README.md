@@ -11,11 +11,33 @@ Injects some very basic method timing code.
 [Introduction to Fody](http://github.com/Fody/Fody/wiki/SampleUsage)
 
 
-## The nuget package 
+## Usage
 
-https://nuget.org/packages/MethodTimer.Fody/
+See also [Fody usage](https://github.com/Fody/Fody#usage).
 
-    PM> Install-Package MethodTimer.Fody
+
+### NuGet installation
+
+Install the [MethodTimer.Fody NuGet package](https://nuget.org/packages/MethodTimer.Fody/) and update the [Fody NuGet package](https://nuget.org/packages/Fody/):
+
+```
+PM> Install-Package MethodTimer.Fody
+PM> Update-Package Fody
+```
+
+The `Update-Package Fody` is required since NuGet always defaults to the oldest, and most buggy, version of any dependency.
+
+
+### Add to FodyWeavers.xml
+
+Add `<MethodTimer/>` to [FodyWeavers.xml](https://github.com/Fody/Fody#add-fodyweaversxml)
+
+```xml
+<?xml version="1.0" encoding="utf-8" ?>
+<Weavers>
+  <MethodTimer/>
+</Weavers>
+```
 
 
 ### Your Code

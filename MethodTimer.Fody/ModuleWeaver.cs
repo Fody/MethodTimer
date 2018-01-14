@@ -1,37 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Fody;
 using Mono.Cecil;
-using Mono.Cecil.Cil;
 
-public partial class ModuleWeaver
+public partial class ModuleWeaver: BaseModuleWeaver
 {
-    public Action<string> LogDebug { get; set; }
-    public Action<string> LogInfo { get; set; }
-    public Action<string> LogWarning { get; set; }
-    public Action<string, SequencePoint> LogWarningPoint { get; set; }
-    public Action<string> LogError { get; set; }
-    public Action<string, SequencePoint> LogErrorPoint { get; set; }
-    public ModuleDefinition ModuleDefinition { get; set; }
-    public IAssemblyResolver AssemblyResolver { get; set; }
     List<TypeDefinition> types;
-    public List<string> ReferenceCopyLocalPaths { get; set; }
 
     ParameterFormattingProcessor parameterFormattingProcessor = new ParameterFormattingProcessor();
 
     public ModuleWeaver()
     {
-        LogDebug = s => { Trace.WriteLine(s); };
-        LogInfo = s => { Trace.WriteLine(s); };
-        LogWarning = s => { Trace.WriteLine(s); };
-        LogWarningPoint = (s, p) => { Trace.WriteLine(s); };
-        LogError = s => { Trace.WriteLine(s); };
-        LogErrorPoint = (s, p) => { Trace.WriteLine(s); };
         ReferenceCopyLocalPaths = new List<string>();
     }
 
-    public void Execute()
+    public override void Execute()
     {
         types = ModuleDefinition.GetTypes().ToList();
         FindReferences();
@@ -41,12 +24,24 @@ public partial class ModuleWeaver
             var logMethod = LogMethod ?? LogWithMessageMethod;
             LogDebug($"'{logMethod?.FullName}' is a Nop so skipping weaving");
             RemoveAttributes();
-            RemoveReference();
             return;
         }
         CheckForBadAttributes();
         ProcessAssembly();
         RemoveAttributes();
-        RemoveReference();
     }
+
+    public override IEnumerable<string> GetAssembliesForScanning()
+    {
+        yield return "System.Runtime.Extensions";
+        yield return "System";
+        yield return "mscorlib";
+        yield return "System.Diagnostics.TraceSource";
+        yield return "System.Diagnostics.Debug";
+        yield return "System.Runtime";
+        yield return "System.Reflection";
+        yield return "netstandard";
+    }
+
+    public override bool ShouldCleanReference => true;
 }

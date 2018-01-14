@@ -1,42 +1,42 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 
-[TestFixture]
-internal class ParameterFormattingProcessorTests
+public class ParameterFormattingProcessorTests
 {
-    [TestCase(null, "")]
-    [TestCase("", "")]
+    [Theory]
+    [InlineData(null, "")]
+    [InlineData("", "")]
     public void ParseEmptyFormatting(string input, string expectedOutput)
     {
         var processor = new ParameterFormattingProcessor();
 
         var info = processor.ParseParameterFormatting(input);
-        
-        Assert.IsNotNull(info);
-        Assert.AreEqual(expectedOutput, info.Format);
+
+        Assert.NotNull(info);
+        Assert.Equal(expectedOutput, info.Format);
     }
 
-    [Test]
+    [Fact]
     public void ParseSimpleFormatting()
     {
         var processor = new ParameterFormattingProcessor();
 
         var info = processor.ParseParameterFormatting("This is a {fileName}");
 
-        Assert.IsNotNull(info);
+        Assert.NotNull(info);
 
-        Assert.AreEqual("This is a {0}", info.Format);
-        Assert.AreEqual(info.ParameterNames[0], "fileName");
+        Assert.Equal("This is a {0}", info.Format);
+        Assert.Equal("fileName", info.ParameterNames[0]);
     }
 
-    [Test]
+    [Fact]
     public void ParseComplexFormatting()
     {
         var processor = new ParameterFormattingProcessor();
 
         var info = processor.ParseParameterFormatting("This is a {fileName} test with id = '{id}' and {fileName} but don't replace fileName");
 
-        Assert.AreEqual("This is a {0} test with id = '{1}' and {0} but don't replace fileName", info.Format);
-        Assert.AreEqual(info.ParameterNames[0], "fileName");
-        Assert.AreEqual(info.ParameterNames[1], "id");
+        Assert.Equal("This is a {0} test with id = '{1}' and {0} but don't replace fileName", info.Format);
+        Assert.Equal("fileName", info.ParameterNames[0]);
+        Assert.Equal("id", info.ParameterNames[1]);
     }
 }

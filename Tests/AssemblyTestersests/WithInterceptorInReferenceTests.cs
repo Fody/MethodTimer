@@ -1,40 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using NUnit.Framework;
+using Fody;
+using Xunit;
+#pragma warning disable 618
 
-[TestFixture]
 public class WithInterceptorInReferenceTests
 {
-    AssemblyWeaver assemblyWeaver;
-    FieldInfo methodBaseField;
-    string beforeAssemblyPath;
+    static FieldInfo methodBaseField;
+    static TestResult testResult;
 
-    public WithInterceptorInReferenceTests()
+    static WithInterceptorInReferenceTests()
     {
-        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "AssemblyWIthInterceptorInReference.dll");
-        var assemblyToReference = Path.Combine(TestContext.CurrentContext.TestDirectory, "AssemblyToReference.dll");
-        assemblyWeaver = new AssemblyWeaver(beforeAssemblyPath, new List<string> {assemblyToReference});
-
-        var interceptorAssembly = Assembly.LoadFrom(assemblyToReference);
-        var methodTimeLogger = interceptorAssembly.GetType("MethodTimeLogger");
-        methodBaseField = methodTimeLogger.GetField("MethodBase");
+        var weavingTask = new ModuleWeaver
+        {
+            ReferenceCopyLocalPaths = new List<string>
+            {
+                "AssemblyToReference.dll"
+            }
+        };
+        testResult = weavingTask.ExecuteTestRun(
+            assemblyPath: "AssemblyWIthInterceptorInReference.dll",
+            ignoreCodes: new []{ "0x80131869" });
+        methodBaseField = typeof(AssemblyToReference.MethodTimeLogger).GetField("MethodBase");
     }
 
-    [Test]
+    [Fact]
     public void ClassWithMethod()
     {
         ClearMessage();
-        var type = assemblyWeaver.Assembly.GetType("ClassWithMethod");
-        var instance = (dynamic) Activator.CreateInstance(type);
+        var instance = testResult.GetInstance("ClassWithMethod");
         instance.Method();
         var methodBases = GetMethodInfoField();
-        Assert.AreEqual(1, methodBases.Count);
+        Assert.Single(methodBases);
         var methodBase = methodBases.First();
-        Assert.AreEqual(methodBase.Name, "Method");
-        Assert.AreEqual(methodBase.DeclaringType, type);
+        Assert.Equal("Method", methodBase.Name);
+        Assert.Equal(methodBase.DeclaringType, instance.GetType());
     }
 
     void ClearMessage()
@@ -44,13 +45,6 @@ public class WithInterceptorInReferenceTests
 
     List<MethodBase> GetMethodInfoField()
     {
-        return (List<MethodBase>) methodBaseField.GetValue(null);
+        return (List<MethodBase>)methodBaseField.GetValue(null);
     }
-
-    [Test]
-    public void PeVerify()
-    {
-        Verifier.Verify(beforeAssemblyPath, assemblyWeaver.AfterAssemblyPath);
-    }
-
 }

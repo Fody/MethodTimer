@@ -1,6 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Fody;
 using Mono.Cecil;
 
 public partial class ModuleWeaver
@@ -22,59 +20,45 @@ public partial class ModuleWeaver
 
     public void FindReferences()
     {
-        var refTypes = new List<TypeDefinition>();
-        AddAssemblyIfExists("System.Runtime.Extensions", refTypes);
-        AddAssemblyIfExists("System", refTypes);
-        AddAssemblyIfExists("mscorlib", refTypes);
-        AddAssemblyIfExists("System.Diagnostics.TraceSource", refTypes);
-        AddAssemblyIfExists("System.Diagnostics.Debug", refTypes);
-        AddAssemblyIfExists("System.Runtime", refTypes);
-        AddAssemblyIfExists("System.Reflection", refTypes);
-        AddAssemblyIfExists("netstandard", refTypes);
-
-        var traceType = refTypes.FirstOrDefault(x => x.Name == "Trace");
-        if (traceType == null)
+        if (!TryFindType("System.Diagnostics.Trace", out var traceType))
         {
-            traceType = refTypes.FirstOrDefault(x => x.Name == "Debug");
-        }
-
-        if (traceType == null)
-        {
-            throw new WeavingException("Could not find either Trace Or Debug");
+            if (!TryFindType("System.Diagnostics.Debug", out traceType))
+            {
+                throw new WeavingException("Could not find either Trace Or Debug");
+            }
         }
 
         var writeLine = traceType.Method("WriteLine", "String");
         TraceWriteLineMethod = ModuleDefinition.ImportReference(writeLine);
 
-        var objectConstructor = refTypes.Type("Object").Method(".ctor");
+        var objectConstructor = FindType("System.Object").Method(".ctor");
         ObjectConstructorMethod = ModuleDefinition.ImportReference(objectConstructor);
 
-        var mathType = refTypes.Type("Math");
+        var mathType = FindType("System.Math");
         MaxMethod = ModuleDefinition.ImportReference(mathType.Method("Max", "Int64", "Int64"));
 
-        var dateTimeType = refTypes.Type("DateTime");
+        var dateTimeType = FindType("System.DateTime");
         DateTimeType = ModuleDefinition.ImportReference(dateTimeType);
         UtcNowMethod = ModuleDefinition.ImportReference(dateTimeType.Method("get_UtcNow"));
         GetTicksMethod = ModuleDefinition.ImportReference(dateTimeType.Method("get_Ticks"));
 
-        var methodBaseType = refTypes.Type("MethodBase");
+        var methodBaseType = FindType("System.Reflection.MethodBase");
         var methodBase = methodBaseType.Method("GetMethodFromHandle", "RuntimeMethodHandle", "RuntimeTypeHandle");
         GetMethodFromHandle = ModuleDefinition.ImportReference(methodBase);
 
-        var booleanType = refTypes.Type("Boolean");
+        var booleanType = FindType("System.Boolean");
         BooleanType = ModuleDefinition.ImportReference(booleanType);
 
-        var stopwatchType = refTypes.FirstOrDefault(x => x.Name == "Stopwatch");
-        if (stopwatchType == null)
-        {
-            InjectStopwatchType();
-        }
-        else
+        if (TryFindType("System.Diagnostics.Stopwatch", out var stopwatchType))
         {
             StopwatchType = ModuleDefinition.ImportReference(stopwatchType);
             StartNewMethod = ModuleDefinition.ImportReference(stopwatchType.Method("StartNew"));
             StopMethod = ModuleDefinition.ImportReference(stopwatchType.Method("Stop"));
             ElapsedMilliseconds = ModuleDefinition.ImportReference(stopwatchType.Method("get_ElapsedMilliseconds"));
+        }
+        else
+        {
+            InjectStopwatchType();
         }
 
         var stringType = ModuleDefinition.TypeSystem.String.Resolve();
@@ -82,31 +66,5 @@ public partial class ModuleWeaver
         StringFormatWithArray = ModuleDefinition.ImportReference(formatMethod);
         var concatMethod = stringType.Method("Concat", "Object", "Object", "Object");
         ConcatMethod = ModuleDefinition.ImportReference(concatMethod);
-    }
-
-    void AddAssemblyIfExists(string name, List<TypeDefinition> refTypes)
-    {
-        try
-        {
-            var assembly = AssemblyResolver.Resolve(new AssemblyNameReference(name, null));
-            if (assembly == null)
-            {
-                return;
-            }
-            var module = assembly.MainModule;
-            refTypes.AddRange(module.Types);
-            refTypes.AddRange(ResolveExportedTypes(module));
-        }
-        catch (AssemblyResolutionException)
-        {
-            LogInfo($"Failed to resolve '{name}'. So skipping its types.");
-        }
-    }
-
-    static IEnumerable<TypeDefinition> ResolveExportedTypes(ModuleDefinition module)
-    {
-        return module.ExportedTypes
-            .Select(exportedType => exportedType.Resolve())
-            .Where(typeDefinition => typeDefinition != null);
     }
 }

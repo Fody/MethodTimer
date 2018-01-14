@@ -1,27 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net452;netcoreapp2.0</TargetFrameworks>
-    <DebugType>portable</DebugType>
+    <TargetFrameworks>net46;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="FodyCecil" Version="2.*" />
-    <PackageReference Include="PepitaPackage" Version="1.*" />
-    <Compile Include="..\CommonAssemblyInfo.cs" />
+    <PackageReference Include="FodyHelpers" Version="2.3.20" />
   </ItemGroup>
-  <Target Name="BuildNugets" AfterTargets="CopyFilesToOutputDirectory" Condition="'$(ConfigurationName)' == 'Release'">
-    <ItemGroup>
-      <FilesToDelete Include="$(SolutionDir)nugets\**\*.*" />
-    </ItemGroup>
-    <Delete Files="@(FilesToDelete)" />
-    <MakeDir Directories="$(SolutionDir)nugets" />
-    <Copy SourceFiles="$(ProjectDir)MethodTimer.Fody.nuspec" DestinationFolder="$(SolutionDir)nugets" />
-    <Copy SourceFiles="$(ProjectDir)bin\$(ConfigurationName)\net452\MethodTimer.Fody.dll" DestinationFolder="$(SolutionDir)nugets" />
-    <Copy SourceFiles="$(ProjectDir)bin\$(ConfigurationName)\net452\MethodTimer.Fody.pdb" DestinationFolder="$(SolutionDir)nugets" />
-    <Copy SourceFiles="$(SolutionDir)MethodTimer\bin\$(ConfigurationName)\netstandard1.0\MethodTimer.dll" DestinationFolder="$(SolutionDir)nugets\lib\netstandard1.0" />
-    <Copy SourceFiles="$(SolutionDir)MethodTimer\bin\$(ConfigurationName)\netstandard1.0\MethodTimer.xml" DestinationFolder="$(SolutionDir)nugets\lib\netstandard1.0" />
-    <Copy SourceFiles="$(SolutionDir)MethodTimer\bin\$(ConfigurationName)\net452\MethodTimer.dll" DestinationFolder="$(SolutionDir)nugets\lib\net452" />
-    <Copy SourceFiles="$(SolutionDir)MethodTimer\bin\$(ConfigurationName)\net452\MethodTimer.xml" DestinationFolder="$(SolutionDir)nugets\lib\net452" />
-    <PepitaPackage.CreatePackageTask NuGetBuildDirectory="$(SolutionDir)nugets" MetadataAssembly="$(OutputPath)MethodTimer.Fody.dll" />
-  </Target>
 </Project>

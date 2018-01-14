@@ -1,10 +1,10 @@
-[![Chat on Gitter](https://img.shields.io/gitter/room/fody/fody.svg?style=flat)](https://gitter.im/Fody/Fody)
-[![NuGet Status](http://img.shields.io/nuget/v/MethodTimer.Fody.svg?style=flat)](https://www.nuget.org/packages/MethodTimer.Fody/)
+[![Chat on Gitter](https://img.shields.io/gitter/room/fody/fody.svg?style=flat&max-age=86400)](https://gitter.im/Fody/Fody)
+[![NuGet Status](http://img.shields.io/nuget/v/MethodTimer.Fody.svg?style=flat&max-age=86400)](https://www.nuget.org/packages/MethodTimer.Fody/)
 
 
 ## This is an add-in for [Fody](https://github.com/Fody/Fody/)
 
-![Icon](https://raw.github.com/Fody/MethodTimer/master/package_icon.png)
+![Icon](https://raw.githubusercontent.com/Fody/MethodTimer/master/package_icon.png)
 
 Injects some very basic method timing code.
 

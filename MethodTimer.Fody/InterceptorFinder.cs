@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using Fody;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
@@ -13,7 +14,7 @@ public partial class ModuleWeaver
 
     public void FindInterceptor()
     {
-        LogDebug("Searching for an intercepter");
+        LogDebug("Searching for an interceptor");
 
         var interceptor = types.FirstOrDefault(x => x.IsInterceptor());
         if (interceptor != null)
@@ -181,7 +182,7 @@ public partial class ModuleWeaver
     {
         var readerParameters = new ReaderParameters
         {
-            AssemblyResolver = AssemblyResolver
+            AssemblyResolver = ModuleDefinition.AssemblyResolver
         };
 
         try

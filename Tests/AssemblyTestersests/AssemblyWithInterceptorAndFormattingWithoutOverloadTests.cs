@@ -1,22 +1,15 @@
-﻿using System.IO;
-using System.Linq;
-using NUnit.Framework;
+﻿using System.Linq;
+using Fody;
+using Xunit;
 
-[TestFixture]
 public class AssemblyWithInterceptorAndFormattingWithoutOverloadTests
 {
-    AssemblyWeaver assemblyWeaver;
-    string beforeAssemblyPath;
-
-    [Test]
+    [Fact]
     public void RaisesErrorForMissingOverload()
     {
-        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "AssemblyWithInterceptorAndFormattingWithoutOverload.dll");
-        assemblyWeaver = new AssemblyWeaver(beforeAssemblyPath);
+        var weavingTask = new ModuleWeaver();
+        var testResult = weavingTask.ExecuteTestRun("AssemblyWithInterceptorAndFormattingWithoutOverload.dll");
 
-        Assert.AreNotEqual(0, assemblyWeaver.Errors);
-
-        var error = assemblyWeaver.Errors.First();
-        Assert.AreEqual("Feature with parameter formatting is being used, but no useable log method can be found. Either disable the feature usage or update the logger signature to 'public static void Log(MethodBase methodBase, long milliseconds, string message)'", error);
+        Assert.Equal("Feature with parameter formatting is being used, but no useable log method can be found. Either disable the feature usage or update the logger signature to 'public static void Log(MethodBase methodBase, long milliseconds, string message)'", testResult.Errors.Single().Text);
     }
 }

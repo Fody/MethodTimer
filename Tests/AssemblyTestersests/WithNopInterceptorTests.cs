@@ -1,38 +1,30 @@
 ﻿using System;
-using System.IO;
-using NUnit.Framework;
+using Fody;
+using Xunit;
+#pragma warning disable 618
 
-[TestFixture]
 public class WithNopInterceptorTests
 {
-    AssemblyWeaver assemblyWeaver;
-    string beforeAssemblyPath;
+    static TestResult testResult;
 
-    public WithNopInterceptorTests()
+    static WithNopInterceptorTests()
     {
-        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "AssemblyWithNopInterceptor.dll");
-        assemblyWeaver = new AssemblyWeaver(beforeAssemblyPath);
+        var weavingTask = new ModuleWeaver();
+        testResult = weavingTask.ExecuteTestRun("AssemblyWithNopInterceptor.dll");
     }
 
-    [Test]
+    [Fact]
     public void AssertAttributeIsRemoved()
     {
-        var type = assemblyWeaver.Assembly.GetType("TimeAttribute");
-        Assert.IsNull(type);
+        var type = testResult.Assembly.GetType("TimeAttribute");
+        Assert.Null(type);
     }
 
-    [Test]
+    [Fact]
     public void ClassWithMethod()
     {
-        var type = assemblyWeaver.Assembly.GetType("ClassWithMethod");
-        var instance = (dynamic) Activator.CreateInstance(type);
+        var type = testResult.Assembly.GetType("ClassWithMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
         instance.Method();
     }
-
-    [Test]
-    public void PeVerify()
-    {
-        Verifier.Verify(beforeAssemblyPath, assemblyWeaver.AfterAssemblyPath);
-    }
-
 }

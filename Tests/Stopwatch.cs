@@ -1,6 +1,6 @@
 using System;
 
-internal class Stopwatch
+class Stopwatch
 {
     long startTicks = CurrentTicks();
     const long TicksPerMillisecond = 10000;

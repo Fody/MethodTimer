@@ -2,13 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-public static class MethodTimeLogger
+namespace AssemblyToReference
 {
-    public static List<MethodBase> MethodBase = new List<MethodBase>();
-
-    public static void Log(MethodBase methodBase, long milliseconds)
+    public static class MethodTimeLogger
     {
-        Console.WriteLine($"{methodBase.Name} {milliseconds}");
-        MethodBase.Add(methodBase);
+        public static List<MethodBase> MethodBase = new List<MethodBase>();
+
+        public static void Log(MethodBase methodBase, long milliseconds)
+        {
+            Console.WriteLine($"{methodBase.Name} {milliseconds}");
+            MethodBase.Add(methodBase);
+        }
     }
 }

@@ -3,10 +3,13 @@
   <PropertyGroup>
     <TargetFrameworks>net452;netstandard1.0</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\key.snk</AssemblyOriginatorKeyFile>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+    <Authors>Simon Cropp</Authors>
+    <Description>Adds basic timing to methods.</Description>
+    <PackageTags>Stopwatch, Performance, ILWeaving, Fody, Cecil</PackageTags>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\CommonAssemblyInfo.cs" />
+    <PackageReference Include="Fody" Version="2.3.20" PrivateAssets="None" />
+    <PackageReference Include="FodyPackaging" Version="2.3.20" PrivateAssets="All" />
   </ItemGroup>
 </Project>

@@ -3,7 +3,6 @@ using Mono.Cecil.Cil;
 
 public partial class ModuleWeaver
 {
-    
     public void InjectStopwatchType()
     {
         var typeSystem = ModuleDefinition.TypeSystem;
@@ -18,7 +17,6 @@ public partial class ModuleWeaver
 
         var elapsedTicks = new FieldDefinition("elapsedTicks", FieldAttributes.Private, typeSystem.Int64);
         type.Fields.Add(elapsedTicks);
-
 
         var currentTicks = new MethodDefinition("CurrentTicks",
             MethodAttributes.HideBySig | MethodAttributes.Private| MethodAttributes.Static, typeSystem.Int64)
@@ -49,10 +47,8 @@ public partial class ModuleWeaver
             Instruction.Create(OpCodes.Call,currentTicks),
             Instruction.Create(OpCodes.Stfld, startTicks),
             Instruction.Create(OpCodes.Ldarg_0),
-            Instruction.Create(OpCodes.Call, ObjectConstructorMethod), 
+            Instruction.Create(OpCodes.Call, ObjectConstructorMethod),
             Instruction.Create(OpCodes.Ret));
-
-
 
         var startNew = new MethodDefinition("StartNew",
             MethodAttributes.HideBySig | MethodAttributes.Public | MethodAttributes.Static, type);
@@ -60,7 +56,6 @@ public partial class ModuleWeaver
         startNew.Body.Add(
             Instruction.Create(OpCodes.Newobj, constructor),
             Instruction.Create(OpCodes.Ret));
-
 
         var stop = new MethodDefinition("Stop",
             MethodAttributes.HideBySig | MethodAttributes.Public , typeSystem.Void);
@@ -83,7 +78,6 @@ public partial class ModuleWeaver
             Instruction.Create(OpCodes.Call,MaxMethod),
             Instruction.Create(OpCodes.Stfld, elapsedTicks),
             stopReturn);
-
 
         var elapsedMilliseconds = new MethodDefinition("GetElapsedMilliseconds", MethodAttributes.HideBySig | MethodAttributes.Public , typeSystem.Int64);
         type.Methods.Add(elapsedMilliseconds);

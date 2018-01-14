@@ -1,77 +1,78 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Fody;
+using Xunit;
+#pragma warning disable 618
 
-[TestFixture]
 public class WithInterceptorAndFormattingTests
 {
-    AssemblyWeaver assemblyWeaver;
-    FieldInfo methodBaseField;
-    FieldInfo messagesField;
-    string beforeAssemblyPath;
+    static FieldInfo methodBaseField;
+    static FieldInfo messagesField;
+    static TestResult testResult;
 
-    public WithInterceptorAndFormattingTests()
+    static WithInterceptorAndFormattingTests()
     {
-        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "AssemblyWithInterceptorAndFormatting.dll");
-        assemblyWeaver = new AssemblyWeaver(beforeAssemblyPath);
-        var methodTimeLogger = assemblyWeaver.Assembly.GetType("MethodTimeLogger");
+        var weavingTask = new ModuleWeaver();
+
+        testResult = weavingTask.ExecuteTestRun("AssemblyWithInterceptorAndFormatting.dll",
+            ignoreCodes: IgnoreCodes.GetIgnoreCoders());
+        var methodTimeLogger = testResult.Assembly.GetType("MethodTimeLogger");
         methodBaseField = methodTimeLogger.GetField("MethodBase");
         messagesField = methodTimeLogger.GetField("Messages");
     }
 
-    [Test]
+    [Fact]
     public void ClassWithMethod()
     {
         ClearMessage();
 
-        var type = assemblyWeaver.Assembly.GetType("ClassWithMethod");
+        var type = testResult.Assembly.GetType("ClassWithMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
         instance.Method("123", 42);
 
         var methodBases = GetMethodInfoField();
-        Assert.AreEqual(1, methodBases.Count);
+        Assert.Single(methodBases);
 
         var methodBase = methodBases.First();
-        Assert.AreEqual(methodBase.Name, "Method");
-        Assert.AreEqual(methodBase.DeclaringType, type);
+        Assert.Equal("Method", methodBase.Name);
+        Assert.Equal(methodBase.DeclaringType, type);
 
         var messages = GetMessagesField();
-        Assert.AreEqual(1, messages.Count);
+        Assert.Single(messages);
 
         var message = messages.First();
-        Assert.AreEqual(message, "File name '123' with id '42'");
+        Assert.Equal("File name '123' with id '42'", message);
     }
 
-    [Test]
+    [Fact]
     public void ClassWithMethodWithoutFormatting()
     {
         ClearMessage();
 
-        var type = assemblyWeaver.Assembly.GetType("ClassWithMethod");
+        var type = testResult.Assembly.GetType("ClassWithMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
         instance.MethodWithoutFormatting("123", 42);
 
         var methodBases = GetMethodInfoField();
-        Assert.AreEqual(1, methodBases.Count);
+        Assert.Single(methodBases);
 
         var methodBase = methodBases.First();
-        Assert.AreEqual(methodBase.Name, "MethodWithoutFormatting");
-        Assert.AreEqual(methodBase.DeclaringType, type);
+        Assert.Equal("MethodWithoutFormatting", methodBase.Name);
+        Assert.Equal(methodBase.DeclaringType, type);
 
         var messages = GetMessagesField();
-        Assert.AreEqual(0, messages.Count);
+        Assert.Empty(messages);
     }
 
-    [Test]
+    [Fact]
     public void ClassWithAsyncMethod()
     {
         ClearMessage();
 
-        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var type = testResult.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
         TraceRunner.Capture(() =>
         {
@@ -80,24 +81,24 @@ public class WithInterceptorAndFormattingTests
         });
 
         var methodBases = GetMethodInfoField();
-        Assert.AreEqual(1, methodBases.Count);
+        Assert.Single(methodBases);
 
         var methodBase = methodBases.First();
-        Assert.AreEqual(methodBase.Name, "MethodWithAwaitAsync");
+        Assert.Equal("MethodWithAwaitAsync", methodBase.Name);
 
         var messages = GetMessagesField();
-        Assert.AreEqual(1, messages.Count);
+        Assert.Single(messages);
 
         var message = messages.First();
-        Assert.AreEqual(message, "File name '123' with id '42'");
+        Assert.Equal("File name '123' with id '42'", message);
     }
 
-    [Test]
+    [Fact]
     public void ClassWithAsyncWithoutFormattingMethod()
     {
         ClearMessage();
 
-        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var type = testResult.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
         TraceRunner.Capture(() =>
         {
@@ -106,23 +107,23 @@ public class WithInterceptorAndFormattingTests
         });
 
         var methodBases = GetMethodInfoField();
-        Assert.AreEqual(1, methodBases.Count);
+        Assert.Single(methodBases);
 
         var methodBase = methodBases.First();
-        Assert.AreEqual(methodBase.Name, "MethodWithAwaitWithoutFormattingAsync");
+        Assert.Equal("MethodWithAwaitWithoutFormattingAsync", methodBase.Name);
 
         var messages = GetMessagesField();
-        Assert.AreEqual(0, messages.Count);
+        Assert.Empty(messages);
     }
 
     // Note: in DEBUG because this only needs to run against optimized libraries
 #if !DEBUG
-    [Test]
+    [Fact]
     public void ClassWithAsyncMethodWithUnusedParameters()
     {
         ClearMessage();
 
-        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var type = testResult.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
         TraceRunner.Capture(() =>
         {
@@ -130,19 +131,17 @@ public class WithInterceptorAndFormattingTests
             task.Wait();
         });
 
-        Assert.AreNotEqual(0, assemblyWeaver.Errors);
-
-        var error = assemblyWeaver.Errors.First();
-        Assert.AreEqual("Parameter 'fileName' is not available on the async state machine. Probably it has been optimized away by the compiler. Please update the format so it excludes this parameter.", error);
+        var error = testResult.Errors.First();
+        Assert.Equal("Parameter 'fileName' is not available on the async state machine. Probably it has been optimized away by the compiler. Please update the format so it excludes this parameter.", error.Text);
     }
 #endif
 
-    [Test]
+    [Fact]
     public void ClassWithAsyncMethodThatThrowsException()
     {
         ClearMessage();
 
-        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var type = testResult.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
         TraceRunner.Capture(() =>
         {
@@ -159,22 +158,23 @@ public class WithInterceptorAndFormattingTests
 
         var methodBases = GetMethodInfoField();
         var methodBase = methodBases.Last();
-        Assert.AreEqual(methodBase.Name, "MethodWithAwaitAndExceptionAsync");
+        Assert.Equal("MethodWithAwaitAndExceptionAsync", methodBase.Name);
 
         var messages = GetMessagesField();
-        Assert.AreEqual(1, messages.Count);
+        Assert.Single(messages);
 
         var message = messages.First();
-        Assert.AreEqual(message, "File name '123' with id '42'");
+        Assert.Equal("File name '123' with id '42'", message);
     }
 
-    [TestCase(true)]
-    [TestCase(false)]
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public void ClassWithAsyncMethodWithFastPath(bool recurse)
     {
         ClearMessage();
 
-        var type = assemblyWeaver.Assembly.GetType("ClassWithAsyncMethod");
+        var type = testResult.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
         TraceRunner.Capture(() =>
         {
@@ -185,16 +185,16 @@ public class WithInterceptorAndFormattingTests
         var methodBases = GetMethodInfoField();
 
         // Interceptor can't deal with 2 test cases
-        //Assert.AreEqual(recurse ? 2 : 1, methodBases.Count);
+        //Assert.Equal(recurse ? 2 : 1, methodBases.Count);
 
         var methodBase = methodBases.Last();
-        Assert.AreEqual("MethodWithFastPathAsync", methodBase.Name);
+        Assert.Equal("MethodWithFastPathAsync", methodBase.Name);
 
         var messages = GetMessagesField();
-        Assert.AreEqual(recurse ? 2 : 1, messages.Count);
+        Assert.Equal(recurse ? 2 : 1, messages.Count);
 
         var message = messages.First();
-        Assert.AreEqual(message, "File name '123' with id '42'");
+        Assert.Equal("File name '123' with id '42'", message);
     }
 
     void ClearMessage()
@@ -211,11 +211,5 @@ public class WithInterceptorAndFormattingTests
     List<string> GetMessagesField()
     {
         return (List<string>)messagesField.GetValue(null);
-    }
-
-    [Test]
-    public void PeVerify()
-    {
-        Verifier.Verify(beforeAssemblyPath, assemblyWeaver.AfterAssemblyPath);
     }
 }

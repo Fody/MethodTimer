@@ -1,70 +1,59 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Fody;
+using Xunit;
+#pragma warning disable 618
 
-[TestFixture]
 public class AssemblyWithAttributeOnModuleTests
 {
-    AssemblyWeaver assemblyWeaver;
-    string beforeAssemblyPath;
+    static TestResult testResult;
 
-    public AssemblyWithAttributeOnModuleTests()
+    static AssemblyWithAttributeOnModuleTests()
     {
-        beforeAssemblyPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "AssemblyWithAttributeOnModule.dll");
-        assemblyWeaver = new AssemblyWeaver(beforeAssemblyPath);
+        var weavingTask = new ModuleWeaver();
+        testResult = weavingTask.ExecuteTestRun("AssemblyWithAttributeOnModule.dll",
+            ignoreCodes: IgnoreCodes.GetIgnoreCoders());
     }
 
-    [Test]
+    [Fact]
     public void ClassWithNoAttribute()
     {
         var message = TraceRunner.Capture(() =>
         {
-            var type = assemblyWeaver.Assembly.GetType("ClassWithNoAttribute");
-            var instance = (dynamic) Activator.CreateInstance(type);
+            var instance = testResult.GetInstance("ClassWithNoAttribute");
             instance.Method();
         });
-        Assert.AreEqual(1, message.Count);
-        Assert.IsTrue(message.First().StartsWith("ClassWithNoAttribute.Method "));
+        Assert.Single(message);
+        Assert.StartsWith("ClassWithNoAttribute.Method ", message.First());
     }
 
-    [Test]
+    [Fact]
     public void ClassWithAsyncMethod()
     {
-        var type = assemblyWeaver.Assembly.GetType("ClassWithCompilerGeneratedTypes");
-        var instance = (dynamic) Activator.CreateInstance(type);
+        var instance = testResult.GetInstance("ClassWithCompilerGeneratedTypes");
         var message = TraceRunner.Capture(() =>
         {
-            var task = (Task) instance.AsyncMethod();
+            var task = (Task)instance.AsyncMethod();
             task.Wait();
         });
 
-        Assert.AreEqual(1, message.Count);
-        Assert.IsTrue(message.First().StartsWith("ClassWithCompilerGeneratedTypes.AsyncMethod "));
+        Assert.Single(message);
+        Assert.StartsWith("ClassWithCompilerGeneratedTypes.AsyncMethod ", message.First());
     }
 
-    [Test]
+    [Fact]
     public void ClassWithYieldMethod()
     {
-        var type = assemblyWeaver.Assembly.GetType("ClassWithCompilerGeneratedTypes");
-        var instance = (dynamic) Activator.CreateInstance(type);
+        var instance = testResult.GetInstance("ClassWithCompilerGeneratedTypes");
         var message = TraceRunner.Capture(() =>
         {
-            var task = (IEnumerable<string>) instance.YieldMethod();
+            var task = (IEnumerable<string>)instance.YieldMethod();
             task.ToList();
         });
 
-        Assert.AreEqual(0, message.Count);
+        Assert.Empty(message);
         //TODO: support yield
-        //Assert.IsTrue(message.First().StartsWith("ClassWithCompilerGeneratedTypes.YieldMethod "));
+        //Assert.True(message.First().StartsWith("ClassWithCompilerGeneratedTypes.YieldMethod "));
     }
-
-    [Test]
-    public void PeVerify()
-    {
-        Verifier.Verify(beforeAssemblyPath, assemblyWeaver.AfterAssemblyPath);
-    }
-
 }

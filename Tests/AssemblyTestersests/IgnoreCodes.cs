@@ -4,7 +4,7 @@ public static class IgnoreCodes
 {
     public static IEnumerable<string> GetIgnoreCoders()
     {
-#if NET461
+#if NET46
         return System.Linq.Enumerable.Empty<string>();
 #endif
 #if NETCOREAPP2_0

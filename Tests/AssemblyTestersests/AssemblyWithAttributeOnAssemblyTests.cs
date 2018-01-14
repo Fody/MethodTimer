@@ -14,7 +14,11 @@ public class AssemblyWithAttributeOnAssemblyTests
         var weavingTask = new ModuleWeaver();
         testResult = weavingTask.ExecuteTestRun(
             assemblyPath: "AssemblyWithAttributeOnAssembly.dll",
-            ignoreCodes: IgnoreCodes.GetIgnoreCoders());
+            ignoreCodes: IgnoreCodes.GetIgnoreCoders()
+#if NETCOREAPP2_0
+            , runPeVerify: false
+#endif
+            );
     }
 
     [Fact]

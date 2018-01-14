@@ -14,7 +14,11 @@ public class WithoutInterceptorTests
     {
         var weavingTask = new ModuleWeaver();
         testResult = weavingTask.ExecuteTestRun("AssemblyWithoutInterceptor.dll",
-            ignoreCodes: IgnoreCodes.GetIgnoreCoders());
+            ignoreCodes: IgnoreCodes.GetIgnoreCoders()
+#if NETCOREAPP2_0
+            , runPeVerify: false
+#endif
+        );
     }
 
     [Fact]

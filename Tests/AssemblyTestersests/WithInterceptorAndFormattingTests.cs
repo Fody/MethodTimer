@@ -18,8 +18,11 @@ public class WithInterceptorAndFormattingTests
         var weavingTask = new ModuleWeaver();
 
         testResult = weavingTask.ExecuteTestRun("AssemblyWithInterceptorAndFormatting.dll",
-            ignoreCodes: IgnoreCodes.GetIgnoreCoders());
-        var methodTimeLogger = testResult.Assembly.GetType("MethodTimeLogger");
+            ignoreCodes: IgnoreCodes.GetIgnoreCoders()
+#if NETCOREAPP2_0
+            , runPeVerify: false
+#endif
+        ); var methodTimeLogger = testResult.Assembly.GetType("MethodTimeLogger");
         methodBaseField = methodTimeLogger.GetField("MethodBase");
         messagesField = methodTimeLogger.GetField("Messages");
     }

@@ -16,7 +16,11 @@ public class WithInterceptorTests
     {
         var weavingTask = new ModuleWeaver();
         testResult = weavingTask.ExecuteTestRun("AssemblyWithInterceptor.dll",
-            ignoreCodes: IgnoreCodes.GetIgnoreCoders());
+            ignoreCodes: IgnoreCodes.GetIgnoreCoders()
+#if NETCOREAPP2_0
+            , runPeVerify: false
+#endif
+        );
         var methodTimeLogger = testResult.Assembly.GetType("MethodTimeLogger");
         methodBaseField = methodTimeLogger.GetField("MethodBase");
     }

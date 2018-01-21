@@ -8,7 +8,7 @@
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
     <PackageReference Include="FluentDateTime" Version="1.14.0" />
-    <PackageReference Include="FodyHelpers" Version="2.3.20" />
+    <PackageReference Include="FodyHelpers" Version="2.3.21" />
     <PackageReference Include="xunit" Version="2.3.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
   </ItemGroup>

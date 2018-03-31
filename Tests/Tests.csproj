@@ -8,7 +8,7 @@
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
     <PackageReference Include="FluentDateTime" Version="1.14.0" />
-    <PackageReference Include="FodyHelpers" Version="2.3.21" />
+    <PackageReference Include="FodyHelpers" Version="3.0.0" />
     <PackageReference Include="xunit" Version="2.3.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
   </ItemGroup>
@@ -25,5 +25,8 @@
     <ProjectReference Include="..\AssemblyWithoutInterceptor\AssemblyWithoutInterceptor.csproj" />
     <ProjectReference Include="..\MethodTimer.Fody\MethodTimer.Fody.csproj" />
     <ProjectReference Include="..\MethodTimer\MethodTimer.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
 </Project>

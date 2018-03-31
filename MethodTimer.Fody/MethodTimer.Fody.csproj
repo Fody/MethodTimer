@@ -4,6 +4,6 @@
     <TargetFrameworks>net46;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="FodyHelpers" Version="2.3.21" />
+    <PackageReference Include="FodyHelpers" Version="3.0.0" />
   </ItemGroup>
 </Project>

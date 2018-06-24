@@ -227,7 +227,7 @@ public class AsyncMethodProcessor
             var formattedFieldDefinition = stateMachineType.Fields.FirstOrDefault(x => x.Name.Equals("methodTimerMessage"));
             if (formattedFieldDefinition == null)
             {
-                formattedFieldDefinition = new FieldDefinition("methodTimerMessage", FieldAttributes.Private | FieldAttributes.CompilerControlled, ModuleWeaver.ModuleDefinition.TypeSystem.String);
+                formattedFieldDefinition = new FieldDefinition("methodTimerMessage", FieldAttributes.Private | FieldAttributes.CompilerControlled, ModuleWeaver.TypeSystem.StringReference);
                 stateMachineType.Fields.Add(formattedFieldDefinition);
             }
 
@@ -243,7 +243,7 @@ public class AsyncMethodProcessor
                     yield return Instruction.Create(OpCodes.Ldarg_0);
                     yield return Instruction.Create(OpCodes.Ldstr, info.Format);
                     yield return Instruction.Create(OpCodes.Ldc_I4, info.ParameterNames.Count);
-                    yield return Instruction.Create(OpCodes.Newarr, ModuleWeaver.ModuleDefinition.TypeSystem.Object);
+                    yield return Instruction.Create(OpCodes.Newarr, ModuleWeaver.TypeSystem.ObjectReference);
 
                     for (var i = 0; i < info.ParameterNames.Count; i++)
                     {
@@ -259,11 +259,10 @@ public class AsyncMethodProcessor
                         }
                         else
                         {
-
                             yield return Instruction.Create(OpCodes.Ldarg_0);
                             yield return Instruction.Create(OpCodes.Ldfld, field);
 
-                            if (field.FieldType.IsBoxingRequired(ModuleWeaver.ModuleDefinition.TypeSystem.Object))
+                            if (field.FieldType.IsBoxingRequired(ModuleWeaver.TypeSystem.ObjectReference))
                             {
                                 yield return Instruction.Create(OpCodes.Box, ModuleWeaver.ModuleDefinition.ImportReference(field.FieldType));
                             }
@@ -311,7 +310,7 @@ public class AsyncMethodProcessor
             yield return Instruction.Create(OpCodes.Ldarg_0);
             yield return Instruction.Create(OpCodes.Ldfld, stopwatchField);
             yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);
-            yield return Instruction.Create(OpCodes.Box, ModuleWeaver.ModuleDefinition.TypeSystem.Int64);
+            yield return Instruction.Create(OpCodes.Box, ModuleWeaver.TypeSystem.Int64Reference);
             yield return Instruction.Create(OpCodes.Ldstr, "ms");
             yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ConcatMethod);
             yield return Instruction.Create(OpCodes.Call, ModuleWeaver.TraceWriteLineMethod);

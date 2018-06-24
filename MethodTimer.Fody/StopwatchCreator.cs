@@ -5,21 +5,20 @@ public partial class ModuleWeaver
 {
     public void InjectStopwatchType()
     {
-        var typeSystem = ModuleDefinition.TypeSystem;
-        var type = new TypeDefinition("MethodTimer","Stopwatch",TypeAttributes.BeforeFieldInit| TypeAttributes.AnsiClass| TypeAttributes.AutoClass,typeSystem.Object);
+        var type = new TypeDefinition("MethodTimer","Stopwatch",TypeAttributes.BeforeFieldInit| TypeAttributes.AnsiClass| TypeAttributes.AutoClass, TypeSystem.ObjectReference);
         ModuleDefinition.Types.Add(type);
 
-        var startTicks = new FieldDefinition("startTicks",FieldAttributes.Private,typeSystem.Int64);
+        var startTicks = new FieldDefinition("startTicks",FieldAttributes.Private, TypeSystem.Int64Reference);
         type.Fields.Add(startTicks);
 
-        var stopped = new FieldDefinition("stopped", FieldAttributes.Private, typeSystem.Boolean);
+        var stopped = new FieldDefinition("stopped", FieldAttributes.Private, TypeSystem.BooleanReference);
         type.Fields.Add(stopped);
 
-        var elapsedTicks = new FieldDefinition("elapsedTicks", FieldAttributes.Private, typeSystem.Int64);
+        var elapsedTicks = new FieldDefinition("elapsedTicks", FieldAttributes.Private, TypeSystem.Int64Reference);
         type.Fields.Add(elapsedTicks);
 
         var currentTicks = new MethodDefinition("CurrentTicks",
-            MethodAttributes.HideBySig | MethodAttributes.Private| MethodAttributes.Static, typeSystem.Int64)
+            MethodAttributes.HideBySig | MethodAttributes.Private| MethodAttributes.Static, TypeSystem.Int64Reference)
             {
                 Body =
                     {
@@ -40,7 +39,7 @@ public partial class ModuleWeaver
         var constructor = new MethodDefinition(".ctor",
             MethodAttributes.RTSpecialName|
             MethodAttributes.SpecialName|
-            MethodAttributes.HideBySig|MethodAttributes.Public,typeSystem.Void);
+            MethodAttributes.HideBySig|MethodAttributes.Public, TypeSystem.VoidReference);
         type.Methods.Add(constructor);
         constructor.Body.Add(
             Instruction.Create(OpCodes.Ldarg_0),
@@ -58,7 +57,7 @@ public partial class ModuleWeaver
             Instruction.Create(OpCodes.Ret));
 
         var stop = new MethodDefinition("Stop",
-            MethodAttributes.HideBySig | MethodAttributes.Public , typeSystem.Void);
+            MethodAttributes.HideBySig | MethodAttributes.Public , TypeSystem.VoidReference);
         type.Methods.Add(stop);
         var stopReturn = Instruction.Create(OpCodes.Ret);
         stop.Body.Add(
@@ -79,7 +78,7 @@ public partial class ModuleWeaver
             Instruction.Create(OpCodes.Stfld, elapsedTicks),
             stopReturn);
 
-        var elapsedMilliseconds = new MethodDefinition("GetElapsedMilliseconds", MethodAttributes.HideBySig | MethodAttributes.Public , typeSystem.Int64);
+        var elapsedMilliseconds = new MethodDefinition("GetElapsedMilliseconds", MethodAttributes.HideBySig | MethodAttributes.Public , TypeSystem.Int64Reference);
         type.Methods.Add(elapsedMilliseconds);
         elapsedMilliseconds.Body.Add(
             Instruction.Create(OpCodes.Ldarg_0),

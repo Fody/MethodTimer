@@ -84,7 +84,7 @@ public class MethodProcessor
     Instruction FixReturns()
     {
         var instructions = body.Instructions;
-        if (Method.ReturnType == ModuleWeaver.ModuleDefinition.TypeSystem.Void)
+        if (Method.ReturnType.FullName == ModuleWeaver.TypeSystem.VoidReference.FullName)
         {
             var lastRet = Instruction.Create(OpCodes.Ret);
 

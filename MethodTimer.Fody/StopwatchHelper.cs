@@ -15,7 +15,7 @@ public partial class ModuleWeaver
 
         if (logWithMessageMethod != null)
         {
-            var formattedVariableDefinition = new VariableDefinition(ModuleDefinition.TypeSystem.String);
+            var formattedVariableDefinition = new VariableDefinition(TypeSystem.StringReference);
             methodDefinition.Body.Variables.Add(formattedVariableDefinition);
 
             // Load everything for a string format
@@ -29,7 +29,7 @@ public partial class ModuleWeaver
 
                     yield return Instruction.Create(OpCodes.Ldstr, info.Format);
                     yield return Instruction.Create(OpCodes.Ldc_I4, info.ParameterNames.Count);
-                    yield return Instruction.Create(OpCodes.Newarr, ModuleDefinition.TypeSystem.Object);
+                    yield return Instruction.Create(OpCodes.Newarr, TypeSystem.ObjectReference);
 
                     for (var i = 0; i < info.ParameterNames.Count; i++)
                     {
@@ -39,7 +39,7 @@ public partial class ModuleWeaver
                         yield return Instruction.Create(OpCodes.Ldc_I4, i);
                         yield return Instruction.Create(OpCodes.Ldarg, parameter);
 
-                        if (parameter.ParameterType.IsBoxingRequired(ModuleDefinition.TypeSystem.Object))
+                        if (parameter.ParameterType.IsBoxingRequired(TypeSystem.ObjectReference))
                         {
                             yield return Instruction.Create(OpCodes.Box,
                                 ModuleDefinition.ImportReference(parameter.ParameterType));
@@ -82,7 +82,7 @@ public partial class ModuleWeaver
             yield return Instruction.Create(OpCodes.Ldstr, methodDefinition.MethodName());
             yield return Instruction.Create(OpCodes.Ldloc, stopwatchVariableDefinition);
             yield return Instruction.Create(OpCodes.Call, ElapsedMilliseconds);
-            yield return Instruction.Create(OpCodes.Box, ModuleDefinition.TypeSystem.Int64);
+            yield return Instruction.Create(OpCodes.Box, TypeSystem.Int64Reference);
             yield return Instruction.Create(OpCodes.Ldstr, "ms");
             yield return Instruction.Create(OpCodes.Call, ConcatMethod);
             yield return Instruction.Create(OpCodes.Call, TraceWriteLineMethod);

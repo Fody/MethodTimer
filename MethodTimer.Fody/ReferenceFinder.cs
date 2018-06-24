@@ -61,10 +61,9 @@ public partial class ModuleWeaver
             InjectStopwatchType();
         }
 
-        var stringType = ModuleDefinition.TypeSystem.String.Resolve();
-        var formatMethod = stringType.Method("Format", "String", "Object[]");
+        var formatMethod = TypeSystem.StringDefinition.Method("Format", "String", "Object[]");
         StringFormatWithArray = ModuleDefinition.ImportReference(formatMethod);
-        var concatMethod = stringType.Method("Concat", "Object", "Object", "Object");
+        var concatMethod = TypeSystem.StringDefinition.Method("Concat", "Object", "Object", "Object");
         ConcatMethod = ModuleDefinition.ImportReference(concatMethod);
     }
 }

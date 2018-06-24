@@ -224,10 +224,6 @@ public class AsyncMethodProcessor
             // 1. Because async works with state machines, use the state machine & fields instead of method & variables.
             // 2. The ldarg_0 calls are required to load the state machine class and is required before every field call.
 
-            //var moveNextMethodDefinition = stateMachineType.Methods.First(x => x.Name == "MoveNext");
-            //var formattedVariableDefinition = new VariableDefinition(ModuleWeaver.ModuleDefinition.TypeSystem.String);
-            //moveNextMethodDefinition.Body.Variables.Add(formattedVariableDefinition);
-
             var formattedFieldDefinition = stateMachineType.Fields.FirstOrDefault(x => x.Name.Equals("methodTimerMessage"));
             if (formattedFieldDefinition == null)
             {

@@ -7,8 +7,14 @@ using Mono.Cecil.Cil;
 
 public partial class ModuleWeaver
 {
-    public MethodReference LogMethod;
-    public MethodReference LogWithMessageMethod;
+    private const string LongType = "System.Int64";
+    private const string TimeSpanType = "System.TimeSpan";
+
+    public MethodReference LogMethodUsingLong;
+    public MethodReference LogWithMessageMethodUsingLong;
+
+    public MethodReference LogMethodUsingTimeSpan;
+    public MethodReference LogWithMessageMethodUsingTimeSpan;
 
     public bool LogMethodIsNop;
 
@@ -19,10 +25,14 @@ public partial class ModuleWeaver
         var interceptor = types.FirstOrDefault(x => x.IsInterceptor());
         if (interceptor != null)
         {
-            LogMethod = FindLogMethod(interceptor);
-            LogWithMessageMethod = FindLogWithMessageMethod(interceptor);
+            LogMethodUsingLong = FindLogMethod(interceptor, LongType);
+            LogWithMessageMethodUsingLong = FindLogWithMessageMethod(interceptor, LongType);
 
-            if (LogMethod == null && LogWithMessageMethod == null)
+            LogMethodUsingTimeSpan = FindLogMethod(interceptor, TimeSpanType);
+            LogWithMessageMethodUsingTimeSpan = FindLogWithMessageMethod(interceptor, TimeSpanType);
+
+            if (LogMethodUsingLong == null && LogWithMessageMethodUsingLong == null &&
+                LogMethodUsingTimeSpan == null && LogWithMessageMethodUsingTimeSpan == null)
             {
                 throw new WeavingException($"Could not find 'Log' method on '{interceptor.FullName}'.");
             }
@@ -63,19 +73,32 @@ public partial class ModuleWeaver
                 continue;
             }
 
-            var logMethod = FindLogMethod(interceptor);
-            if (logMethod != null)
+            var logMethodUsingLong = FindLogMethod(interceptor, LongType);
+            if (logMethodUsingLong != null)
             {
-                LogMethod = ModuleDefinition.ImportReference(logMethod);
+                LogMethodUsingLong = ModuleDefinition.ImportReference(logMethodUsingLong);
             }
 
-            var logWithMessageMethod = FindLogWithMessageMethod(interceptor);
-            if (logWithMessageMethod != null)
+            var logWithMessageMethodUsingLong = FindLogWithMessageMethod(interceptor, LongType);
+            if (logWithMessageMethodUsingLong != null)
             {
-                LogWithMessageMethod = ModuleDefinition.ImportReference(logWithMessageMethod);
+                LogWithMessageMethodUsingLong = ModuleDefinition.ImportReference(logWithMessageMethodUsingLong);
             }
 
-            if (LogMethod == null && LogWithMessageMethod == null)
+            var logMethodUsingTimeSpan = FindLogMethod(interceptor, LongType);
+            if (logMethodUsingTimeSpan != null)
+            {
+                LogMethodUsingTimeSpan = ModuleDefinition.ImportReference(logMethodUsingTimeSpan);
+            }
+
+            var logWithMessageMethodUsingTimeSpan = FindLogWithMessageMethod(interceptor, LongType);
+            if (logWithMessageMethodUsingTimeSpan != null)
+            {
+                LogWithMessageMethodUsingTimeSpan = ModuleDefinition.ImportReference(logWithMessageMethodUsingTimeSpan);
+            }
+
+            if (LogMethodUsingLong == null && LogWithMessageMethodUsingLong == null &&
+                LogMethodUsingTimeSpan == null && LogWithMessageMethodUsingTimeSpan == null)
             {
                 throw new WeavingException($"Could not find 'Log' method on '{interceptor.FullName}'.");
             }
@@ -83,9 +106,9 @@ public partial class ModuleWeaver
         }
     }
 
-    MethodDefinition FindLogMethod(TypeDefinition interceptorType)
+    MethodDefinition FindLogMethod(TypeDefinition interceptorType, string elapsedParameterTypeName)
     {
-        var requiredParameterTypes = new[] { "System.Reflection.MethodBase", "System.Int64" };
+        var requiredParameterTypes = new[] { "System.Reflection.MethodBase", elapsedParameterTypeName };
 
         var logMethod = interceptorType.Methods.FirstOrDefault(x => x.Name == "Log" &&
                                                                x.Parameters.Count == 2 &&
@@ -98,15 +121,14 @@ public partial class ModuleWeaver
 
         VerifyHasCorrectParameters(logMethod, requiredParameterTypes);
         VerifyMethodIsPublicStatic(logMethod);
-        LogMethod = ModuleDefinition.ImportReference(logMethod);
         CheckNop(logMethod);
 
         return logMethod;
     }
 
-    MethodDefinition FindLogWithMessageMethod(TypeDefinition interceptorType)
+    MethodDefinition FindLogWithMessageMethod(TypeDefinition interceptorType, string elapsedParameterTypeName)
     {
-        var requiredParameterTypes = new[] { "System.Reflection.MethodBase", "System.Int64", "System.String" };
+        var requiredParameterTypes = new[] { "System.Reflection.MethodBase", elapsedParameterTypeName, "System.String" };
 
         var logMethod = interceptorType.Methods.FirstOrDefault(x => x.Name == "Log" &&
                                                                     x.Parameters.Count == 3 &&
@@ -120,7 +142,6 @@ public partial class ModuleWeaver
 
         VerifyHasCorrectParameters(logMethod, requiredParameterTypes);
         VerifyMethodIsPublicStatic(logMethod);
-        LogMethod = ModuleDefinition.ImportReference(logMethod);
         CheckNop(logMethod);
 
         return logMethod;

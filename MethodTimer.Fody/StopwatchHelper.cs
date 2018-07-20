@@ -10,10 +10,13 @@ public partial class ModuleWeaver
         yield return Instruction.Create(OpCodes.Ldloc, stopwatchVariableDefinition);
         yield return Instruction.Create(OpCodes.Call, StopMethod);
 
-        var logWithMessageMethod = LogWithMessageMethod;
-        var logMethod = LogMethod;
+        var logWithMessageMethodUsingLong = LogWithMessageMethodUsingLong;
+        var logWithMessageMethodUsingTimeSpan = LogWithMessageMethodUsingTimeSpan;
 
-        if (logWithMessageMethod != null)
+        var logMethodUsingLong = LogMethodUsingLong;
+        var logMethodUsingTimeSpan = LogMethodUsingTimeSpan;
+
+        if (logWithMessageMethodUsingLong != null || logWithMessageMethodUsingTimeSpan != null)
         {
             var formattedVariableDefinition = new VariableDefinition(TypeSystem.StringReference);
             methodDefinition.Body.Variables.Add(formattedVariableDefinition);
@@ -64,18 +67,45 @@ public partial class ModuleWeaver
             yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition.DeclaringType);
             yield return Instruction.Create(OpCodes.Call, GetMethodFromHandle);
             yield return Instruction.Create(OpCodes.Ldloc, stopwatchVariableDefinition);
-            yield return Instruction.Create(OpCodes.Call, ElapsedMilliseconds);
-            yield return Instruction.Create(OpCodes.Ldloc, formattedVariableDefinition);
-            yield return Instruction.Create(OpCodes.Call, logWithMessageMethod);
+
+            if (logWithMessageMethodUsingTimeSpan != null)
+            {
+                yield return Instruction.Create(OpCodes.Call, Elapsed);
+                yield return Instruction.Create(OpCodes.Ldloc, formattedVariableDefinition);
+                yield return Instruction.Create(OpCodes.Call, logWithMessageMethodUsingTimeSpan);
+            }
+            else if (logWithMessageMethodUsingLong != null)
+            {
+                yield return Instruction.Create(OpCodes.Call, ElapsedMilliseconds);
+                yield return Instruction.Create(OpCodes.Ldloc, formattedVariableDefinition);
+                yield return Instruction.Create(OpCodes.Call, logWithMessageMethodUsingLong);
+            }
+            else
+            {
+                LogError("No supported log method call can be found, please double check your configuration or raise a ticket.");
+            }
         }
-        else if (logMethod != null)
+        else if (logMethodUsingLong != null || logMethodUsingTimeSpan != null)
         {
             yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition);
             yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition.DeclaringType);
             yield return Instruction.Create(OpCodes.Call, GetMethodFromHandle);
             yield return Instruction.Create(OpCodes.Ldloc, stopwatchVariableDefinition);
-            yield return Instruction.Create(OpCodes.Call, ElapsedMilliseconds);
-            yield return Instruction.Create(OpCodes.Call, logMethod);
+
+            if (logMethodUsingTimeSpan != null)
+            {
+                yield return Instruction.Create(OpCodes.Call, Elapsed);
+                yield return Instruction.Create(OpCodes.Call, logMethodUsingTimeSpan);
+            }
+            else if (logMethodUsingLong != null)
+            {
+                yield return Instruction.Create(OpCodes.Call, ElapsedMilliseconds);
+                yield return Instruction.Create(OpCodes.Call, logMethodUsingLong);
+            }
+            else
+            {
+                LogError("No supported log method call can be found, please double check your configuration or raise a ticket.");
+            }
         }
         else
         {

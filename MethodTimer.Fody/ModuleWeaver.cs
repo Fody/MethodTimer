@@ -21,7 +21,7 @@ public partial class ModuleWeaver: BaseModuleWeaver
         FindInterceptor();
         if (LogMethodIsNop)
         {
-            var logMethod = LogMethod ?? LogWithMessageMethod;
+            var logMethod = GetPreferredLogMethod();
             LogDebug($"'{logMethod?.FullName}' is a Nop so skipping weaving");
             RemoveAttributes();
             return;
@@ -29,6 +29,12 @@ public partial class ModuleWeaver: BaseModuleWeaver
         CheckForBadAttributes();
         ProcessAssembly();
         RemoveAttributes();
+    }
+
+    private MethodReference GetPreferredLogMethod()
+    {
+        // TimeSpan first, then long
+        return LogWithMessageMethodUsingTimeSpan ?? LogMethodUsingTimeSpan ?? LogWithMessageMethodUsingLong ?? LogMethodUsingLong;
     }
 
     public override IEnumerable<string> GetAssembliesForScanning()

@@ -9,6 +9,7 @@ public partial class ModuleWeaver
     public TypeReference StopwatchType;
     public MethodReference StringFormatWithArray;
     public MethodReference ConcatMethod;
+    public MethodReference Elapsed;
     public MethodReference ElapsedMilliseconds;
     public MethodReference GetMethodFromHandle;
     public MethodReference ObjectConstructorMethod;
@@ -54,10 +55,12 @@ public partial class ModuleWeaver
             StopwatchType = ModuleDefinition.ImportReference(stopwatchType);
             StartNewMethod = ModuleDefinition.ImportReference(stopwatchType.Method("StartNew"));
             StopMethod = ModuleDefinition.ImportReference(stopwatchType.Method("Stop"));
+            Elapsed = ModuleDefinition.ImportReference(stopwatchType.Method("get_Elapsed"));
             ElapsedMilliseconds = ModuleDefinition.ImportReference(stopwatchType.Method("get_ElapsedMilliseconds"));
         }
         else
         {
+            // Note: injected stopwatch is not supported for TimeSpan elapsed, should we error or add?
             InjectStopwatchType();
         }
 

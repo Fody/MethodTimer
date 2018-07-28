@@ -14,7 +14,7 @@ public class AssemblyWithAttributeOnModuleTests
         var weavingTask = new ModuleWeaver();
         testResult = weavingTask.ExecuteTestRun("AssemblyWithAttributeOnModule.dll",
             ignoreCodes: IgnoreCodes.GetIgnoreCoders()
-#if NETCOREAPP2_0
+#if NETCOREAPP2_1
             , runPeVerify: false
 #endif
         );

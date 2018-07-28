@@ -15,7 +15,7 @@ public class AssemblyWithAttributeOnAssemblyTests
         testResult = weavingTask.ExecuteTestRun(
             assemblyPath: "AssemblyWithAttributeOnAssembly.dll",
             ignoreCodes: IgnoreCodes.GetIgnoreCoders()
-#if NETCOREAPP2_0
+#if NETCOREAPP2_1
             , runPeVerify: false
 #endif
             );

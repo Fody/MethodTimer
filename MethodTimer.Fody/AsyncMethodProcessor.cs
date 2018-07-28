@@ -208,7 +208,6 @@ public class AsyncMethodProcessor
         }
     }
 
-
     IEnumerable<Instruction> GetWriteTimeInstruction(MethodDefinition methodDefinition)
     {
         yield return Instruction.Create(OpCodes.Ldarg_0);
@@ -221,131 +220,131 @@ public class AsyncMethodProcessor
         var logMethodUsingLong = ModuleWeaver.LogMethodUsingLong;
         var logMethodUsingTimeSpan = ModuleWeaver.LogMethodUsingTimeSpan;
 
-        if (logWithMessageMethodUsingLong != null || logWithMessageMethodUsingTimeSpan != null)
+        if (logWithMessageMethodUsingLong == null && logWithMessageMethodUsingTimeSpan == null)
         {
-            // Important notes:
-            // 1. Because async works with state machines, use the state machine & fields instead of method & variables.
-            // 2. The ldarg_0 calls are required to load the state machine class and is required before every field call.
-
-            var formattedFieldDefinition = stateMachineType.Fields.FirstOrDefault(x => x.Name.Equals("methodTimerMessage"));
-            if (formattedFieldDefinition == null)
+            if (logMethodUsingLong == null && logMethodUsingTimeSpan == null)
             {
-                formattedFieldDefinition = new FieldDefinition("methodTimerMessage", FieldAttributes.Private | FieldAttributes.CompilerControlled, ModuleWeaver.TypeSystem.StringReference);
-                stateMachineType.Fields.Add(formattedFieldDefinition);
-            }
-
-            // Load everything for a string format
-            var timeAttribute = methodDefinition.GetTimeAttribute();
-            if (timeAttribute != null)
-            {
-                var value = timeAttribute.ConstructorArguments.FirstOrDefault().Value as string;
-                if (!string.IsNullOrWhiteSpace(value))
-                {
-                    var info = parameterFormattingProcessor.ParseParameterFormatting(value);
-
-                    yield return Instruction.Create(OpCodes.Ldarg_0);
-                    yield return Instruction.Create(OpCodes.Ldstr, info.Format);
-                    yield return Instruction.Create(OpCodes.Ldc_I4, info.ParameterNames.Count);
-                    yield return Instruction.Create(OpCodes.Newarr, ModuleWeaver.TypeSystem.ObjectReference);
-
-                    for (var i = 0; i < info.ParameterNames.Count; i++)
-                    {
-                        yield return Instruction.Create(OpCodes.Dup);
-                        yield return Instruction.Create(OpCodes.Ldc_I4, i);
-
-                        var field = stateMachineType.Fields.FirstOrDefault(x => x.Name.Equals(info.ParameterNames[i]));
-                        if (field == null)
-                        {
-                            ModuleWeaver.LogError($"Parameter '{info.ParameterNames[i]}' is not available on the async state machine. Probably it has been optimized away by the compiler. Please update the format so it excludes this parameter.");
-
-                            yield return Instruction.Create(OpCodes.Ldnull);
-                        }
-                        else
-                        {
-                            yield return Instruction.Create(OpCodes.Ldarg_0);
-                            yield return Instruction.Create(OpCodes.Ldfld, field);
-
-                            if (field.FieldType.IsBoxingRequired(ModuleWeaver.TypeSystem.ObjectReference))
-                            {
-                                yield return Instruction.Create(OpCodes.Box, ModuleWeaver.ModuleDefinition.ImportReference(field.FieldType));
-                            }
-                        }
-
-                        yield return Instruction.Create(OpCodes.Stelem_Ref);
-                    }
-
-                    yield return Instruction.Create(OpCodes.Call, ModuleWeaver.StringFormatWithArray);
-                }
-                else
-                {
-                    // Load null a string
-                    yield return Instruction.Create(OpCodes.Ldarg_0);
-                    yield return Instruction.Create(OpCodes.Ldnull);
-                }
-
-                yield return Instruction.Create(OpCodes.Stfld, formattedFieldDefinition);
-            }
-
-            // Handle call to log method
-            yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition);
-            yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition.DeclaringType);
-            yield return Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle);
-            yield return Instruction.Create(OpCodes.Ldarg_0);
-            yield return Instruction.Create(OpCodes.Ldfld, stopwatchField);
-
-            if (logWithMessageMethodUsingTimeSpan != null)
-            {
-                yield return Instruction.Create(OpCodes.Call, ModuleWeaver.Elapsed);
+                yield return Instruction.Create(OpCodes.Ldstr, methodDefinition.MethodName());
                 yield return Instruction.Create(OpCodes.Ldarg_0);
-                yield return Instruction.Create(OpCodes.Ldfld, formattedFieldDefinition);
-                yield return Instruction.Create(OpCodes.Call, logWithMessageMethodUsingTimeSpan);
-            }
-            else if (logWithMessageMethodUsingLong != null)
-            {
+                yield return Instruction.Create(OpCodes.Ldfld, stopwatchField);
                 yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);
-                yield return Instruction.Create(OpCodes.Ldarg_0);
-                yield return Instruction.Create(OpCodes.Ldfld, formattedFieldDefinition);
-                yield return Instruction.Create(OpCodes.Call, logWithMessageMethodUsingLong);
+                yield return Instruction.Create(OpCodes.Box, ModuleWeaver.TypeSystem.Int64Reference);
+                yield return Instruction.Create(OpCodes.Ldstr, "ms");
+                yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ConcatMethod);
+                yield return Instruction.Create(OpCodes.Call, ModuleWeaver.TraceWriteLineMethod);
+                yield break;
             }
-            else
-            {
-                ModuleWeaver.LogError("No supported log method call can be found, please double check your configuration or raise a ticket.");
-            }
-        }
-        else if (logMethodUsingLong != null || logMethodUsingTimeSpan != null)
-        {
+
             yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition);
             yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition.DeclaringType);
             yield return Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle);
             yield return Instruction.Create(OpCodes.Ldarg_0);
             yield return Instruction.Create(OpCodes.Ldfld, stopwatchField);
 
-            if (logMethodUsingTimeSpan != null)
-            {
-                yield return Instruction.Create(OpCodes.Call, ModuleWeaver.Elapsed);
-                yield return Instruction.Create(OpCodes.Call, logMethodUsingTimeSpan);
-            }
-            else if (logMethodUsingLong != null)
+            if (logMethodUsingTimeSpan == null)
             {
                 yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);
                 yield return Instruction.Create(OpCodes.Call, logMethodUsingLong);
+
+                yield break;
+            }
+
+            yield return Instruction.Create(OpCodes.Call, ModuleWeaver.Elapsed);
+            yield return Instruction.Create(OpCodes.Call, logMethodUsingTimeSpan);
+            yield break;
+        }
+
+
+        // Important notes:
+        // 1. Because async works with state machines, use the state machine & fields instead of method & variables.
+        // 2. The ldarg_0 calls are required to load the state machine class and is required before every field call.
+
+        var formattedFieldDefinition = stateMachineType.Fields.FirstOrDefault(x => x.Name.Equals("methodTimerMessage"));
+        if (formattedFieldDefinition == null)
+        {
+            formattedFieldDefinition = new FieldDefinition("methodTimerMessage", FieldAttributes.Private | FieldAttributes.CompilerControlled, ModuleWeaver.TypeSystem.StringReference);
+            stateMachineType.Fields.Add(formattedFieldDefinition);
+        }
+
+        foreach (var instruction in ProcessTimeAttribute(methodDefinition, formattedFieldDefinition))
+        {
+            yield return instruction;
+        }
+
+        // Handle call to log method
+        yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition);
+        yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition.DeclaringType);
+        yield return Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle);
+        yield return Instruction.Create(OpCodes.Ldarg_0);
+        yield return Instruction.Create(OpCodes.Ldfld, stopwatchField);
+
+        if (logWithMessageMethodUsingTimeSpan == null)
+        {
+            yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);
+            yield return Instruction.Create(OpCodes.Ldarg_0);
+            yield return Instruction.Create(OpCodes.Ldfld, formattedFieldDefinition);
+            yield return Instruction.Create(OpCodes.Call, logWithMessageMethodUsingLong);
+            yield break;
+        }
+
+        yield return Instruction.Create(OpCodes.Call, ModuleWeaver.Elapsed);
+        yield return Instruction.Create(OpCodes.Ldarg_0);
+        yield return Instruction.Create(OpCodes.Ldfld, formattedFieldDefinition);
+        yield return Instruction.Create(OpCodes.Call, logWithMessageMethodUsingTimeSpan);
+    }
+
+    IEnumerable<Instruction> ProcessTimeAttribute(MethodDefinition methodDefinition, FieldDefinition formattedFieldDefinition)
+    {
+// Load everything for a string format
+        var timeAttribute = methodDefinition.GetTimeAttribute();
+        if (timeAttribute != null)
+        {
+            var value = timeAttribute.ConstructorArguments.FirstOrDefault().Value as string;
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                var info = parameterFormattingProcessor.ParseParameterFormatting(value);
+
+                yield return Instruction.Create(OpCodes.Ldarg_0);
+                yield return Instruction.Create(OpCodes.Ldstr, info.Format);
+                yield return Instruction.Create(OpCodes.Ldc_I4, info.ParameterNames.Count);
+                yield return Instruction.Create(OpCodes.Newarr, ModuleWeaver.TypeSystem.ObjectReference);
+
+                for (var i = 0; i < info.ParameterNames.Count; i++)
+                {
+                    yield return Instruction.Create(OpCodes.Dup);
+                    yield return Instruction.Create(OpCodes.Ldc_I4, i);
+
+                    var field = stateMachineType.Fields.FirstOrDefault(x => x.Name.Equals(info.ParameterNames[i]));
+                    if (field == null)
+                    {
+                        ModuleWeaver.LogError($"Parameter '{info.ParameterNames[i]}' is not available on the async state machine. Probably it has been optimized away by the compiler. Please update the format so it excludes this parameter.");
+
+                        yield return Instruction.Create(OpCodes.Ldnull);
+                    }
+                    else
+                    {
+                        yield return Instruction.Create(OpCodes.Ldarg_0);
+                        yield return Instruction.Create(OpCodes.Ldfld, field);
+
+                        if (field.FieldType.IsBoxingRequired(ModuleWeaver.TypeSystem.ObjectReference))
+                        {
+                            yield return Instruction.Create(OpCodes.Box, ModuleWeaver.ModuleDefinition.ImportReference(field.FieldType));
+                        }
+                    }
+
+                    yield return Instruction.Create(OpCodes.Stelem_Ref);
+                }
+
+                yield return Instruction.Create(OpCodes.Call, ModuleWeaver.StringFormatWithArray);
             }
             else
             {
-                ModuleWeaver.LogError("No supported log method call can be found, please double check your configuration or raise a ticket.");
+                // Load null a string
+                yield return Instruction.Create(OpCodes.Ldarg_0);
+                yield return Instruction.Create(OpCodes.Ldnull);
             }
-        }
-        else
-        {
-            yield return Instruction.Create(OpCodes.Ldstr, methodDefinition.MethodName());
-            yield return Instruction.Create(OpCodes.Ldarg_0);
-            yield return Instruction.Create(OpCodes.Ldfld, stopwatchField);
-            yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);
-            yield return Instruction.Create(OpCodes.Box, ModuleWeaver.TypeSystem.Int64Reference);
-            yield return Instruction.Create(OpCodes.Ldstr, "ms");
-            yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ConcatMethod);
-            yield return Instruction.Create(OpCodes.Call, ModuleWeaver.TraceWriteLineMethod);
+
+            yield return Instruction.Create(OpCodes.Stfld, formattedFieldDefinition);
         }
     }
 }
-

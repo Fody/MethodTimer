@@ -7,8 +7,8 @@ using Mono.Cecil.Cil;
 
 public partial class ModuleWeaver
 {
-    private const string LongType = "System.Int64";
-    private const string TimeSpanType = "System.TimeSpan";
+    const string LongType = "System.Int64";
+    const string TimeSpanType = "System.TimeSpan";
 
     public MethodReference LogMethodUsingLong;
     public MethodReference LogWithMessageMethodUsingLong;

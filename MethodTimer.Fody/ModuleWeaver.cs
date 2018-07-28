@@ -31,7 +31,7 @@ public partial class ModuleWeaver: BaseModuleWeaver
         RemoveAttributes();
     }
 
-    private MethodReference GetPreferredLogMethod()
+    MethodReference GetPreferredLogMethod()
     {
         // TimeSpan first, then long
         return LogWithMessageMethodUsingTimeSpan ?? LogMethodUsingTimeSpan ?? LogWithMessageMethodUsingLong ?? LogMethodUsingLong;

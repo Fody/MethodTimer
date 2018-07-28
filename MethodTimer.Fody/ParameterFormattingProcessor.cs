@@ -40,9 +40,8 @@ public class ParameterFormattingProcessor
         return info;
     }
 
-    private string CleanMatchValue(string matchValue)
+    string CleanMatchValue(string matchValue)
     {
-        var cleanedValue = matchValue.Replace("{", string.Empty).Replace("}", string.Empty);
-        return cleanedValue;
+        return matchValue.Replace("{", string.Empty).Replace("}", string.Empty);
     }
 }

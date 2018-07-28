@@ -19,7 +19,7 @@ public class WithInterceptorAndFormattingTests
 
         testResult = weavingTask.ExecuteTestRun("AssemblyWithInterceptorAndFormatting.dll",
             ignoreCodes: IgnoreCodes.GetIgnoreCoders()
-#if NETCOREAPP2_0
+#if NETCOREAPP2_1
             , runPeVerify: false
 #endif
         ); var methodTimeLogger = testResult.Assembly.GetType("MethodTimeLogger");

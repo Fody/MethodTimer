@@ -215,10 +215,13 @@ public class AsyncMethodProcessor
         yield return Instruction.Create(OpCodes.Ldfld, stopwatchField);
         yield return Instruction.Create(OpCodes.Call, ModuleWeaver.StopMethod);
 
-        var logWithMessageMethod = ModuleWeaver.LogWithMessageMethod;
-        var logMethod = ModuleWeaver.LogMethod;
+        var logWithMessageMethodUsingLong = ModuleWeaver.LogWithMessageMethodUsingLong;
+        var logWithMessageMethodUsingTimeSpan = ModuleWeaver.LogWithMessageMethodUsingTimeSpan;
 
-        if (logWithMessageMethod != null)
+        var logMethodUsingLong = ModuleWeaver.LogMethodUsingLong;
+        var logMethodUsingTimeSpan = ModuleWeaver.LogMethodUsingTimeSpan;
+
+        if (logWithMessageMethodUsingLong != null || logWithMessageMethodUsingTimeSpan != null)
         {
             // Important notes:
             // 1. Because async works with state machines, use the state machine & fields instead of method & variables.
@@ -289,20 +292,48 @@ public class AsyncMethodProcessor
             yield return Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle);
             yield return Instruction.Create(OpCodes.Ldarg_0);
             yield return Instruction.Create(OpCodes.Ldfld, stopwatchField);
-            yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);
-            yield return Instruction.Create(OpCodes.Ldarg_0);
-            yield return Instruction.Create(OpCodes.Ldfld, formattedFieldDefinition);
-            yield return Instruction.Create(OpCodes.Call, logWithMessageMethod);
+
+            if (logWithMessageMethodUsingTimeSpan != null)
+            {
+                yield return Instruction.Create(OpCodes.Call, ModuleWeaver.Elapsed);
+                yield return Instruction.Create(OpCodes.Ldarg_0);
+                yield return Instruction.Create(OpCodes.Ldfld, formattedFieldDefinition);
+                yield return Instruction.Create(OpCodes.Call, logWithMessageMethodUsingTimeSpan);
+            }
+            else if (logWithMessageMethodUsingLong != null)
+            {
+                yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);
+                yield return Instruction.Create(OpCodes.Ldarg_0);
+                yield return Instruction.Create(OpCodes.Ldfld, formattedFieldDefinition);
+                yield return Instruction.Create(OpCodes.Call, logWithMessageMethodUsingLong);
+            }
+            else
+            {
+                ModuleWeaver.LogError("No supported log method call can be found, please double check your configuration or raise a ticket.");
+            }
         }
-        else if (logMethod != null)
+        else if (logMethodUsingLong != null || logMethodUsingTimeSpan != null)
         {
             yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition);
             yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition.DeclaringType);
             yield return Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle);
             yield return Instruction.Create(OpCodes.Ldarg_0);
             yield return Instruction.Create(OpCodes.Ldfld, stopwatchField);
-            yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);
-            yield return Instruction.Create(OpCodes.Call, logMethod);
+
+            if (logMethodUsingTimeSpan != null)
+            {
+                yield return Instruction.Create(OpCodes.Call, ModuleWeaver.Elapsed);
+                yield return Instruction.Create(OpCodes.Call, logMethodUsingTimeSpan);
+            }
+            else if (logMethodUsingLong != null)
+            {
+                yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);
+                yield return Instruction.Create(OpCodes.Call, logMethodUsingLong);
+            }
+            else
+            {
+                ModuleWeaver.LogError("No supported log method call can be found, please double check your configuration or raise a ticket.");
+            }
         }
         else
         {

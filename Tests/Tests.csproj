@@ -23,6 +23,7 @@
     <ProjectReference Include="..\AssemblyWithInterceptor\AssemblyWithInterceptor.csproj" />
     <ProjectReference Include="..\AssemblyWithNopInterceptor\AssemblyWithNopInterceptor.csproj" />
     <ProjectReference Include="..\AssemblyWithoutInterceptor\AssemblyWithoutInterceptor.csproj" />
+    <ProjectReference Include="..\AssemblyWithTimeSpanInterceptorAndFormatting\AssemblyWithTimeSpanInterceptorAndFormatting.csproj" />
     <ProjectReference Include="..\MethodTimer.Fody\MethodTimer.Fody.csproj" />
     <ProjectReference Include="..\MethodTimer\MethodTimer.csproj" />
   </ItemGroup>

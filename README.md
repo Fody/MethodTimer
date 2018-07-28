@@ -77,17 +77,32 @@ public class MyClass
 }
 ```
 
-
 ### What gets compiled with an Interceptor
 
 If you want to handle the logging you can define a static class to intercept the logging. 
 
-The interceptor takes the following form.
+The interceptor takes one of the two following forms.
+
+**Note:** when both methods are available, the intercepter will prefer the `TimeSpan` overload.
+
+1. Interceptor with elapsed duration as long (milliseconds) 
 
 ```
 public static class MethodTimeLogger
 {
-    public static void Log(MethodBase methodBase, long milliseconds)
+    public static void Log(MethodBase methodBase, long milliseconds, string message)
+    {
+        //Do some logging here
+    }
+}
+```
+
+2. Interceptor with elapsed duration as TimeSpan
+
+```
+public static class MethodTimeLogger
+{
+    public static void Log(MethodBase methodBase, TimeSpan elapsed, string message)
     {
         //Do some logging here
     }

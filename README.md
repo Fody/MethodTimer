@@ -85,7 +85,7 @@ The interceptor takes one of the two following forms.
 
 **Note:** when both methods are available, the intercepter will prefer the `TimeSpan` overload.
 
-1. Interceptor with elapsed duration as long (milliseconds) 
+#### Interceptor with elapsed duration as long (milliseconds) 
 
 ```
 public static class MethodTimeLogger
@@ -97,7 +97,7 @@ public static class MethodTimeLogger
 }
 ```
 
-2. Interceptor with elapsed duration as TimeSpan
+#### Interceptor with elapsed duration as TimeSpan
 
 ```
 public static class MethodTimeLogger

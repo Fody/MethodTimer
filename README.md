@@ -97,6 +97,29 @@ public static class MethodTimeLogger
 }
 ```
 
+Then this will be compiled
+
+```
+public class MyClass
+{
+    public void MyMethod()
+    {
+        var stopwatch = Stopwatch.StartNew();
+        try
+        {
+            //Some code u are curious how long it takes
+            Console.WriteLine("Hello");
+        }
+        finally
+        {
+            stopwatch.Stop();
+            MethodTimeLogger.Log(methodof(MyClass.MyMethod), stopwatch.ElapsedMilliseconds);
+        }
+    }
+}
+```
+
+
 #### Interceptor with elapsed duration as TimeSpan
 
 ```
@@ -125,7 +148,7 @@ public class MyClass
         finally
         {
             stopwatch.Stop();
-            MethodTimeLogger.Log(methodof(MyClass.MyMethod), stopwatch.ElapsedMilliseconds);
+            MethodTimeLogger.Log(methodof(MyClass.MyMethod), stopwatch.Elapsed);
         }
     }
 }

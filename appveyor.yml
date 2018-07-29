@@ -10,8 +10,8 @@ build:
   verbosity: minimal
 test_script:
 - cmd: >-
-    %xunit20%\xunit.console Tests\bin\Release\net46\Tests.dll
+    %xunit20%\xunit.console Tests\bin\Release\net471\Tests.dll
 
-    dotnet test "Tests\Tests.csproj" --framework netcoreapp2.0 --configuration Release --no-build --output bin\Release\netcoreapp2.0
+    dotnet test "Tests\Tests.csproj" --framework netcoreapp2.1 --configuration Release --no-build --output bin\Release\netcoreapp2.1
 artifacts:
 - path: nugets\**\*.nupkg

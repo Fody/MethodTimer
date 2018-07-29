@@ -170,11 +170,11 @@ public class WithTimeSpanInterceptorAndFormattingTests
         Assert.Equal("Parameter 'fileName' is not available on the async state machine. Probably it has been optimized away by the compiler. Please update the format so it excludes this parameter.", error.Text);
 
         // Note: must prefer TimeSpan above long
-        var interceptorTypes = GetIntercepterTypesField();
+        var interceptorTypes = GetInterceptorTypesField();
         Assert.Single(interceptorTypes);
 
         var interceptorType = interceptorTypes.First();
-        Assert.Equal(InterceptorType.TimeSpan, interceptorType);
+        Assert.Equal(InterceptorType.TimeSpan.ToString(), interceptorType);
     }
 #endif
 

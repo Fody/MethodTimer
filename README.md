@@ -20,12 +20,12 @@ See also [Fody usage](https://github.com/Fody/Fody#usage).
 
 Install the [MethodTimer.Fody NuGet package](https://nuget.org/packages/MethodTimer.Fody/) and update the [Fody NuGet package](https://nuget.org/packages/Fody/):
 
-```
+```powershell
+PM> Install-Package Fody
 PM> Install-Package MethodTimer.Fody
-PM> Update-Package Fody
 ```
 
-The `Update-Package Fody` is required since NuGet always defaults to the oldest, and most buggy, version of any dependency.
+The `Install-Package Fody` is required since NuGet always defaults to the oldest, and most buggy, version of any dependency.
 
 
 ### Add to FodyWeavers.xml
@@ -42,7 +42,7 @@ Add `<MethodTimer/>` to [FodyWeavers.xml](https://github.com/Fody/Fody#add-fodyw
 
 ### Your Code
 
-```
+```csharp
 public class MyClass
 {
     [Time]
@@ -57,7 +57,7 @@ public class MyClass
 
 ### What gets compiled without an Interceptor
 
-```
+```csharp
 public class MyClass
 {
     public void MyMethod()
@@ -77,6 +77,7 @@ public class MyClass
 }
 ```
 
+
 ### What gets compiled with an Interceptor
 
 If you want to handle the logging you can define a static class to intercept the logging. 
@@ -85,9 +86,10 @@ The interceptor takes one of the two following forms.
 
 **Note:** when both methods are available, the intercepter will prefer the `TimeSpan` overload.
 
+
 #### Interceptor with elapsed duration as long (milliseconds) 
 
-```
+```csharp
 public static class MethodTimeLogger
 {
     public static void Log(MethodBase methodBase, long milliseconds, string message)
@@ -99,7 +101,7 @@ public static class MethodTimeLogger
 
 Then this will be compiled
 
-```
+```csharp
 public class MyClass
 {
     public void MyMethod()
@@ -122,7 +124,7 @@ public class MyClass
 
 #### Interceptor with elapsed duration as TimeSpan
 
-```
+```csharp
 public static class MethodTimeLogger
 {
     public static void Log(MethodBase methodBase, TimeSpan elapsed, string message)
@@ -134,7 +136,7 @@ public static class MethodTimeLogger
 
 Then this will be compiled
 
-```
+```csharp
 public class MyClass
 {
     public void MyMethod()
@@ -159,7 +161,7 @@ public class MyClass
 
 If you want to get the parameter values inside the logging, you can use a string format in the attribute definition.
 
-```
+```csharp
 public class MyClass
 {
     [Time("File name: '{fileName}'")]
@@ -173,7 +175,7 @@ public class MyClass
 
 Then this will be compiled
 
-```
+```csharp
 public class MyClass
 {
     public void MyMethod(string fileName)
@@ -205,7 +207,7 @@ public static void Log(MethodBase methodBase, long milliseconds, string message)
 
 In addition to the actual weaving assembly the NuGet package will also add a file `TimeAttribute.cs` to the target project.
 
-```
+```csharp
 [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Module | AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Constructor,AllowMultiple = false)]
 class TimeAttribute : Attribute
 {

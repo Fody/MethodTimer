@@ -321,6 +321,11 @@ public class AsyncMethodProcessor
                     {
                         // Field name is <>4__this
                         parameterName = "<>4__this";
+                        if (!stateMachineType.Fields.Any(x => x.Name.Equals(parameterName)))
+                        {
+                            // {this} could be optimized away, let's add it for the user
+                            InjectThisIntoStateMachine(methodDefinition, stateMachineType);
+                        }
                     }
 
                     var field = stateMachineType.Fields.FirstOrDefault(x => x.Name.Equals(parameterName));
@@ -354,5 +359,47 @@ public class AsyncMethodProcessor
 
             yield return Instruction.Create(OpCodes.Stfld, formattedFieldDefinition);
         }
+    }
+
+    void InjectThisIntoStateMachine(MethodDefinition methodDefinition, TypeDefinition stateMachineType)
+    {
+        // Step 1: inject the field
+        var thisField = new FieldDefinition("<>4__this", FieldAttributes.Public, methodDefinition.DeclaringType);
+        stateMachineType.Fields.Add(thisField);
+
+        // Step 2: set the field value in the actual method, search for the first usage of the state machine class
+        var methodBody = methodDefinition.Body;
+        methodBody.SimplifyMacros();
+
+        var instructions = methodDefinition.Body.Instructions;
+        var startInstruction = instructions.FirstOrDefault(x =>
+        {
+            if (x.Operand is VariableDefinition variableDefinition)
+            {
+                if (variableDefinition.VariableType.FullName.Equals(stateMachineType.FullName))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        });
+
+        if (startInstruction is null)
+        {
+            ModuleWeaver.LogError($"Failed to inject '{{this}}' into the async method, the compiler optimized it away and it could not be injected automatically, please create a support ticket.");
+            return;
+        }
+
+        // IL_0000: ldloca.s     'stateMachine [Range(Instruction(IL_0000 ldloca.s)-Instruction(IL_003c ldloca.s))]'
+        // IL_0002: ldarg.0      // this
+        // IL_0003: stfld        class ClassWithAsyncMethod ClassWithAsyncMethod/'<MethodWithAwaitAndThisAsync>d__1'::'<>4__this'
+
+        var index = instructions.IndexOf(startInstruction);
+        instructions.Insert(index + 0, Instruction.Create(OpCodes.Ldloca_S, (VariableDefinition)startInstruction.Operand));
+        instructions.Insert(index + 1, Instruction.Create(OpCodes.Ldarg_0));
+        instructions.Insert(index + 2, Instruction.Create(OpCodes.Stfld, thisField));
+
+        methodBody.OptimizeMacros();
     }
 }

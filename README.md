@@ -196,7 +196,14 @@ public class MyClass
 }
 ```
 
-**Note that this feature requires an updated Log method call with the definition below. If this method (with the *message* parameter) is not found, the weaver will raise an error.**
+The following values are allowed:
+
+* Any parameter name (e.g. `{fileName}`)
+* `{this}` (calls `ToString()` on the instance itself) - Note that this is not available on static methods, the weaver will throw an error if being used in a static method
+
+**Note 1:** sub-properties are not (yet?) supported. [Support Fody on OpenCollective](https://opencollective.com/fody) and this might be implemented!
+
+**Note 2:** this feature requires an updated Log method call with the definition below. If this method (with the *message* parameter) is not found, the weaver will raise an error.
 
 ```
 public static void Log(MethodBase methodBase, long milliseconds, string message)

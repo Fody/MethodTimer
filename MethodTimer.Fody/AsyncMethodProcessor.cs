@@ -302,6 +302,7 @@ public class AsyncMethodProcessor
             var value = timeAttribute.ConstructorArguments.FirstOrDefault().Value as string;
             if (!string.IsNullOrWhiteSpace(value))
             {
+                // Note: no need to validate, already done in AssemblyProcessor::ProcessMethod
                 var info = parameterFormattingProcessor.ParseParameterFormatting(value);
 
                 yield return Instruction.Create(OpCodes.Ldarg_0);
@@ -311,15 +312,22 @@ public class AsyncMethodProcessor
 
                 for (var i = 0; i < info.ParameterNames.Count; i++)
                 {
+                    var parameterName = info.ParameterNames[i];
+
                     yield return Instruction.Create(OpCodes.Dup);
                     yield return Instruction.Create(OpCodes.Ldc_I4, i);
 
-                    var field = stateMachineType.Fields.FirstOrDefault(x => x.Name.Equals(info.ParameterNames[i]));
-                    if (field == null)
+                    if (string.Equals(parameterName, "this"))
                     {
-                        ModuleWeaver.LogError($"Parameter '{info.ParameterNames[i]}' is not available on the async state machine. Probably it has been optimized away by the compiler. Please update the format so it excludes this parameter.");
+                        // Field name is <>4__this
+                        parameterName = "<>4__this";
+                    }
 
-                        yield return Instruction.Create(OpCodes.Ldnull);
+                    var field = stateMachineType.Fields.FirstOrDefault(x => x.Name.Equals(parameterName));
+                    if (field is null)
+                    {
+                        ModuleWeaver.LogError($"Parameter '{parameterName}' is not available on the async state machine. Probably it has been optimized away by the compiler. Please update the format so it excludes this parameter.");
+                        yield break;
                     }
                     else
                     {

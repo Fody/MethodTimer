@@ -68,7 +68,7 @@ public class WithTimeSpanInterceptorAndFormattingTests
 
         var type = testResult.Assembly.GetType("ClassWithMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
-        instance.Method("123", 42);
+        instance.MethodWithThis("123", 42);
 
         var methodBases = GetMethodInfoField();
         Assert.Single(methodBases);
@@ -81,7 +81,7 @@ public class WithTimeSpanInterceptorAndFormattingTests
         Assert.Single(messages);
 
         var message = messages.First();
-        Assert.Equal("Current object: '{TEST VALUE}' | File name '123' with id '42'", message);
+        Assert.Equal("Current object: 'TEST VALUE' | File name '123' with id '42'", message);
 
         // Note: must prefer TimeSpan above long
         var interceptorTypes = GetInterceptorTypesField();
@@ -160,7 +160,7 @@ public class WithTimeSpanInterceptorAndFormattingTests
         var instance = (dynamic)Activator.CreateInstance(type);
         TraceRunner.Capture(() =>
         {
-            var task = (Task)instance.MethodWithAwaitAsync("123", 42);
+            var task = (Task)instance.MethodWithAwaitAndThisAsync("123", 42);
             task.Wait();
         });
 
@@ -174,7 +174,7 @@ public class WithTimeSpanInterceptorAndFormattingTests
         Assert.Single(messages);
 
         var message = messages.First();
-        Assert.Equal("Current object: '{TEST VALUE}' | File name '123' with id '42'", message);
+        Assert.Equal("Current object: 'TEST VALUE' | File name '123' with id '42'", message);
 
         // Note: must prefer TimeSpan above long
         var interceptorTypes = GetInterceptorTypesField();

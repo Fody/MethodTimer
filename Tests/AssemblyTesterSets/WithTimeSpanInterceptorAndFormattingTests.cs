@@ -62,6 +62,36 @@ public class WithTimeSpanInterceptorAndFormattingTests
     }
 
     [Fact]
+    public void ClassWithMethodAndThis()
+    {
+        ClearMessage();
+
+        var type = testResult.Assembly.GetType("ClassWithMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        instance.Method("123", 42);
+
+        var methodBases = GetMethodInfoField();
+        Assert.Single(methodBases);
+
+        var methodBase = methodBases.First();
+        Assert.Equal("MethodWithThis", methodBase.Name);
+        Assert.Equal(methodBase.DeclaringType, type);
+
+        var messages = GetMessagesField();
+        Assert.Single(messages);
+
+        var message = messages.First();
+        Assert.Equal("Current object: '{TEST VALUE}' | File name '123' with id '42'", message);
+
+        // Note: must prefer TimeSpan above long
+        var interceptorTypes = GetInterceptorTypesField();
+        Assert.Single(interceptorTypes);
+
+        var interceptorType = interceptorTypes.First();
+        Assert.Equal(InterceptorType.TimeSpan.ToString(), interceptorType);
+    }
+
+    [Fact]
     public void ClassWithMethodWithoutFormatting()
     {
         ClearMessage();
@@ -112,6 +142,39 @@ public class WithTimeSpanInterceptorAndFormattingTests
 
         var message = messages.First();
         Assert.Equal("File name '123' with id '42'", message);
+
+        // Note: must prefer TimeSpan above long
+        var interceptorTypes = GetInterceptorTypesField();
+        Assert.Single(interceptorTypes);
+
+        var interceptorType = interceptorTypes.First();
+        Assert.Equal(InterceptorType.TimeSpan.ToString(), interceptorType);
+    }
+
+    [Fact]
+    public void ClassWithAsyncAndThisMethod()
+    {
+        ClearMessage();
+
+        var type = testResult.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        TraceRunner.Capture(() =>
+        {
+            var task = (Task)instance.MethodWithAwaitAsync("123", 42);
+            task.Wait();
+        });
+
+        var methodBases = GetMethodInfoField();
+        Assert.Single(methodBases);
+
+        var methodBase = methodBases.First();
+        Assert.Equal("MethodWithAwaitAndThisAsync", methodBase.Name);
+
+        var messages = GetMessagesField();
+        Assert.Single(messages);
+
+        var message = messages.First();
+        Assert.Equal("Current object: '{TEST VALUE}' | File name '123' with id '42'", message);
 
         // Note: must prefer TimeSpan above long
         var interceptorTypes = GetInterceptorTypesField();

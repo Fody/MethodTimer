@@ -16,6 +16,12 @@ public class ClassWithMethod
         Thread.Sleep(10);
     }
 
+    [Time("Current object: '{this}' | File name '{fileName}' with id '{id}'")]
+    public void MethodWithThis(string fileName, int id)
+    {
+        Thread.Sleep(10);
+    }
+
     public void Method_Expected(string fileName, int id)
     {
         var stopwatch = Stopwatch.StartNew();
@@ -29,5 +35,10 @@ public class ClassWithMethod
             var methodTimerMessage = string.Format("File name '{0}' with id '{1}'", new object [] { fileName, id });
             MethodTimeLogger.Log(null, stopwatch.ElapsedMilliseconds, methodTimerMessage);
         }
+    }
+
+    public override string ToString()
+    {
+        return $"TEST VALUE";
     }
 }

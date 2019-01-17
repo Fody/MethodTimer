@@ -4,10 +4,10 @@ public static class IgnoreCodes
 {
     public static IEnumerable<string> GetIgnoreCoders()
     {
-#if NET471
+#if NET472
         return System.Linq.Enumerable.Empty<string>();
 #endif
-#if NETCOREAPP2_1
+#if NETCOREAPP2_2
         return new[] { "0x80131869" };
 #endif
     }

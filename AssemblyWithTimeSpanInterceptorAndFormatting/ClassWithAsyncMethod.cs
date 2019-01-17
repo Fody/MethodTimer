@@ -15,6 +15,16 @@ public class ClassWithAsyncMethod
         Console.Write(id);
     }
 
+    [Time("Current object: '{this}' | File name '{fileName}' with id '{id}'")]
+    public async Task MethodWithAwaitAndThisAsync(string fileName, int id)
+    {
+        await Task.Delay(500);
+
+        // Use so the compiler won't optimize
+        Console.Write(fileName);
+        Console.Write(id);
+    }
+
     [Time]
     public async Task MethodWithAwaitWithoutFormattingAsync(string fileName, int id)
     {
@@ -70,5 +80,10 @@ public class ClassWithAsyncMethod
         }
 
         isRunning = false;
+    }
+
+    public override string ToString()
+    {
+        return $"TEST VALUE";
     }
 }

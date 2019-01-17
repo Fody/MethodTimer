@@ -77,7 +77,7 @@ public partial class ModuleWeaver
 
     IEnumerable<Instruction> ProcessTimeAttribute(MethodDefinition methodDefinition, VariableDefinition formattedVariableDefinition)
     {
-// Load everything for a string format
+        // Load everything for a string format
         var timeAttribute = methodDefinition.GetTimeAttribute();
         if (timeAttribute != null)
         {
@@ -92,16 +92,26 @@ public partial class ModuleWeaver
 
                 for (var i = 0; i < info.ParameterNames.Count; i++)
                 {
-                    var parameter = methodDefinition.Parameters.First(x => x.Name.Equals(info.ParameterNames[i]));
+                    // Note: no need to validate, already done in AssemblyProcessor::ProcessMethod
+                    var parameterName = info.ParameterNames[i];
 
                     yield return Instruction.Create(OpCodes.Dup);
                     yield return Instruction.Create(OpCodes.Ldc_I4, i);
-                    yield return Instruction.Create(OpCodes.Ldarg, parameter);
 
-                    if (parameter.ParameterType.IsBoxingRequired(TypeSystem.ObjectReference))
+                    if (string.Equals(parameterName, "this"))
                     {
-                        yield return Instruction.Create(OpCodes.Box,
-                            ModuleDefinition.ImportReference(parameter.ParameterType));
+                        // IL_0028: ldarg.0  
+                        yield return Instruction.Create(OpCodes.Ldarg_0);
+                    }
+                    else
+                    {
+                        var parameter = methodDefinition.Parameters.First(x => x.Name.Equals(parameterName));
+                        yield return Instruction.Create(OpCodes.Ldarg, parameter);
+
+                        if (parameter.ParameterType.IsBoxingRequired(TypeSystem.ObjectReference))
+                        {
+                            yield return Instruction.Create(OpCodes.Box, ModuleDefinition.ImportReference(parameter.ParameterType));
+                        }
                     }
 
                     yield return Instruction.Create(OpCodes.Stelem_Ref);

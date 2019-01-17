@@ -92,11 +92,22 @@ public partial class ModuleWeaver
                 for (var i = 0; i < info.ParameterNames.Count; i++)
                 {
                     var parameterName = info.ParameterNames[i];
-                    var containsParameter = method.Parameters.Any(x => x.Name.Equals(parameterName));
-                    if (!containsParameter)
+                    if (string.Equals(parameterName, "this"))
                     {
-                        hasErrors = true;
-                        LogError(string.Format("Could not process '" + method.FullName + "' because the format uses '{0}' which is not available as method parameter.", parameterName));
+                        if (method.IsStatic)
+                        {
+                            hasErrors = true;
+                            LogError($"Could not process '{method.FullName}' because the format uses 'this' in a static context.");
+                        }
+                    }
+                    else
+                    {
+                        var containsParameter = method.Parameters.Any(x => x.Name.Equals(parameterName));
+                        if (!containsParameter)
+                        {
+                            hasErrors = true;
+                            LogError($"Could not process '{method.FullName}' because the format uses '{parameterName}' which is not available as method parameter.");
+                        }
                     }
                 }
 

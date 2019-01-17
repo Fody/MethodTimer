@@ -17,6 +17,7 @@
     <ProjectReference Include="..\AssemblyWithAttributeOnAssembly\AssemblyWithAttributeOnAssembly.csproj" />
     <ProjectReference Include="..\AssemblyWithAttributeOnModule\AssemblyWithAttributeOnModule.csproj" />
     <ProjectReference Include="..\AssemblyWithInterceptorAndFormattingWithoutOverload\AssemblyWithInterceptorAndFormattingWithoutOverload.csproj" />
+    <ProjectReference Include="..\AssemblyWithInterceptorAndFormattingWithThisInStaticMember\AssemblyWithInterceptorAndFormattingWithThisInStaticMember.csproj" />
     <ProjectReference Include="..\AssemblyWithInterceptorAndFormattingWithWrongParameters\AssemblyWithInterceptorAndFormattingWithWrongParameters.csproj" />
     <ProjectReference Include="..\AssemblyWithInterceptorAndFormatting\AssemblyWithInterceptorAndFormatting.csproj" />
     <ProjectReference Include="..\AssemblyWIthInterceptorInReference\AssemblyWithInterceptorInReference.csproj" />

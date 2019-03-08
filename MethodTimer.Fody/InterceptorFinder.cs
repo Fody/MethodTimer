@@ -31,8 +31,8 @@ public partial class ModuleWeaver
             LogMethodUsingTimeSpan = FindLogMethod(interceptor, TimeSpanType);
             LogWithMessageMethodUsingTimeSpan = FindLogWithMessageMethod(interceptor, TimeSpanType);
 
-            if (LogMethodUsingLong == null && LogWithMessageMethodUsingLong == null &&
-                LogMethodUsingTimeSpan == null && LogWithMessageMethodUsingTimeSpan == null)
+            if (LogMethodUsingLong is null && LogWithMessageMethodUsingLong is null &&
+                LogMethodUsingTimeSpan is null && LogWithMessageMethodUsingTimeSpan is null)
             {
                 throw new WeavingException($"Could not find 'Log' method on '{interceptor.FullName}'.");
             }
@@ -62,7 +62,7 @@ public partial class ModuleWeaver
             interceptor = moduleDefinition
                 .GetTypes()
                 .FirstOrDefault(x => x.IsInterceptor());
-            if (interceptor == null)
+            if (interceptor is null)
             {
                 continue;
             }
@@ -97,8 +97,8 @@ public partial class ModuleWeaver
                 LogWithMessageMethodUsingTimeSpan = ModuleDefinition.ImportReference(logWithMessageMethodUsingTimeSpan);
             }
 
-            if (LogMethodUsingLong == null && LogWithMessageMethodUsingLong == null &&
-                LogMethodUsingTimeSpan == null && LogWithMessageMethodUsingTimeSpan == null)
+            if (LogMethodUsingLong is null && LogWithMessageMethodUsingLong is null &&
+                LogMethodUsingTimeSpan is null && LogWithMessageMethodUsingTimeSpan is null)
             {
                 throw new WeavingException($"Could not find 'Log' method on '{interceptor.FullName}'.");
             }
@@ -114,7 +114,7 @@ public partial class ModuleWeaver
                                                                x.Parameters.Count == 2 &&
                                                                x.Parameters[0].ParameterType.FullName == requiredParameterTypes[0] &&
                                                                x.Parameters[1].ParameterType.FullName == requiredParameterTypes[1]);
-        if (logMethod == null)
+        if (logMethod is null)
         {
             return null;
         }
@@ -135,7 +135,7 @@ public partial class ModuleWeaver
                                                                     x.Parameters[0].ParameterType.FullName == requiredParameterTypes[0] &&
                                                                     x.Parameters[1].ParameterType.FullName == requiredParameterTypes[1] &&
                                                                     x.Parameters[2].ParameterType.FullName == requiredParameterTypes[2]);
-        if (logMethod == null)
+        if (logMethod is null)
         {
             return null;
         }

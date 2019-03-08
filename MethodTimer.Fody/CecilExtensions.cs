@@ -87,7 +87,7 @@ public static class CecilExtensions
 
     public static bool IsYield(this MethodDefinition method)
     {
-        if (method.ReturnType == null)
+        if (method.ReturnType is null)
         {
             return false;
         }
@@ -118,7 +118,7 @@ public static class CecilExtensions
     public static MethodDefinition Method(this TypeDefinition type, string name)
     {
         var method = type.Methods.FirstOrDefault(x => x.Name == name);
-        if (method == null)
+        if (method is null)
         {
             throw new Exception($"Could not find method '{name}' on type {type.FullName}.");
         }
@@ -133,7 +133,7 @@ public static class CecilExtensions
                    parameters.Length == x.Parameters.Count &&
                    x.Parameters.Select(y => y.ParameterType.Name).SequenceEqual(parameters);
         });
-        if (method == null)
+        if (method is null)
         {
             throw new Exception($"Could not find method '{name}' on type {type.FullName}.");
         }
@@ -143,7 +143,7 @@ public static class CecilExtensions
     public static TypeDefinition Type(this List<TypeDefinition> types, string name)
     {
         var type = types.FirstOrDefault(x => x.Name == name);
-        if (type == null)
+        if (type is null)
         {
             throw new Exception($"Could not find type '{name}'.");
         }

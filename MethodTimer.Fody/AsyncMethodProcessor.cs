@@ -53,7 +53,7 @@ public class AsyncMethodProcessor
                                      fieldReference != null &&
                                      fieldReference.Name.Contains("__state")
                                select instruction).FirstOrDefault();
-        if (firstStateUsage == null)
+        if (firstStateUsage is null)
         {
             // Probably compiled without roslyn, inject at first line
             index = 0;
@@ -87,7 +87,7 @@ public class AsyncMethodProcessor
         body.Insert(index, new[]
         {
             // This code looks like this:
-            // if (_stopwatch == null)
+            // if (_stopwatch is null)
             // {
             //    _stopwatch = Stopwatch.StartNew();
             // }
@@ -220,9 +220,9 @@ public class AsyncMethodProcessor
         var logMethodUsingLong = ModuleWeaver.LogMethodUsingLong;
         var logMethodUsingTimeSpan = ModuleWeaver.LogMethodUsingTimeSpan;
 
-        if (logWithMessageMethodUsingLong == null && logWithMessageMethodUsingTimeSpan == null)
+        if (logWithMessageMethodUsingLong is null && logWithMessageMethodUsingTimeSpan is null)
         {
-            if (logMethodUsingLong == null && logMethodUsingTimeSpan == null)
+            if (logMethodUsingLong is null && logMethodUsingTimeSpan is null)
             {
                 yield return Instruction.Create(OpCodes.Ldstr, methodDefinition.MethodName());
                 yield return Instruction.Create(OpCodes.Ldarg_0);
@@ -241,7 +241,7 @@ public class AsyncMethodProcessor
             yield return Instruction.Create(OpCodes.Ldarg_0);
             yield return Instruction.Create(OpCodes.Ldfld, stopwatchField);
 
-            if (logMethodUsingTimeSpan == null)
+            if (logMethodUsingTimeSpan is null)
             {
                 yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);
                 yield return Instruction.Create(OpCodes.Call, logMethodUsingLong);
@@ -260,7 +260,7 @@ public class AsyncMethodProcessor
         // 2. The ldarg_0 calls are required to load the state machine class and is required before every field call.
 
         var formattedFieldDefinition = stateMachineType.Fields.FirstOrDefault(x => x.Name.Equals("methodTimerMessage"));
-        if (formattedFieldDefinition == null)
+        if (formattedFieldDefinition is null)
         {
             formattedFieldDefinition = new FieldDefinition("methodTimerMessage", FieldAttributes.Private | FieldAttributes.CompilerControlled, ModuleWeaver.TypeSystem.StringReference);
             stateMachineType.Fields.Add(formattedFieldDefinition);
@@ -278,7 +278,7 @@ public class AsyncMethodProcessor
         yield return Instruction.Create(OpCodes.Ldarg_0);
         yield return Instruction.Create(OpCodes.Ldfld, stopwatchField);
 
-        if (logWithMessageMethodUsingTimeSpan == null)
+        if (logWithMessageMethodUsingTimeSpan is null)
         {
             yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);
             yield return Instruction.Create(OpCodes.Ldarg_0);

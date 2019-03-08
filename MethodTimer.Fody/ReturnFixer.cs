@@ -47,7 +47,7 @@ public class ReturnFixer
         Method.Body.Instructions.Add(NopForHandleEnd);
         foreach (var handler in Method.Body.ExceptionHandlers)
         {
-            if (handler.HandlerStart != null && handler.HandlerEnd == null)
+            if (handler.HandlerStart != null && handler.HandlerEnd is null)
             {
                 handler.HandlerEnd = NopForHandleEnd;
             }

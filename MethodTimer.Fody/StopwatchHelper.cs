@@ -16,9 +16,9 @@ public partial class ModuleWeaver
         var logMethodUsingLong = LogMethodUsingLong;
         var logMethodUsingTimeSpan = LogMethodUsingTimeSpan;
 
-        if (logWithMessageMethodUsingLong == null && logWithMessageMethodUsingTimeSpan == null)
+        if (logWithMessageMethodUsingLong is null && logWithMessageMethodUsingTimeSpan is null)
         {
-            if (logMethodUsingLong == null && logMethodUsingTimeSpan == null)
+            if (logMethodUsingLong is null && logMethodUsingTimeSpan is null)
             {
                 yield return Instruction.Create(OpCodes.Ldstr, methodDefinition.MethodName());
                 yield return Instruction.Create(OpCodes.Ldloc, stopwatchVariableDefinition);
@@ -62,7 +62,7 @@ public partial class ModuleWeaver
         yield return Instruction.Create(OpCodes.Call, GetMethodFromHandle);
         yield return Instruction.Create(OpCodes.Ldloc, stopwatchVariableDefinition);
 
-        if (logWithMessageMethodUsingTimeSpan == null)
+        if (logWithMessageMethodUsingTimeSpan is null)
         {
             yield return Instruction.Create(OpCodes.Call, ElapsedMilliseconds);
             yield return Instruction.Create(OpCodes.Ldloc, formattedVariableDefinition);

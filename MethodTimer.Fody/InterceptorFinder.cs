@@ -85,13 +85,13 @@ public partial class ModuleWeaver
                 LogWithMessageMethodUsingLong = ModuleDefinition.ImportReference(logWithMessageMethodUsingLong);
             }
 
-            var logMethodUsingTimeSpan = FindLogMethod(interceptor, LongType);
+            var logMethodUsingTimeSpan = FindLogMethod(interceptor, TimeSpanType);
             if (logMethodUsingTimeSpan != null)
             {
                 LogMethodUsingTimeSpan = ModuleDefinition.ImportReference(logMethodUsingTimeSpan);
             }
 
-            var logWithMessageMethodUsingTimeSpan = FindLogWithMessageMethod(interceptor, LongType);
+            var logWithMessageMethodUsingTimeSpan = FindLogWithMessageMethod(interceptor, TimeSpanType);
             if (logWithMessageMethodUsingTimeSpan != null)
             {
                 LogWithMessageMethodUsingTimeSpan = ModuleDefinition.ImportReference(logWithMessageMethodUsingTimeSpan);

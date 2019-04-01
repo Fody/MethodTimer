@@ -324,7 +324,7 @@ public class AsyncMethodProcessor
                         if (!stateMachineType.Fields.Any(x => x.Name.Equals(parameterName)))
                         {
                             // {this} could be optimized away, let's add it for the user
-                            InjectThisIntoStateMachine(methodDefinition, stateMachineType);
+                            InjectThisIntoStateMachine(methodDefinition);
                         }
                     }
 
@@ -361,7 +361,7 @@ public class AsyncMethodProcessor
         }
     }
 
-    void InjectThisIntoStateMachine(MethodDefinition methodDefinition, TypeDefinition stateMachineType)
+    void InjectThisIntoStateMachine(MethodDefinition methodDefinition)
     {
         // Step 1: inject the field
         var thisField = new FieldDefinition("<>4__this", FieldAttributes.Public, methodDefinition.DeclaringType);

@@ -80,7 +80,6 @@ public class MethodProcessor
         return body.Instructions.First();
     }
 
-
     Instruction FixReturns()
     {
         var instructions = body.Instructions;
@@ -107,17 +106,16 @@ public class MethodProcessor
             var instruction = instructions[index];
             if (instruction.OpCode == OpCodes.Ret)
             {
-                instruction.OpCode = OpCodes.Leave;
-                instruction.Operand = lastLd;
-                instructions.Insert(index, Instruction.Create(OpCodes.Stloc, returnVariable));
+                instruction.OpCode = OpCodes.Stloc;
+                instruction.Operand = returnVariable;
                 index++;
+                instructions.Insert(index, Instruction.Create(OpCodes.Leave, lastLd));
             }
         }
         instructions.Add(lastLd);
         instructions.Add(Instruction.Create(OpCodes.Ret));
         return lastLd;
     }
-
     void InjectIlForFinally(Instruction beforeThis)
     {
         foreach (var instruction in ModuleWeaver.GetWriteTimeInstruction(stopwatchVar, Method))

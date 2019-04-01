@@ -26,6 +26,19 @@ public class WithInterceptorTests
     }
 
     [Fact]
+    public void ClassWithExpressionBodiedMember()
+    {
+        ClearMessage();
+        var type = testResult.Assembly.GetType("ClassWithExpressionBodiedMember");
+        var instance = (dynamic) Activator.CreateInstance(type);
+        instance.Method();
+        var methodBases = GetMethodInfoField();
+        var methodBase = methodBases.First();
+        Assert.Equal("get_FooBar", methodBase.Name);
+        Assert.Equal(methodBase.DeclaringType, type);
+    }
+
+    [Fact]
     public void ClassWithMethod()
     {
         ClearMessage();

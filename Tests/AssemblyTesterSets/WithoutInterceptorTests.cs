@@ -194,6 +194,15 @@ public class WithoutInterceptorTests
     }
 
     [Fact]
+    public void ClassWithExpressionBodiedMember()
+    {
+        var type = testResult.Assembly.GetType("ClassWithExpressionBodiedMember");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        var message = TraceRunner.Capture(() => instance.Method());
+        Assert.StartsWith("ClassWithExpressionBodiedMember.get_FooBar ", message.First());
+    }
+
+    [Fact]
     public void ClassWithAttribute()
     {
         var type = testResult.Assembly.GetType("ClassWithAttribute");

@@ -387,7 +387,7 @@ public class AsyncMethodProcessor
 
         if (startInstruction is null)
         {
-            ModuleWeaver.LogError($"Failed to inject '{{this}}' into the async method, the compiler optimized it away and it could not be injected automatically, please create a support ticket.");
+            ModuleWeaver.LogError("Failed to inject '{this}' into the async method, the compiler optimized it away and it could not be injected automatically, please create a support ticket.");
             return;
         }
 

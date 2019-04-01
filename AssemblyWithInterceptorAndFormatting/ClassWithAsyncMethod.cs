@@ -84,6 +84,6 @@ public class ClassWithAsyncMethod
 
     public override string ToString()
     {
-        return $"TEST VALUE";
+        return "TEST VALUE";
     }
 }

@@ -54,6 +54,6 @@ public class ClassWithMethod
 
     public override string ToString()
     {
-        return $"TEST VALUE";
+        return "TEST VALUE";
     }
 }

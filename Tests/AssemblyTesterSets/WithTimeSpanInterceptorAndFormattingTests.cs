@@ -5,9 +5,10 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Fody;
 using Xunit;
-#pragma warning disable 618
+using Xunit.Abstractions;
 
-public class WithTimeSpanInterceptorAndFormattingTests
+public class WithTimeSpanInterceptorAndFormattingTests :
+    XunitLoggingBase
 {
     static FieldInfo methodBaseField;
     static FieldInfo messagesField;
@@ -336,5 +337,10 @@ public class WithTimeSpanInterceptorAndFormattingTests
     List<string> GetInterceptorTypesField()
     {
         return (List<string>)interceptorTypesField.GetValue(null);
+    }
+
+    public WithTimeSpanInterceptorAndFormattingTests(ITestOutputHelper output) :
+        base(output)
+    {
     }
 }

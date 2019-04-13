@@ -3,9 +3,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Fody;
 using Xunit;
-#pragma warning disable 618
+using Xunit.Abstractions;
 
-public class AssemblyWithAttributeOnModuleTests
+public class AssemblyWithAttributeOnModuleTests :
+    XunitLoggingBase
 {
     static TestResult testResult;
 
@@ -59,5 +60,10 @@ public class AssemblyWithAttributeOnModuleTests
         Assert.Empty(message);
         //TODO: support yield
         //Assert.True(message.First().StartsWith("ClassWithCompilerGeneratedTypes.YieldMethod "));
+    }
+
+    public AssemblyWithAttributeOnModuleTests(ITestOutputHelper output) : 
+        base(output)
+    {
     }
 }

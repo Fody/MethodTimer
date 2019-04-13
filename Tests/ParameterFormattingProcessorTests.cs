@@ -1,6 +1,8 @@
 ﻿using Xunit;
+using Xunit.Abstractions;
 
-public class ParameterFormattingProcessorTests
+public class ParameterFormattingProcessorTests :
+    XunitLoggingBase
 {
     [Theory]
     [InlineData(null, "")]
@@ -38,5 +40,10 @@ public class ParameterFormattingProcessorTests
         Assert.Equal("This is a {0} test with id = '{1}' and {0} but don't replace fileName", info.Format);
         Assert.Equal("fileName", info.ParameterNames[0]);
         Assert.Equal("id", info.ParameterNames[1]);
+    }
+
+    public ParameterFormattingProcessorTests(ITestOutputHelper output) :
+        base(output)
+    {
     }
 }

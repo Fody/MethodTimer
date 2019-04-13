@@ -1,9 +1,10 @@
 ﻿using System;
 using Fody;
 using Xunit;
-#pragma warning disable 618
+using Xunit.Abstractions;
 
-public class WithNopInterceptorTests
+public class WithNopInterceptorTests :
+    XunitLoggingBase
 {
     static TestResult testResult;
 
@@ -26,5 +27,10 @@ public class WithNopInterceptorTests
         var type = testResult.Assembly.GetType("ClassWithMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
         instance.Method();
+    }
+
+    public WithNopInterceptorTests(ITestOutputHelper output) :
+        base(output)
+    {
     }
 }

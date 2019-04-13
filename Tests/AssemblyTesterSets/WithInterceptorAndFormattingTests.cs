@@ -5,9 +5,10 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Fody;
 using Xunit;
-#pragma warning disable 618
+using Xunit.Abstractions;
 
-public class WithInterceptorAndFormattingTests
+public class WithInterceptorAndFormattingTests :
+    XunitLoggingBase
 {
     static FieldInfo methodBaseField;
     static FieldInfo messagesField;
@@ -214,5 +215,10 @@ public class WithInterceptorAndFormattingTests
     List<string> GetMessagesField()
     {
         return (List<string>)messagesField.GetValue(null);
+    }
+
+    public WithInterceptorAndFormattingTests(ITestOutputHelper output) :
+        base(output)
+    {
     }
 }

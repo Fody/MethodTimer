@@ -3,9 +3,10 @@ using System.Linq;
 using System.Reflection;
 using Fody;
 using Xunit;
-#pragma warning disable 618
+using Xunit.Abstractions;
 
-public class WithInterceptorInReferenceTests
+public class WithInterceptorInReferenceTests :
+    XunitLoggingBase
 {
     static FieldInfo methodBaseField;
     static TestResult testResult;
@@ -46,5 +47,10 @@ public class WithInterceptorInReferenceTests
     List<MethodBase> GetMethodInfoField()
     {
         return (List<MethodBase>)methodBaseField.GetValue(null);
+    }
+
+    public WithInterceptorInReferenceTests(ITestOutputHelper output) :
+        base(output)
+    {
     }
 }

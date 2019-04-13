@@ -4,9 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Fody;
 using Xunit;
-#pragma warning disable 618
+using Xunit.Abstractions;
 
-public class WithoutInterceptorTests
+public class WithoutInterceptorTests :
+    XunitLoggingBase
 {
     static TestResult testResult;
 
@@ -278,5 +279,10 @@ public class WithoutInterceptorTests
         var message = TraceRunner.Capture(() => Activator.CreateInstance(type));
         Assert.Single(message);
         Assert.True(message[0].StartsWith("InheritedClassDoingConstructionCall.ctor "), message[0]);
+    }
+
+    public WithoutInterceptorTests(ITestOutputHelper output) :
+        base(output)
+    {
     }
 }

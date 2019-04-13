@@ -5,9 +5,10 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Fody;
 using Xunit;
-#pragma warning disable 618
+using Xunit.Abstractions;
 
-public class WithInterceptorTests
+public class WithInterceptorTests :
+    XunitLoggingBase
 {
     static FieldInfo methodBaseField;
     static TestResult testResult;
@@ -137,5 +138,10 @@ public class WithInterceptorTests
 
         var methodBase = methodBases.Last();
         Assert.Equal("MethodWithFastPathAsync", methodBase.Name);
+    }
+
+    public WithInterceptorTests(ITestOutputHelper output) :
+        base(output)
+    {
     }
 }

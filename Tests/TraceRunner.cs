@@ -3,22 +3,20 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 
-public class TraceRunner
+public static class TraceRunner
 {
-    public static List<string> Capture(Action action)
+    static TraceRunner()
     {
         var myTraceListener = new MyTraceListener();
-        try
-        {
-            Trace.Listeners.Add(myTraceListener);
-            action();
-            Thread.Sleep(100);
-        }
-        finally
-        {
-            Trace.Listeners.Remove(myTraceListener);
-        }
-        return myTraceListener.Messages;
+        Trace.Listeners.Add(myTraceListener);
     }
 
+    public static List<string> Capture(Action action)
+    {
+        var list = new List<string>();
+        MyTraceListener.Messages.Value = list;
+        action();
+        Thread.Sleep(100);
+        return list;
+    }
 }

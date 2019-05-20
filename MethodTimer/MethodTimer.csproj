@@ -9,7 +9,7 @@
     <PackageTags>Stopwatch, Performance, ILWeaving, Fody, Cecil</PackageTags>
     <PackageOutputPath>$(SolutionDir)nugets</PackageOutputPath>
     <PackageIconUrl>https://raw.githubusercontent.com/Fody/MethodTimer/master/package_icon.png</PackageIconUrl>
-    <PackageProjectUrl>http://github.com/Fody/MethodTimer</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/Fody/MethodTimer</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
   <ItemGroup>

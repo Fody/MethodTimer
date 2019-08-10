@@ -223,4 +223,4 @@ At compile time this attribute and all usages to it will be removed from the tar
 
 ## Icon
 
-Icon courtesy of [The Noun Project](http://thenounproject.com)
+Icon courtesy of [The Noun Project](https://thenounproject.com)

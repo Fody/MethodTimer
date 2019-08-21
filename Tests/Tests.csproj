@@ -6,7 +6,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
-    <PackageReference Include="FodyHelpers" Version="6.0.0-beta.1" />
+    <PackageReference Include="FodyHelpers" Version="6.0.0" />
     <PackageReference Include="FluentDateTime" Version="1.16.0" />
     <PackageReference Include="Xunit" Version="2.4.1" />
     <PackageReference Include="XunitLogger" Version="2.5.0" />

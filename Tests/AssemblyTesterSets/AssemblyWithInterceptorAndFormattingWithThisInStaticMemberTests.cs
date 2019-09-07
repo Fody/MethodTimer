@@ -4,7 +4,7 @@ using Xunit;
 using Xunit.Abstractions;
 
 public class AssemblyWithInterceptorAndFormattingWithThisInStaticMemberTests :
-    XunitLoggingBase
+    XunitApprovalBase
 {
     [Fact]
     public void RaisesErrorForThisInStaticMember()

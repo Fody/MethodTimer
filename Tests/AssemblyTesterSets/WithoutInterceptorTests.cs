@@ -7,7 +7,7 @@ using Xunit;
 using Xunit.Abstractions;
 
 public class WithoutInterceptorTests :
-    XunitLoggingBase
+    XunitApprovalBase
 {
     static TestResult testResult;
 

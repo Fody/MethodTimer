@@ -8,7 +8,7 @@ using Xunit;
 using Xunit.Abstractions;
 
 public class WithInterceptorAndFormattingTests :
-    XunitLoggingBase
+    XunitApprovalBase
 {
     static FieldInfo methodBaseField;
     static FieldInfo messagesField;

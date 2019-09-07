@@ -6,7 +6,7 @@ using Xunit;
 using Xunit.Abstractions;
 
 public class AssemblyWithAttributeOnModuleTests :
-    XunitLoggingBase
+    XunitApprovalBase
 {
     static TestResult testResult;
 

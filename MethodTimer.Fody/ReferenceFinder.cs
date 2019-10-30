@@ -9,6 +9,7 @@ public partial class ModuleWeaver
     public TypeReference StopwatchType;
     public MethodReference StringFormatWithArray;
     public MethodReference ConcatMethod;
+    public MethodReference IsRunning;
     public MethodReference Elapsed;
     public MethodReference ElapsedMilliseconds;
     public MethodReference GetMethodFromHandle;
@@ -18,6 +19,7 @@ public partial class ModuleWeaver
     public MethodReference UtcNowMethod;
     public TypeReference DateTimeType;
     public TypeReference BooleanType;
+    public TypeReference VoidType;
 
     public void FindReferences()
     {
@@ -50,6 +52,9 @@ public partial class ModuleWeaver
         var booleanType = FindType("System.Boolean");
         BooleanType = ModuleDefinition.ImportReference(booleanType);
 
+        var voidType = FindType("System.Void");
+        VoidType = ModuleDefinition.ImportReference(voidType);
+
         if (TryFindType("System.Diagnostics.Stopwatch", out var stopwatchType))
         {
             StopwatchType = ModuleDefinition.ImportReference(stopwatchType);
@@ -57,6 +62,7 @@ public partial class ModuleWeaver
             StopMethod = ModuleDefinition.ImportReference(stopwatchType.Method("Stop"));
             Elapsed = ModuleDefinition.ImportReference(stopwatchType.Method("get_Elapsed"));
             ElapsedMilliseconds = ModuleDefinition.ImportReference(stopwatchType.Method("get_ElapsedMilliseconds"));
+            IsRunning = ModuleDefinition.ImportReference(stopwatchType.Method("get_IsRunning"));
         }
         else
         {

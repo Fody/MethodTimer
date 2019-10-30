@@ -11,6 +11,7 @@ public class WithInterceptorTests :
     XunitApprovalBase
 {
     static FieldInfo methodBaseField;
+    static FieldInfo messagesField;
     static TestResult testResult;
 
     static WithInterceptorTests()
@@ -22,8 +23,10 @@ public class WithInterceptorTests :
             , runPeVerify: false
 #endif
         );
+
         var methodTimeLogger = testResult.Assembly.GetType("MethodTimeLogger");
         methodBaseField = methodTimeLogger.GetField("MethodBase");
+        messagesField = methodTimeLogger.GetField("Messages");
     }
 
     [Fact]
@@ -56,11 +59,17 @@ public class WithInterceptorTests :
     void ClearMessage()
     {
         methodBaseField.SetValue(null, new List<MethodBase>());
+        messagesField.SetValue(null, new List<string>());
     }
 
     List<MethodBase> GetMethodInfoField()
     {
         return (List<MethodBase>) methodBaseField.GetValue(null);
+    }
+
+    List<string> GetMessagesField()
+    {
+        return (List<string>)messagesField.GetValue(null);
     }
 
     [Fact]
@@ -96,16 +105,15 @@ public class WithInterceptorTests :
     }
 
     [Fact]
-    public void ClassWithAsyncMethodThatThrowsException()
+    public async Task ClassWithAsyncMethodThatThrowsException()
     {
         var type = testResult.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic) Activator.CreateInstance(type);
-        TraceRunner.Capture(() =>
+        await TraceRunner.CaptureAsync(async () =>
         {
             try
             {
-                var task = (Task) instance.MethodWithAwaitAndExceptionAsync();
-                task.Wait();
+                await (Task) instance.MethodWithAwaitAndExceptionAsync();
             }
             catch (Exception)
             {
@@ -114,8 +122,40 @@ public class WithInterceptorTests :
         });
 
         var methodBases = GetMethodInfoField();
-        var methodBase = methodBases.Last();
-        Assert.Equal("MethodWithAwaitAndExceptionAsync", methodBase.Name);
+        
+        // Make sure there are no 2, see https://github.com/Fody/MethodTimer/issues/124
+        var allMethodBases = (from x in methodBases
+                              where x.Name.Equals("MethodWithAwaitAndExceptionAsync")
+                              select x).ToList();
+
+        Assert.Single(allMethodBases);
+    }
+
+    [Fact]
+    public async Task ClassWithAsyncMethodWithExceptionAsync()
+    {
+        var type = testResult.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        await TraceRunner.CaptureAsync(async () =>
+        {
+            try
+            {
+                await (Task)instance.MethodWithAwaitAndExceptionAsync();
+            }
+            catch (Exception)
+            {
+                // Expected
+            }
+        });
+
+        var methodBases = GetMethodInfoField();
+
+        // Make sure there are no 2, see https://github.com/Fody/MethodTimer/issues/124
+        var allMethodBases = (from x in methodBases
+                              where x.Name.Equals("MethodWithAwaitAndExceptionAsync")
+                              select x).ToList();
+
+        Assert.Single(allMethodBases);
     }
 
     [Theory]

@@ -151,8 +151,6 @@ public class AsyncMethodProcessor
             methodBody.Instructions.Add(instruction);
         }
 
-        methodBody.Instructions.Add(Instruction.Create(OpCodes.Ret));
-
         methodBody.InitLocals = true;
         methodBody.OptimizeMacros();
 
@@ -223,21 +221,16 @@ public class AsyncMethodProcessor
 
     IEnumerable<Instruction> GetWriteTimeInstruction(MethodDefinition method)
     {
-        var boolVariable = new VariableDefinition(ModuleWeaver.BooleanType.Resolve());
-        method.Body.Variables.Add(boolVariable);
-
-        var nopInstruction = Instruction.Create(OpCodes.Nop);
+        var startOfRealMethod = Instruction.Create(OpCodes.Ldarg_0);
 
         // Check if state machine is completed (state == -2)
         yield return Instruction.Create(OpCodes.Ldarg_0);
         yield return Instruction.Create(OpCodes.Ldfld, stateField);
         yield return Instruction.Create(OpCodes.Ldc_I4, -2);
-        yield return Instruction.Create(OpCodes.Ceq);
-        yield return Instruction.Create(OpCodes.Stloc, boolVariable);
-        yield return Instruction.Create(OpCodes.Ldloc, boolVariable);
-        yield return Instruction.Create(OpCodes.Brfalse_S, nopInstruction);
+        yield return Instruction.Create(OpCodes.Beq_S, startOfRealMethod);
+        yield return Instruction.Create(OpCodes.Ret);
 
-        yield return Instruction.Create(OpCodes.Ldarg_0);
+        yield return startOfRealMethod; // Ldarg_0
         yield return Instruction.Create(OpCodes.Ldfld, stopwatchField);
         yield return Instruction.Create(OpCodes.Call, ModuleWeaver.StopMethod);
 
@@ -321,7 +314,7 @@ public class AsyncMethodProcessor
             }
         }
 
-        yield return nopInstruction;
+        yield return Instruction.Create(OpCodes.Ret);
     }
 
     IEnumerable<Instruction> ProcessTimeAttribute(MethodDefinition methodDefinition, FieldDefinition formattedFieldDefinition)
@@ -345,25 +338,25 @@ public class AsyncMethodProcessor
                 {
                     var parameterName = info.ParameterNames[i];
 
-                    yield return Instruction.Create(OpCodes.Dup);
-                    yield return Instruction.Create(OpCodes.Ldc_I4, i);
-
                     if (string.Equals(parameterName, "this"))
                     {
                         // Field name is <>4__this
                         parameterName = "<>4__this";
-                        if (!stateMachineType.Fields.Any(x => x.Name.Equals(parameterName)))
-                        {
-                            // {this} could be optimized away, let's add it for the user
-                            InjectThisIntoStateMachine(methodDefinition);
-                        }
+
+                        // {this} could be optimized away, let's add it for the user
+                        InjectThisIntoStateMachine(methodDefinition);
                     }
+
+                    yield return Instruction.Create(OpCodes.Dup);
+                    yield return Instruction.Create(OpCodes.Ldc_I4, i);
 
                     var field = stateMachineType.Fields.FirstOrDefault(x => x.Name.Equals(parameterName));
                     if (field is null)
                     {
                         ModuleWeaver.LogError($"Parameter '{parameterName}' is not available on the async state machine. Probably it has been optimized away by the compiler. Please update the format so it excludes this parameter.");
-                        yield break;
+
+                        // To make sure the weaver still produces valid IL, pass in a null value
+                        yield return Instruction.Create(OpCodes.Ldnull);
                     }
                     else
                     {
@@ -394,8 +387,15 @@ public class AsyncMethodProcessor
 
     void InjectThisIntoStateMachine(MethodDefinition methodDefinition)
     {
+        const string fieldName = "<>4__this";
+
+        if (stateMachineType.Fields.Any(x => x.Name.Equals(fieldName)))
+        {
+            return;
+        }
+
         // Step 1: inject the field
-        var thisField = new FieldDefinition("<>4__this", FieldAttributes.Public, methodDefinition.DeclaringType);
+        var thisField = new FieldDefinition(fieldName, FieldAttributes.Public, methodDefinition.DeclaringType);
         stateMachineType.Fields.Add(thisField);
 
         // Step 2: set the field value in the actual method, search for the first usage of the state machine class

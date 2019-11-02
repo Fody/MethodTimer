@@ -32,7 +32,7 @@ public class ClassWithAsyncMethod
     [Time]
     public async Task MethodWithAwaitAndExceptionAsync()
     {
-        await Task.Factory.StartNew(() => { throw new Exception("Expected exception"); });
+        await Task.Factory.StartNew(() => throw new Exception("Expected exception"));
     }
 
     bool isRunning;
@@ -105,10 +105,7 @@ public class ClassWithAsyncMethod
 
     public async Task MethodWithExceptionAsync()
     {
-        await Task.Factory.StartNew(() =>
-        {
-            throw new ArgumentOutOfRangeException();
-        });
+        await Task.Factory.StartNew(() => throw new ArgumentOutOfRangeException());
     }
 
 }

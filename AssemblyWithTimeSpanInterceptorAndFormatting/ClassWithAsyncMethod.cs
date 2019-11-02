@@ -48,7 +48,7 @@ public class ClassWithAsyncMethod
         Console.Write(fileName);
         Console.Write(id);
 
-        await Task.Factory.StartNew(() => { throw new Exception("Expected exception"); });
+        await Task.Factory.StartNew(() => throw new Exception("Expected exception"));
     }
 
     bool isRunning;
@@ -67,7 +67,7 @@ public class ClassWithAsyncMethod
             return;
         }
 
-        // Use so we 
+        // Use so we
         Console.WriteLine();
 
         isRunning = true;

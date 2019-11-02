@@ -116,6 +116,7 @@ public class MethodProcessor
         instructions.Add(Instruction.Create(OpCodes.Ret));
         return lastLd;
     }
+
     void InjectIlForFinally(Instruction beforeThis)
     {
         foreach (var instruction in ModuleWeaver.GetWriteTimeInstruction(stopwatchVar, Method))
@@ -125,5 +126,4 @@ public class MethodProcessor
 
         body.InsertBefore(beforeThis, Instruction.Create(OpCodes.Endfinally));
     }
-
 }

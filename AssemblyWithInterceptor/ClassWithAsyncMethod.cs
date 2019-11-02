@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using MethodTimer;
 #pragma warning disable 414
+#pragma warning disable S112
 
 public class ClassWithAsyncMethod
 {
@@ -39,5 +41,28 @@ public class ClassWithAsyncMethod
         }
 
         isRunning = false;
+    }
+
+    [Time]
+    public async Task MethodWithExceptionAsync()
+    {
+        await Task.Delay(1000);
+        throw new Exception();
+    }
+
+    public async Task MethodWithExceptionAsync_Expected()
+    {
+        var sw = Stopwatch.StartNew();
+
+        try
+        {
+            await Task.Delay(1000);
+            throw new Exception();
+        }
+        finally
+        {
+            sw.Stop();
+            Trace.WriteLine($"Program.AsyncDelayWithTimer {sw.Elapsed}ms");
+        }
     }
 }

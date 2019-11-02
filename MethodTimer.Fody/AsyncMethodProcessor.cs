@@ -12,8 +12,9 @@ public class AsyncMethodProcessor
     public MethodDefinition Method;
     MethodBody body;
     FieldDefinition stopwatchField;
+    FieldDefinition stateField;
     TypeDefinition stateMachineType;
-    List<Instruction> returnPoints;
+    MethodDefinition stopStopwatchMethod;
     ParameterFormattingProcessor parameterFormattingProcessor = new ParameterFormattingProcessor();
 
     public void Process()
@@ -39,9 +40,6 @@ public class AsyncMethodProcessor
         body = moveNextMethod.Body;
 
         body.SimplifyMacros();
-
-        returnPoints = GetAsyncReturns(body.Instructions)
-            .ToList();
 
         // First, fall back to old mechanism
         int index;
@@ -70,14 +68,43 @@ public class AsyncMethodProcessor
             index = body.Instructions.IndexOf(firstStateUsage) - 1;
         }
 
-        InjectStopwatch(index, body.Instructions[index]);
+        stateField = (from x in stateMachineType.Fields
+                      where x.Name.EndsWith("__state")
+                      select x).First();
 
-        HandleReturns();
+        InjectStopwatchStart(index, body.Instructions[index]);
+        InjectStopwatchStopMethod();
+        InjectStopwatchStopCalls();
+
         body.InitLocals = true;
         body.OptimizeMacros();
     }
 
-    void InjectStopwatch(int index, Instruction nextInstruction)
+    Instruction FixReturns()
+    {
+        var instructions = body.Instructions;
+
+        // We inject both a nop and return. This allows us to inject between the nop
+        // and the return
+        var nop = Instruction.Create(OpCodes.Nop);
+        var lastRet = Instruction.Create(OpCodes.Ret);
+
+        foreach (var instruction in instructions)
+        {
+            if (instruction.OpCode == OpCodes.Ret)
+            {
+                instruction.OpCode = OpCodes.Leave;
+                instruction.Operand = nop;
+            }
+        }
+
+        instructions.Add(nop);
+        instructions.Add(lastRet);
+
+        return lastRet;
+    }
+
+    void InjectStopwatchStart(int index, Instruction nextInstruction)
     {
         var boolVariable = new VariableDefinition(ModuleWeaver.BooleanType.Resolve());
         body.Variables.Add(boolVariable);
@@ -105,112 +132,105 @@ public class AsyncMethodProcessor
         });
     }
 
-    void HandleReturns()
+    void InjectStopwatchStopMethod()
     {
-        foreach (var returnPoint in returnPoints)
+        if (stopStopwatchMethod != null)
         {
-            FixReturn(returnPoint);
+            return;
         }
+
+        var method = new MethodDefinition("StopMethodTimerStopwatch", MethodAttributes.Private, ModuleWeaver.VoidType);
+
+        var methodBody = method.Body;
+        methodBody.SimplifyMacros();
+
+        var stopwatchInstructions = GetWriteTimeInstruction(method).ToList();
+
+        foreach (var instruction in stopwatchInstructions)
+        {
+            methodBody.Instructions.Add(instruction);
+        }
+
+        methodBody.InitLocals = true;
+        methodBody.OptimizeMacros();
+
+        stateMachineType.Methods.Add(method);
+
+        stopStopwatchMethod = method;
     }
 
-    static IEnumerable<Instruction> GetAsyncReturns(Collection<Instruction> instructions)
+    void InjectStopwatchStopCalls()
     {
-        // There are 3 possible return points:
-        //
-        // 1) async code:
-        //      awaiter.GetResult();
-        //      awaiter = new TaskAwaiter();
-        //
-        // 2) exception handling
-        //      L_00d5: ldloc.1
-        //      L_00d6: call instance void [mscorlib]System.Runtime.CompilerServices.AsyncTaskMethodBuilder::SetException(class [mscorlib]System.Exception)
-        //
-        // 3) all other returns
-        //
-        // We can do this smart by searching for all leave and leave_S op codes and check if they point to the last
-        // instruction of the method. This equals a "return" call.
+        // There are 2 locations where the stopwatch logic should be injected:
+        // 1: just before the ::SetException
+        // 2: end of the method (which is not executed after calling ::SetException) or just after SetResult
 
-        var returnStatements = new List<Instruction>();
-
-        var possibleReturnStatements = new List<Instruction>();
-
-        // Look for the last leave statement (that is the line all "return" statements go to)
-        for (var i = instructions.Count - 1; i >= 0; i--)
+        var stopwatchInstructions = new List<Instruction>(new[]
         {
-            var instruction = instructions[i];
-            if (instruction.IsLeaveInstruction())
+            Instruction.Create(OpCodes.Ldarg_0),
+            Instruction.Create(OpCodes.Call, stopStopwatchMethod)
+        });
+
+        var returnInstruction = FixReturns();
+        var endInstruction = returnInstruction;
+
+        // 1: SetException: We will search for the last known catch block, and implement a finally there with the stopwatch code
+        var exceptionHandler = (from handler in body.ExceptionHandlers
+                                orderby handler.HandlerEnd.Offset descending
+                                select handler).FirstOrDefault();
+        if (exceptionHandler != null)
+        {
+            var catchStartIndex = body.Instructions.IndexOf(exceptionHandler.HandlerStart);
+            var catchEndIndex = body.Instructions.IndexOf(exceptionHandler.HandlerEnd);
+
+            for (var i = catchEndIndex; i >= catchStartIndex; i--)
             {
-                possibleReturnStatements.Add(instructions[i + 1]);
+                if (body.Instructions[i].Operand is MethodReference methodReference &&
+                    methodReference.Name == "SetException")
+                {
+                    // Insert before
+                    for (var j = 0; j < stopwatchInstructions.Count; j++)
+                    {
+                        body.Instructions.Insert(i + j, stopwatchInstructions[j]);
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        // 2: end of the method (either SetResult or end of the method)
+        for (var i = body.Instructions.Count - 1; i >= 0; i--)
+        {
+            if (body.Instructions[i].Operand is MethodReference methodReference &&
+                methodReference.Name == "SetResult")
+            {
+                // Next index, we want this to appear *after* the SetResult call
+                endInstruction = body.Instructions[i + 1];
                 break;
             }
         }
 
-        for (var i = 0; i < instructions.Count; i++)
+        var startIndex = body.Instructions.IndexOf(endInstruction);
+
+        for (var i = 0; i < stopwatchInstructions.Count; i++)
         {
-            var instruction = instructions[i];
-            if (instruction.IsLeaveInstruction())
-            {
-                if (possibleReturnStatements.Any(x => ReferenceEquals(instruction.Operand, x)))
-                {
-                    // This is a return statement, this covers scenarios 1 and 3
-                    returnStatements.Add(instruction);
-                }
-                else
-                {
-                    // Check if we set an exception in this block, this covers scenario 2
-                    for (var j = i - 3; j < i; j++)
-                    {
-                        var previousInstruction = instructions[j];
-                        if (previousInstruction.OpCode == OpCodes.Call)
-                        {
-                            if (previousInstruction.Operand is MethodReference methodReference)
-                            {
-                                if (methodReference.Name.Equals("SetException"))
-                                {
-                                    returnStatements.Add(instruction);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return returnStatements;
-    }
-
-    void FixReturn(Instruction returnPoint)
-    {
-        var opCode = returnPoint.OpCode;
-        var operand = returnPoint.Operand as Instruction;
-
-        returnPoint.OpCode = OpCodes.Nop;
-        returnPoint.Operand = null;
-
-        var instructions = body.Instructions;
-        var indexOf = instructions.IndexOf(returnPoint);
-        foreach (var instruction in GetWriteTimeInstruction(Method))
-        {
-            indexOf++;
-            instructions.Insert(indexOf, instruction);
-        }
-
-        indexOf++;
-
-        if (opCode == OpCodes.Leave || opCode == OpCodes.Leave_S)
-        {
-            instructions.Insert(indexOf, Instruction.Create(opCode, operand));
-        }
-        else
-        {
-            instructions.Insert(indexOf, Instruction.Create(opCode));
+            body.Instructions.Insert(startIndex++, stopwatchInstructions[i]);
         }
     }
 
-    IEnumerable<Instruction> GetWriteTimeInstruction(MethodDefinition methodDefinition)
+    IEnumerable<Instruction> GetWriteTimeInstruction(MethodDefinition method)
     {
+        var startOfRealMethod = Instruction.Create(OpCodes.Ldarg_0);
+
+        // Check if state machine is completed (state == -2)
         yield return Instruction.Create(OpCodes.Ldarg_0);
+        yield return Instruction.Create(OpCodes.Ldfld, stateField);
+        yield return Instruction.Create(OpCodes.Ldc_I4, -2);
+        yield return Instruction.Create(OpCodes.Beq_S, startOfRealMethod);
+        yield return Instruction.Create(OpCodes.Ret);
+
+        yield return startOfRealMethod; // Ldarg_0
         yield return Instruction.Create(OpCodes.Ldfld, stopwatchField);
         yield return Instruction.Create(OpCodes.Call, ModuleWeaver.StopMethod);
 
@@ -224,7 +244,7 @@ public class AsyncMethodProcessor
         {
             if (logMethodUsingLong is null && logMethodUsingTimeSpan is null)
             {
-                yield return Instruction.Create(OpCodes.Ldstr, methodDefinition.MethodName());
+                yield return Instruction.Create(OpCodes.Ldstr, Method.MethodName());
                 yield return Instruction.Create(OpCodes.Ldarg_0);
                 yield return Instruction.Create(OpCodes.Ldfld, stopwatchField);
                 yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);
@@ -232,70 +252,74 @@ public class AsyncMethodProcessor
                 yield return Instruction.Create(OpCodes.Ldstr, "ms");
                 yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ConcatMethod);
                 yield return Instruction.Create(OpCodes.Call, ModuleWeaver.TraceWriteLineMethod);
-                yield break;
+            }
+            else
+            {
+                yield return Instruction.Create(OpCodes.Ldtoken, Method);
+                yield return Instruction.Create(OpCodes.Ldtoken, Method.DeclaringType);
+                yield return Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle);
+                yield return Instruction.Create(OpCodes.Ldarg_0);
+                yield return Instruction.Create(OpCodes.Ldfld, stopwatchField);
+
+                if (logMethodUsingTimeSpan is null)
+                {
+                    yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);
+                    yield return Instruction.Create(OpCodes.Call, logMethodUsingLong);
+                }
+                else
+                {
+                    yield return Instruction.Create(OpCodes.Call, ModuleWeaver.Elapsed);
+                    yield return Instruction.Create(OpCodes.Call, logMethodUsingTimeSpan);
+                }
+            }
+        }
+        else
+        {
+            // Important notes:
+            // 1. Because async works with state machines, use the state machine & fields instead of method & variables.
+            // 2. The ldarg_0 calls are required to load the state machine class and is required before every field call.
+
+            var formattedFieldDefinition = stateMachineType.Fields.FirstOrDefault(x => x.Name.Equals("methodTimerMessage"));
+            if (formattedFieldDefinition is null)
+            {
+                formattedFieldDefinition = new FieldDefinition("methodTimerMessage", FieldAttributes.Private | FieldAttributes.CompilerControlled, ModuleWeaver.TypeSystem.StringReference);
+                stateMachineType.Fields.Add(formattedFieldDefinition);
             }
 
-            yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition);
-            yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition.DeclaringType);
+            foreach (var instruction in ProcessTimeAttribute(Method, formattedFieldDefinition))
+            {
+                yield return instruction;
+            }
+
+            // Handle call to log method
+            yield return Instruction.Create(OpCodes.Ldtoken, Method);
+            yield return Instruction.Create(OpCodes.Ldtoken, Method.DeclaringType);
             yield return Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle);
             yield return Instruction.Create(OpCodes.Ldarg_0);
             yield return Instruction.Create(OpCodes.Ldfld, stopwatchField);
 
-            if (logMethodUsingTimeSpan is null)
+            if (logWithMessageMethodUsingTimeSpan is null)
             {
                 yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);
-                yield return Instruction.Create(OpCodes.Call, logMethodUsingLong);
-
-                yield break;
+                yield return Instruction.Create(OpCodes.Ldarg_0);
+                yield return Instruction.Create(OpCodes.Ldfld, formattedFieldDefinition);
+                yield return Instruction.Create(OpCodes.Call, logWithMessageMethodUsingLong);
             }
-
-            yield return Instruction.Create(OpCodes.Call, ModuleWeaver.Elapsed);
-            yield return Instruction.Create(OpCodes.Call, logMethodUsingTimeSpan);
-            yield break;
+            else
+            {
+                yield return Instruction.Create(OpCodes.Call, ModuleWeaver.Elapsed);
+                yield return Instruction.Create(OpCodes.Ldarg_0);
+                yield return Instruction.Create(OpCodes.Ldfld, formattedFieldDefinition);
+                yield return Instruction.Create(OpCodes.Call, logWithMessageMethodUsingTimeSpan);
+            }
         }
 
-
-        // Important notes:
-        // 1. Because async works with state machines, use the state machine & fields instead of method & variables.
-        // 2. The ldarg_0 calls are required to load the state machine class and is required before every field call.
-
-        var formattedFieldDefinition = stateMachineType.Fields.FirstOrDefault(x => x.Name.Equals("methodTimerMessage"));
-        if (formattedFieldDefinition is null)
-        {
-            formattedFieldDefinition = new FieldDefinition("methodTimerMessage", FieldAttributes.Private | FieldAttributes.CompilerControlled, ModuleWeaver.TypeSystem.StringReference);
-            stateMachineType.Fields.Add(formattedFieldDefinition);
-        }
-
-        foreach (var instruction in ProcessTimeAttribute(methodDefinition, formattedFieldDefinition))
-        {
-            yield return instruction;
-        }
-
-        // Handle call to log method
-        yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition);
-        yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition.DeclaringType);
-        yield return Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle);
-        yield return Instruction.Create(OpCodes.Ldarg_0);
-        yield return Instruction.Create(OpCodes.Ldfld, stopwatchField);
-
-        if (logWithMessageMethodUsingTimeSpan is null)
-        {
-            yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);
-            yield return Instruction.Create(OpCodes.Ldarg_0);
-            yield return Instruction.Create(OpCodes.Ldfld, formattedFieldDefinition);
-            yield return Instruction.Create(OpCodes.Call, logWithMessageMethodUsingLong);
-            yield break;
-        }
-
-        yield return Instruction.Create(OpCodes.Call, ModuleWeaver.Elapsed);
-        yield return Instruction.Create(OpCodes.Ldarg_0);
-        yield return Instruction.Create(OpCodes.Ldfld, formattedFieldDefinition);
-        yield return Instruction.Create(OpCodes.Call, logWithMessageMethodUsingTimeSpan);
+        yield return Instruction.Create(OpCodes.Ret);
     }
 
     IEnumerable<Instruction> ProcessTimeAttribute(MethodDefinition methodDefinition, FieldDefinition formattedFieldDefinition)
     {
-// Load everything for a string format
+        // Load everything for a string format
         var timeAttribute = methodDefinition.GetTimeAttribute();
         if (timeAttribute != null)
         {
@@ -314,25 +338,25 @@ public class AsyncMethodProcessor
                 {
                     var parameterName = info.ParameterNames[i];
 
-                    yield return Instruction.Create(OpCodes.Dup);
-                    yield return Instruction.Create(OpCodes.Ldc_I4, i);
-
                     if (string.Equals(parameterName, "this"))
                     {
                         // Field name is <>4__this
                         parameterName = "<>4__this";
-                        if (!stateMachineType.Fields.Any(x => x.Name.Equals(parameterName)))
-                        {
-                            // {this} could be optimized away, let's add it for the user
-                            InjectThisIntoStateMachine(methodDefinition);
-                        }
+
+                        // {this} could be optimized away, let's add it for the user
+                        InjectThisIntoStateMachine(methodDefinition);
                     }
+
+                    yield return Instruction.Create(OpCodes.Dup);
+                    yield return Instruction.Create(OpCodes.Ldc_I4, i);
 
                     var field = stateMachineType.Fields.FirstOrDefault(x => x.Name.Equals(parameterName));
                     if (field is null)
                     {
                         ModuleWeaver.LogError($"Parameter '{parameterName}' is not available on the async state machine. Probably it has been optimized away by the compiler. Please update the format so it excludes this parameter.");
-                        yield break;
+
+                        // To make sure the weaver still produces valid IL, pass in a null value
+                        yield return Instruction.Create(OpCodes.Ldnull);
                     }
                     else
                     {
@@ -363,8 +387,15 @@ public class AsyncMethodProcessor
 
     void InjectThisIntoStateMachine(MethodDefinition methodDefinition)
     {
+        const string fieldName = "<>4__this";
+
+        if (stateMachineType.Fields.Any(x => x.Name.Equals(fieldName)))
+        {
+            return;
+        }
+
         // Step 1: inject the field
-        var thisField = new FieldDefinition("<>4__this", FieldAttributes.Public, methodDefinition.DeclaringType);
+        var thisField = new FieldDefinition(fieldName, FieldAttributes.Public, methodDefinition.DeclaringType);
         stateMachineType.Fields.Add(thisField);
 
         // Step 2: set the field value in the actual method, search for the first usage of the state machine class

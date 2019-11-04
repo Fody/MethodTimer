@@ -189,7 +189,12 @@ public class AsyncMethodProcessor
         // 1: just before the ::SetException
         // 2: end of the method (which is not executed after calling ::SetException) or just after SetResult
 
-        var stopStopwatchMethodReference = new MethodReference(stopStopwatchMethod.Name, stopStopwatchMethod.ReturnType, stateMachineTypeReference);
+        var stopStopwatchMethodReference = new MethodReference(stopStopwatchMethod.Name, stopStopwatchMethod.ReturnType, stateMachineTypeReference)
+        {
+            HasThis = stopStopwatchMethod.HasThis,
+            ExplicitThis = stopStopwatchMethod.ExplicitThis,
+            CallingConvention = stopStopwatchMethod.CallingConvention
+        };
 
         var stopwatchInstructions = new List<Instruction>(new[]
         {

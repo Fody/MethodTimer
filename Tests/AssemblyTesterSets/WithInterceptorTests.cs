@@ -104,6 +104,24 @@ public class WithInterceptorTests :
         Assert.Equal("MethodWithAwaitAsync", methodBase.Name);
     }
 
+
+    [Fact]
+    public void ClassWithGenericAsyncMethod()
+    {
+        var type = testResult.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        TraceRunner.Capture(() =>
+        {
+            var task = (Task<int>)instance.GenericMethodAsync<int>();
+            task.Wait();
+        });
+
+        var methodBases = GetMethodInfoField();
+        Assert.Single(methodBases);
+        var methodBase = methodBases.First();
+        Assert.Equal("GenericMethodAsync", methodBase.Name);
+    }
+
     [Fact]
     public async Task ClassWithAsyncMethodThatThrowsException()
     {

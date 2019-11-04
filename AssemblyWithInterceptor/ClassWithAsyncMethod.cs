@@ -44,6 +44,13 @@ public class ClassWithAsyncMethod
     }
 
     [Time]
+    public async Task<TValue> GenericMethodAsync<TValue>()
+    {
+        await Task.Delay(1000);
+        return default(TValue);
+    }
+
+    [Time]
     public async Task MethodWithExceptionAsync()
     {
         await Task.Delay(1000);

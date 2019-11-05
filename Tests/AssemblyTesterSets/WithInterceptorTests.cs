@@ -90,6 +90,7 @@ public class WithInterceptorTests :
     [Fact(Skip = "todo")]
     public void ClassWithAsyncMethod()
     {
+        ClearMessage();
         var type = testResult.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic) Activator.CreateInstance(type);
         TraceRunner.Capture(() =>
@@ -105,8 +106,27 @@ public class WithInterceptorTests :
     }
 
     [Fact]
+    public void ClassWithGenericAsyncMethod()
+    {
+        ClearMessage();
+        var type = testResult.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        TraceRunner.Capture(() =>
+        {
+            var task = (Task<int>)instance.GenericMethodAsync<int>();
+            task.Wait();
+        });
+
+        var methodBases = GetMethodInfoField();
+        Assert.Single(methodBases);
+        var methodBase = methodBases.First();
+        Assert.Equal("GenericMethodAsync", methodBase.Name);
+    }
+
+    [Fact]
     public async Task ClassWithAsyncMethodThatThrowsException()
     {
+        ClearMessage();
         var type = testResult.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic) Activator.CreateInstance(type);
         await TraceRunner.CaptureAsync(async () =>
@@ -134,6 +154,7 @@ public class WithInterceptorTests :
     [Fact]
     public async Task ClassWithAsyncMethodWithExceptionAsync()
     {
+        ClearMessage();
         var type = testResult.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
         await TraceRunner.CaptureAsync(async () =>
@@ -163,6 +184,7 @@ public class WithInterceptorTests :
     [InlineData(false)]
     public void ClassWithAsyncMethodWithFastPath(bool recurse)
     {
+        ClearMessage();
         var type = testResult.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic) Activator.CreateInstance(type);
         TraceRunner.Capture(() =>

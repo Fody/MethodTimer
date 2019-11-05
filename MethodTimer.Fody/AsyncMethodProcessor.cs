@@ -10,9 +10,12 @@ public class AsyncMethodProcessor
     public ModuleWeaver ModuleWeaver;
     public MethodDefinition Method;
     MethodBody body;
-    FieldDefinition stopwatchField;
-    FieldDefinition stateField;
-    TypeDefinition stateMachineType;
+    FieldDefinition stopwatchFieldDefinition;
+    FieldReference stopwatchFieldReference;
+    FieldDefinition stateFieldDefinition;
+    FieldReference stateFieldReference;
+    TypeDefinition stateMachineTypeDefinition;
+    TypeReference stateMachineTypeReference;
     MethodDefinition stopStopwatchMethod;
     ParameterFormattingProcessor parameterFormattingProcessor = new ParameterFormattingProcessor();
 
@@ -31,10 +34,27 @@ public class AsyncMethodProcessor
     void InnerProcess()
     {
         var asyncAttribute = Method.GetAsyncStateMachineAttribute();
-        stateMachineType = asyncAttribute.ConstructorArguments
+        stateMachineTypeDefinition = asyncAttribute.ConstructorArguments
             .Select(ctor => (TypeDefinition)ctor.Value)
             .Single();
-        var moveNextMethod = stateMachineType.Methods
+
+        if (stateMachineTypeDefinition.HasGenericParameters)
+        {
+            var genericStateMachineType = new GenericInstanceType(stateMachineTypeDefinition);
+
+            foreach (var genericParameter in stateMachineTypeDefinition.GenericParameters)
+            {
+                genericStateMachineType.GenericArguments.Add(genericParameter);
+            }
+
+            stateMachineTypeReference = genericStateMachineType;
+        }
+        else
+        {
+            stateMachineTypeReference = stateMachineTypeDefinition;
+        }
+
+        var moveNextMethod = stateMachineTypeDefinition.Methods
             .Single(x => x.Name == "MoveNext");
         body = moveNextMethod.Body;
 
@@ -48,7 +68,7 @@ public class AsyncMethodProcessor
                                let fieldReference = instruction.Operand as FieldReference
                                where instruction.OpCode == OpCodes.Ldfld &&
                                      fieldReference != null &&
-                                     fieldReference.Name.Contains("__state")
+                                     fieldReference.Name.EndsWith("__state")
                                select instruction).FirstOrDefault();
         if (firstStateUsage is null)
         {
@@ -67,9 +87,11 @@ public class AsyncMethodProcessor
             index = body.Instructions.IndexOf(firstStateUsage) - 1;
         }
 
-        stateField = (from x in stateMachineType.Fields
+        stateFieldDefinition = (from x in stateMachineTypeDefinition.Fields
                       where x.Name.EndsWith("__state")
                       select x).First();
+
+        stateFieldReference = new FieldReference(stateFieldDefinition.Name, stateFieldDefinition.FieldType, stateMachineTypeReference);
 
         InjectStopwatchStart(index, body.Instructions[index]);
         InjectStopwatchStopMethod();
@@ -108,8 +130,11 @@ public class AsyncMethodProcessor
         var boolVariable = new VariableDefinition(ModuleWeaver.BooleanType.Resolve());
         body.Variables.Add(boolVariable);
 
-        stopwatchField = new FieldDefinition("methodTimerStopwatch", new FieldAttributes(), ModuleWeaver.StopwatchType);
-        stateMachineType.Fields.Add(stopwatchField);
+        stopwatchFieldDefinition = new FieldDefinition("methodTimerStopwatch", new FieldAttributes(), ModuleWeaver.StopwatchType);
+        stateMachineTypeDefinition.Fields.Add(stopwatchFieldDefinition);
+
+        stopwatchFieldReference = new FieldReference(stopwatchFieldDefinition.Name, stopwatchFieldDefinition.FieldType, stateMachineTypeReference);
+
         body.Insert(index, new[]
         {
             // This code looks like this:
@@ -119,7 +144,7 @@ public class AsyncMethodProcessor
             // }
 
             Instruction.Create(OpCodes.Ldarg_0),
-            Instruction.Create(OpCodes.Ldfld, stopwatchField),
+            Instruction.Create(OpCodes.Ldfld, stopwatchFieldReference),
             Instruction.Create(OpCodes.Ldnull),
             Instruction.Create(OpCodes.Ceq),
             Instruction.Create(OpCodes.Stloc, boolVariable),
@@ -127,7 +152,7 @@ public class AsyncMethodProcessor
             Instruction.Create(OpCodes.Brfalse_S, nextInstruction),
             Instruction.Create(OpCodes.Ldarg_0),
             Instruction.Create(OpCodes.Call, ModuleWeaver.StartNewMethod),
-            Instruction.Create(OpCodes.Stfld, stopwatchField)
+            Instruction.Create(OpCodes.Stfld, stopwatchFieldReference)
         });
     }
 
@@ -143,7 +168,7 @@ public class AsyncMethodProcessor
         var methodBody = method.Body;
         methodBody.SimplifyMacros();
 
-        var stopwatchInstructions = GetWriteTimeInstruction(method).ToList();
+        var stopwatchInstructions = GetWriteTimeInstruction().ToList();
 
         foreach (var instruction in stopwatchInstructions)
         {
@@ -153,7 +178,7 @@ public class AsyncMethodProcessor
         methodBody.InitLocals = true;
         methodBody.OptimizeMacros();
 
-        stateMachineType.Methods.Add(method);
+        stateMachineTypeDefinition.Methods.Add(method);
 
         stopStopwatchMethod = method;
     }
@@ -164,10 +189,17 @@ public class AsyncMethodProcessor
         // 1: just before the ::SetException
         // 2: end of the method (which is not executed after calling ::SetException) or just after SetResult
 
+        var stopStopwatchMethodReference = new MethodReference(stopStopwatchMethod.Name, stopStopwatchMethod.ReturnType, stateMachineTypeReference)
+        {
+            HasThis = stopStopwatchMethod.HasThis,
+            ExplicitThis = stopStopwatchMethod.ExplicitThis,
+            CallingConvention = stopStopwatchMethod.CallingConvention
+        };
+
         var stopwatchInstructions = new List<Instruction>(new[]
         {
             Instruction.Create(OpCodes.Ldarg_0),
-            Instruction.Create(OpCodes.Call, stopStopwatchMethod)
+            Instruction.Create(OpCodes.Callvirt, stopStopwatchMethodReference)
         });
 
         var returnInstruction = FixReturns();
@@ -218,19 +250,19 @@ public class AsyncMethodProcessor
         }
     }
 
-    IEnumerable<Instruction> GetWriteTimeInstruction(MethodDefinition method)
+    IEnumerable<Instruction> GetWriteTimeInstruction()
     {
         var startOfRealMethod = Instruction.Create(OpCodes.Ldarg_0);
 
         // Check if state machine is completed (state == -2)
         yield return Instruction.Create(OpCodes.Ldarg_0);
-        yield return Instruction.Create(OpCodes.Ldfld, stateField);
+        yield return Instruction.Create(OpCodes.Ldfld, stateFieldReference);
         yield return Instruction.Create(OpCodes.Ldc_I4, -2);
         yield return Instruction.Create(OpCodes.Beq_S, startOfRealMethod);
         yield return Instruction.Create(OpCodes.Ret);
 
         yield return startOfRealMethod; // Ldarg_0
-        yield return Instruction.Create(OpCodes.Ldfld, stopwatchField);
+        yield return Instruction.Create(OpCodes.Ldfld, stopwatchFieldReference);
         yield return Instruction.Create(OpCodes.Call, ModuleWeaver.StopMethod);
 
         var logWithMessageMethodUsingLong = ModuleWeaver.LogWithMessageMethodUsingLong;
@@ -245,7 +277,7 @@ public class AsyncMethodProcessor
             {
                 yield return Instruction.Create(OpCodes.Ldstr, Method.MethodName());
                 yield return Instruction.Create(OpCodes.Ldarg_0);
-                yield return Instruction.Create(OpCodes.Ldfld, stopwatchField);
+                yield return Instruction.Create(OpCodes.Ldfld, stopwatchFieldReference);
                 yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);
                 yield return Instruction.Create(OpCodes.Box, ModuleWeaver.TypeSystem.Int64Reference);
                 yield return Instruction.Create(OpCodes.Ldstr, "ms");
@@ -258,7 +290,7 @@ public class AsyncMethodProcessor
                 yield return Instruction.Create(OpCodes.Ldtoken, Method.DeclaringType);
                 yield return Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle);
                 yield return Instruction.Create(OpCodes.Ldarg_0);
-                yield return Instruction.Create(OpCodes.Ldfld, stopwatchField);
+                yield return Instruction.Create(OpCodes.Ldfld, stopwatchFieldReference);
 
                 if (logMethodUsingTimeSpan is null)
                 {
@@ -278,14 +310,16 @@ public class AsyncMethodProcessor
             // 1. Because async works with state machines, use the state machine & fields instead of method & variables.
             // 2. The ldarg_0 calls are required to load the state machine class and is required before every field call.
 
-            var formattedFieldDefinition = stateMachineType.Fields.FirstOrDefault(x => x.Name.Equals("methodTimerMessage"));
+            var formattedFieldDefinition = stateMachineTypeDefinition.Fields.FirstOrDefault(x => x.Name.Equals("methodTimerMessage"));
             if (formattedFieldDefinition is null)
             {
                 formattedFieldDefinition = new FieldDefinition("methodTimerMessage", FieldAttributes.Private | FieldAttributes.CompilerControlled, ModuleWeaver.TypeSystem.StringReference);
-                stateMachineType.Fields.Add(formattedFieldDefinition);
+                stateMachineTypeDefinition.Fields.Add(formattedFieldDefinition);
             }
 
-            foreach (var instruction in ProcessTimeAttribute(Method, formattedFieldDefinition))
+            var formattedFieldReference = new FieldReference(formattedFieldDefinition.Name, formattedFieldDefinition.FieldType, stateMachineTypeReference);
+
+            foreach (var instruction in ProcessTimeAttribute(Method, formattedFieldReference))
             {
                 yield return instruction;
             }
@@ -295,7 +329,7 @@ public class AsyncMethodProcessor
             yield return Instruction.Create(OpCodes.Ldtoken, Method.DeclaringType);
             yield return Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle);
             yield return Instruction.Create(OpCodes.Ldarg_0);
-            yield return Instruction.Create(OpCodes.Ldfld, stopwatchField);
+            yield return Instruction.Create(OpCodes.Ldfld, stopwatchFieldReference);
 
             if (logWithMessageMethodUsingTimeSpan is null)
             {
@@ -316,7 +350,7 @@ public class AsyncMethodProcessor
         yield return Instruction.Create(OpCodes.Ret);
     }
 
-    IEnumerable<Instruction> ProcessTimeAttribute(MethodDefinition methodDefinition, FieldDefinition formattedFieldDefinition)
+    IEnumerable<Instruction> ProcessTimeAttribute(MethodDefinition methodDefinition, FieldReference formattedFieldReference)
     {
         // Load everything for a string format
         var timeAttribute = methodDefinition.GetTimeAttribute();
@@ -349,7 +383,7 @@ public class AsyncMethodProcessor
                     yield return Instruction.Create(OpCodes.Dup);
                     yield return Instruction.Create(OpCodes.Ldc_I4, i);
 
-                    var field = stateMachineType.Fields.FirstOrDefault(x => x.Name.Equals(parameterName));
+                    var field = stateMachineTypeDefinition.Fields.FirstOrDefault(x => x.Name.Equals(parameterName));
                     if (field is null)
                     {
                         ModuleWeaver.LogError($"Parameter '{parameterName}' is not available on the async state machine. Probably it has been optimized away by the compiler. Please update the format so it excludes this parameter.");
@@ -380,7 +414,7 @@ public class AsyncMethodProcessor
                 yield return Instruction.Create(OpCodes.Ldnull);
             }
 
-            yield return Instruction.Create(OpCodes.Stfld, formattedFieldDefinition);
+            yield return Instruction.Create(OpCodes.Stfld, formattedFieldReference);
         }
     }
 
@@ -388,14 +422,14 @@ public class AsyncMethodProcessor
     {
         const string fieldName = "<>4__this";
 
-        if (stateMachineType.Fields.Any(x => x.Name.Equals(fieldName)))
+        if (stateMachineTypeDefinition.Fields.Any(x => x.Name.Equals(fieldName)))
         {
             return;
         }
 
         // Step 1: inject the field
         var thisField = new FieldDefinition(fieldName, FieldAttributes.Public, methodDefinition.DeclaringType);
-        stateMachineType.Fields.Add(thisField);
+        stateMachineTypeDefinition.Fields.Add(thisField);
 
         // Step 2: set the field value in the actual method, search for the first usage of the state machine class
         var methodBody = methodDefinition.Body;
@@ -406,7 +440,7 @@ public class AsyncMethodProcessor
         {
             if (x.Operand is VariableDefinition variableDefinition)
             {
-                if (variableDefinition.VariableType.FullName.Equals(stateMachineType.FullName))
+                if (variableDefinition.VariableType.FullName.Equals(stateMachineTypeDefinition.FullName))
                 {
                     return true;
                 }

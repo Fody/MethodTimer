@@ -199,7 +199,7 @@ public class AsyncMethodProcessor
         var stopwatchInstructions = new List<Instruction>(new[]
         {
             Instruction.Create(OpCodes.Ldarg_0),
-            Instruction.Create(OpCodes.Callvirt, stopStopwatchMethodReference)
+            Instruction.Create(OpCodes.Call, stopStopwatchMethodReference)
         });
 
         var returnInstruction = FixReturns();

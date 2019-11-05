@@ -224,7 +224,6 @@ public class AsyncMethodProcessor
                     {
                         body.Instructions.Insert(i + j, stopwatchInstructions[j]);
                     }
-
                     break;
                 }
             }
@@ -252,13 +251,23 @@ public class AsyncMethodProcessor
 
     IEnumerable<Instruction> GetWriteTimeInstruction()
     {
+        var stopwatchRunningCheck = Instruction.Create(OpCodes.Ldarg_0);
         var startOfRealMethod = Instruction.Create(OpCodes.Ldarg_0);
 
         // Check if state machine is completed (state == -2)
         yield return Instruction.Create(OpCodes.Ldarg_0);
         yield return Instruction.Create(OpCodes.Ldfld, stateFieldReference);
         yield return Instruction.Create(OpCodes.Ldc_I4, -2);
-        yield return Instruction.Create(OpCodes.Beq_S, startOfRealMethod);
+        yield return Instruction.Create(OpCodes.Beq_S, stopwatchRunningCheck);
+        yield return Instruction.Create(OpCodes.Ret);
+
+        // Check if stopwatch is actually running
+        yield return stopwatchRunningCheck;
+        yield return Instruction.Create(OpCodes.Ldfld, stopwatchFieldReference);
+        yield return Instruction.Create(OpCodes.Callvirt, ModuleWeaver.IsRunning);
+        yield return Instruction.Create(OpCodes.Ldc_I4_0);
+        yield return Instruction.Create(OpCodes.Ceq);
+        yield return Instruction.Create(OpCodes.Brfalse_S, startOfRealMethod);
         yield return Instruction.Create(OpCodes.Ret);
 
         yield return startOfRealMethod; // Ldarg_0

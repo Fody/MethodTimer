@@ -4,7 +4,7 @@ using Xunit;
 using Xunit.Abstractions;
 
 public class WithNopInterceptorTests :
-    XunitApprovalBase
+    VerifyBase
 {
     static TestResult testResult;
 

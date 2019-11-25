@@ -4,7 +4,7 @@ using Xunit;
 using Xunit.Abstractions;
 
 public class AssemblyWithInterceptorAndFormattingWithoutOverloadTests :
-    XunitApprovalBase
+    VerifyBase
 {
     [Fact]
     public void RaisesErrorForMissingOverload()

@@ -4,7 +4,7 @@ using Xunit;
 using Xunit.Abstractions;
 
 public class AssemblyWithInterceptorAndFormattingWithWrongParametersTests :
-    XunitApprovalBase
+    VerifyBase
 {
     [Fact]
     public void RaisesErrorForWrongParameterNames()

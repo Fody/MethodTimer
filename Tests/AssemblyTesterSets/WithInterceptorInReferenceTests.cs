@@ -6,7 +6,7 @@ using Xunit;
 using Xunit.Abstractions;
 
 public class WithInterceptorInReferenceTests :
-    XunitApprovalBase
+    VerifyBase
 {
     static FieldInfo methodBaseField;
     static TestResult testResult;

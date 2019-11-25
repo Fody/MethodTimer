@@ -2,7 +2,7 @@
 using Xunit.Abstractions;
 
 public class ParameterFormattingProcessorTests :
-    XunitApprovalBase
+    VerifyBase
 {
     [Theory]
     [InlineData(null, "")]

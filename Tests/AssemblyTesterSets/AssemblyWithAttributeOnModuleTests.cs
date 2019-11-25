@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Fody;
+using VerifyXunit;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -62,7 +63,7 @@ public class AssemblyWithAttributeOnModuleTests :
         //Assert.True(message.First().StartsWith("ClassWithCompilerGeneratedTypes.YieldMethod "));
     }
 
-    public AssemblyWithAttributeOnModuleTests(ITestOutputHelper output) : 
+    public AssemblyWithAttributeOnModuleTests(ITestOutputHelper output) :
         base(output)
     {
     }

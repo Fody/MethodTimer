@@ -1,5 +1,6 @@
 ﻿using System;
 using Fody;
+using VerifyXunit;
 using Xunit;
 using Xunit.Abstractions;
 

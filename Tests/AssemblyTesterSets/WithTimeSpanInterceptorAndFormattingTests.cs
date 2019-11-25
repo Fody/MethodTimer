@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Fody;
+using VerifyXunit;
 using Xunit;
 using Xunit.Abstractions;
 

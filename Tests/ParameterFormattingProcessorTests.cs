@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using VerifyXunit;
+using Xunit;
 using Xunit.Abstractions;
 
 public class ParameterFormattingProcessorTests :

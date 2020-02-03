@@ -395,7 +395,7 @@ public class AsyncMethodProcessor
                     var field = stateMachineTypeDefinition.Fields.FirstOrDefault(x => x.Name.Equals(parameterName));
                     if (field is null)
                     {
-                        ModuleWeaver.LogError($"Parameter '{parameterName}' is not available on the async state machine. Probably it has been optimized away by the compiler. Please update the format so it excludes this parameter.");
+                        ModuleWeaver.WriteError($"Parameter '{parameterName}' is not available on the async state machine. Probably it has been optimized away by the compiler. Please update the format so it excludes this parameter.");
 
                         // To make sure the weaver still produces valid IL, pass in a null value
                         yield return Instruction.Create(OpCodes.Ldnull);
@@ -460,7 +460,7 @@ public class AsyncMethodProcessor
 
         if (startInstruction is null)
         {
-            ModuleWeaver.LogError("Failed to inject '{this}' into the async method, the compiler optimized it away and it could not be injected automatically, please create a support ticket.");
+            ModuleWeaver.WriteError("Failed to inject '{this}' into the async method, the compiler optimized it away and it could not be injected automatically, please create a support ticket.");
             return;
         }
 

@@ -20,7 +20,7 @@ public partial class ModuleWeaver
 
     public void FindInterceptor()
     {
-        LogDebug("Searching for an interceptor");
+        WriteDebug("Searching for an interceptor");
 
         var interceptor = types.FirstOrDefault(x => x.IsInterceptor());
         if (interceptor != null)
@@ -50,11 +50,11 @@ public partial class ModuleWeaver
 
             if (!Image.IsAssembly(referencePath))
             {
-                LogDebug($"Skipped checking '{referencePath}' since it is not a .net assembly.");
+                WriteDebug($"Skipped checking '{referencePath}' since it is not a .net assembly.");
                 continue;
             }
 
-            LogDebug($"Reading module from '{referencePath}'");
+            WriteDebug($"Reading module from '{referencePath}'");
             var moduleDefinition = ReadModule(referencePath);
 
             stopwatch.Stop();
@@ -69,7 +69,7 @@ public partial class ModuleWeaver
 
             if (!interceptor.IsPublic)
             {
-                LogInfo($"Did not use '{interceptor.FullName}' since it is not public.");
+                WriteInfo($"Did not use '{interceptor.FullName}' since it is not public.");
                 continue;
             }
 

@@ -22,7 +22,7 @@ public partial class ModuleWeaver: BaseModuleWeaver
         if (LogMethodIsNop)
         {
             var logMethod = GetPreferredLogMethod();
-            LogDebug($"'{logMethod?.FullName}' is a Nop so skipping weaving");
+            WriteDebug($"'{logMethod?.FullName}' is a Nop so skipping weaving");
             RemoveAttributes();
             return;
         }

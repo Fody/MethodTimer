@@ -23,9 +23,9 @@ public partial class ModuleWeaver
 
     public void FindReferences()
     {
-        if (!TryFindType("System.Diagnostics.Trace", out var traceType))
+        if (!TryFindTypeDefinition("System.Diagnostics.Trace", out var traceType))
         {
-            if (!TryFindType("System.Diagnostics.Debug", out traceType))
+            if (!TryFindTypeDefinition("System.Diagnostics.Debug", out traceType))
             {
                 throw new WeavingException("Could not find either Trace Or Debug");
             }
@@ -34,28 +34,28 @@ public partial class ModuleWeaver
         var writeLine = traceType.Method("WriteLine", "String");
         TraceWriteLineMethod = ModuleDefinition.ImportReference(writeLine);
 
-        var objectConstructor = FindType("System.Object").Method(".ctor");
+        var objectConstructor = FindTypeDefinition("System.Object").Method(".ctor");
         ObjectConstructorMethod = ModuleDefinition.ImportReference(objectConstructor);
 
-        var mathType = FindType("System.Math");
+        var mathType = FindTypeDefinition("System.Math");
         MaxMethod = ModuleDefinition.ImportReference(mathType.Method("Max", "Int64", "Int64"));
 
-        var dateTimeType = FindType("System.DateTime");
+        var dateTimeType = FindTypeDefinition("System.DateTime");
         DateTimeType = ModuleDefinition.ImportReference(dateTimeType);
         UtcNowMethod = ModuleDefinition.ImportReference(dateTimeType.Method("get_UtcNow"));
         GetTicksMethod = ModuleDefinition.ImportReference(dateTimeType.Method("get_Ticks"));
 
-        var methodBaseType = FindType("System.Reflection.MethodBase");
+        var methodBaseType = FindTypeDefinition("System.Reflection.MethodBase");
         var methodBase = methodBaseType.Method("GetMethodFromHandle", "RuntimeMethodHandle", "RuntimeTypeHandle");
         GetMethodFromHandle = ModuleDefinition.ImportReference(methodBase);
 
-        var booleanType = FindType("System.Boolean");
+        var booleanType = FindTypeDefinition("System.Boolean");
         BooleanType = ModuleDefinition.ImportReference(booleanType);
 
-        var voidType = FindType("System.Void");
+        var voidType = FindTypeDefinition("System.Void");
         VoidType = ModuleDefinition.ImportReference(voidType);
 
-        if (TryFindType("System.Diagnostics.Stopwatch", out var stopwatchType))
+        if (TryFindTypeDefinition("System.Diagnostics.Stopwatch", out var stopwatchType))
         {
             StopwatchType = ModuleDefinition.ImportReference(stopwatchType);
             StartNewMethod = ModuleDefinition.ImportReference(stopwatchType.Method("StartNew"));

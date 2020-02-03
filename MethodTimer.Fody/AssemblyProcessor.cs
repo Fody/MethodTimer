@@ -63,11 +63,11 @@ public partial class ModuleWeaver
         {
             if (method.ContainsTimeAttribute())
             {
-                LogError("Could not process '" + method.FullName + "' since methods that yield are currently not supported. Please remove the [Time] attribute from that method.");
+                WriteError("Could not process '" + method.FullName + "' since methods that yield are currently not supported. Please remove the [Time] attribute from that method.");
                 return;
             }
 
-            LogInfo("Skipping '" + method.FullName + "' since methods that yield are not supported.");
+            WriteInfo("Skipping '" + method.FullName + "' since methods that yield are not supported.");
             return;
         }
 
@@ -85,7 +85,7 @@ public partial class ModuleWeaver
                 if (logWithMessageMethodUsingLong is null && logWithMessageMethodUsingTimeSpan is null)
                 {
                     hasErrors = true;
-                    LogError("Feature with parameter formatting is being used, but no useable log method can be found. Either disable the feature usage or update the logger signature to 'public static void Log(MethodBase methodBase, long milliseconds, string message)' or 'public static void Log(MethodBase methodBase, TimeSpan elapsed, string message)'");
+                    WriteError("Feature with parameter formatting is being used, but no useable log method can be found. Either disable the feature usage or update the logger signature to 'public static void Log(MethodBase methodBase, long milliseconds, string message)' or 'public static void Log(MethodBase methodBase, TimeSpan elapsed, string message)'");
                 }
 
                 var info = parameterFormattingProcessor.ParseParameterFormatting(format);
@@ -97,7 +97,7 @@ public partial class ModuleWeaver
                         if (method.IsStatic)
                         {
                             hasErrors = true;
-                            LogError($"Could not process '{method.FullName}' because the format uses 'this' in a static context.");
+                            WriteError($"Could not process '{method.FullName}' because the format uses 'this' in a static context.");
                         }
                     }
                     else
@@ -106,7 +106,7 @@ public partial class ModuleWeaver
                         if (!containsParameter)
                         {
                             hasErrors = true;
-                            LogError($"Could not process '{method.FullName}' because the format uses '{parameterName}' which is not available as method parameter.");
+                            WriteError($"Could not process '{method.FullName}' because the format uses '{parameterName}' which is not available as method parameter.");
                         }
                     }
                 }

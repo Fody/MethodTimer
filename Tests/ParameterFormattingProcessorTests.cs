@@ -1,9 +1,6 @@
-﻿using VerifyXunit;
-using Xunit;
-using Xunit.Abstractions;
+﻿using Xunit;
 
-public class ParameterFormattingProcessorTests :
-    VerifyBase
+public class ParameterFormattingProcessorTests
 {
     [Theory]
     [InlineData(null, "")]
@@ -41,10 +38,5 @@ public class ParameterFormattingProcessorTests :
         Assert.Equal("This is a {0} test with id = '{1}' and {0} but don't replace fileName", info.Format);
         Assert.Equal("fileName", info.ParameterNames[0]);
         Assert.Equal("id", info.ParameterNames[1]);
-    }
-
-    public ParameterFormattingProcessorTests(ITestOutputHelper output) :
-        base(output)
-    {
     }
 }

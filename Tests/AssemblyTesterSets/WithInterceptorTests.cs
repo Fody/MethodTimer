@@ -4,12 +4,9 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Fody;
-using VerifyXunit;
 using Xunit;
-using Xunit.Abstractions;
 
-public class WithInterceptorTests :
-    VerifyBase
+public class WithInterceptorTests
 {
     static FieldInfo methodBaseField;
     static FieldInfo messagesField;
@@ -201,10 +198,5 @@ public class WithInterceptorTests :
 
         var methodBase = methodBases.Last();
         Assert.Equal("MethodWithFastPathAsync", methodBase.Name);
-    }
-
-    public WithInterceptorTests(ITestOutputHelper output) :
-        base(output)
-    {
     }
 }

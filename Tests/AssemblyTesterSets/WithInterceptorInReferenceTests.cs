@@ -2,12 +2,9 @@
 using System.Linq;
 using System.Reflection;
 using Fody;
-using VerifyXunit;
 using Xunit;
-using Xunit.Abstractions;
 
-public class WithInterceptorInReferenceTests :
-    VerifyBase
+public class WithInterceptorInReferenceTests
 {
     static FieldInfo methodBaseField;
     static TestResult testResult;
@@ -48,10 +45,5 @@ public class WithInterceptorInReferenceTests :
     List<MethodBase> GetMethodInfoField()
     {
         return (List<MethodBase>)methodBaseField.GetValue(null);
-    }
-
-    public WithInterceptorInReferenceTests(ITestOutputHelper output) :
-        base(output)
-    {
     }
 }

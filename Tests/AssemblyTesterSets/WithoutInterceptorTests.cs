@@ -3,12 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Fody;
-using VerifyXunit;
 using Xunit;
-using Xunit.Abstractions;
 
-public class WithoutInterceptorTests :
-    VerifyBase
+public class WithoutInterceptorTests
 {
     static TestResult testResult;
 
@@ -280,10 +277,5 @@ public class WithoutInterceptorTests :
         var message = TraceRunner.Capture(() => Activator.CreateInstance(type));
         Assert.Single(message);
         Assert.True(message[0].StartsWith("InheritedClassDoingConstructionCall.ctor "), message[0]);
-    }
-
-    public WithoutInterceptorTests(ITestOutputHelper output) :
-        base(output)
-    {
     }
 }

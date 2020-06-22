@@ -1,11 +1,8 @@
 ﻿using System;
 using Fody;
-using VerifyXunit;
 using Xunit;
-using Xunit.Abstractions;
 
-public class WithNopInterceptorTests :
-    VerifyBase
+public class WithNopInterceptorTests
 {
     static TestResult testResult;
 
@@ -28,10 +25,5 @@ public class WithNopInterceptorTests :
         var type = testResult.Assembly.GetType("ClassWithMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
         instance.Method();
-    }
-
-    public WithNopInterceptorTests(ITestOutputHelper output) :
-        base(output)
-    {
     }
 }

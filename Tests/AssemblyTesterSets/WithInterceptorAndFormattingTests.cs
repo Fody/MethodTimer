@@ -4,12 +4,9 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Fody;
-using VerifyXunit;
 using Xunit;
-using Xunit.Abstractions;
 
-public class WithInterceptorAndFormattingTests :
-    VerifyBase
+public class WithInterceptorAndFormattingTests
 {
     static FieldInfo methodBaseField;
     static FieldInfo messagesField;
@@ -216,10 +213,5 @@ public class WithInterceptorAndFormattingTests :
     List<string> GetMessagesField()
     {
         return (List<string>)messagesField.GetValue(null);
-    }
-
-    public WithInterceptorAndFormattingTests(ITestOutputHelper output) :
-        base(output)
-    {
     }
 }

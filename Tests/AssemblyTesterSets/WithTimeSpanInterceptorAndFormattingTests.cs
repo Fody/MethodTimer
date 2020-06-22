@@ -4,12 +4,9 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Fody;
-using VerifyXunit;
 using Xunit;
-using Xunit.Abstractions;
 
-public class WithTimeSpanInterceptorAndFormattingTests :
-    VerifyBase
+public class WithTimeSpanInterceptorAndFormattingTests
 {
     static FieldInfo methodBaseField;
     static FieldInfo messagesField;
@@ -338,10 +335,5 @@ public class WithTimeSpanInterceptorAndFormattingTests :
     List<string> GetInterceptorTypesField()
     {
         return (List<string>)interceptorTypesField.GetValue(null);
-    }
-
-    public WithTimeSpanInterceptorAndFormattingTests(ITestOutputHelper output) :
-        base(output)
-    {
     }
 }

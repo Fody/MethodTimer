@@ -2,12 +2,9 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Fody;
-using VerifyXunit;
 using Xunit;
-using Xunit.Abstractions;
 
-public class AssemblyWithAttributeOnModuleTests :
-    VerifyBase
+public class AssemblyWithAttributeOnModuleTests
 {
     static TestResult testResult;
 
@@ -61,10 +58,5 @@ public class AssemblyWithAttributeOnModuleTests :
         Assert.Empty(message);
         //TODO: support yield
         //Assert.True(message.First().StartsWith("ClassWithCompilerGeneratedTypes.YieldMethod "));
-    }
-
-    public AssemblyWithAttributeOnModuleTests(ITestOutputHelper output) :
-        base(output)
-    {
     }
 }

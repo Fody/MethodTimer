@@ -25,5 +25,6 @@
     <ProjectReference Include="..\AssemblyWithTimeSpanInterceptorAndFormatting\AssemblyWithTimeSpanInterceptorAndFormatting.csproj" />
     <ProjectReference Include="..\MethodTimer.Fody\MethodTimer.Fody.csproj" />
     <ProjectReference Include="..\MethodTimer\MethodTimer.csproj" />
+    <ProjectReference Include="..\VBNetAssemblyWithInterceptor\VBNetAssemblyWithInterceptor.vbproj" />
   </ItemGroup>
 </Project>

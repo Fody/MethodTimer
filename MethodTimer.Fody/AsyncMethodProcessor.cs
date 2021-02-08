@@ -68,7 +68,7 @@ public class AsyncMethodProcessor
                                let fieldReference = instruction.Operand as FieldReference
                                where instruction.OpCode == OpCodes.Ldfld &&
                                      fieldReference != null &&
-                                     fieldReference.Name.EndsWith("__state")
+                                     (fieldReference.Name.EndsWith("__state") || fieldReference.Name.EndsWith("$State"))
                                select instruction).FirstOrDefault();
         if (firstStateUsage is null)
         {
@@ -81,14 +81,14 @@ public class AsyncMethodProcessor
             //
             // <== this is where we want to start the stopwatch
             // ldarg.0
-            // ldfld __state
+            // ldfld __state ($State for VB.net)
             // stloc.0
             // ldloc.0
             index = body.Instructions.IndexOf(firstStateUsage) - 1;
         }
 
         stateFieldDefinition = (from x in stateMachineTypeDefinition.Fields
-                      where x.Name.EndsWith("__state")
+                      where x.Name.EndsWith("__state") || x.Name.EndsWith("$State")
                       select x).First();
 
         stateFieldReference = new FieldReference(stateFieldDefinition.Name, stateFieldDefinition.FieldType, stateMachineTypeReference);

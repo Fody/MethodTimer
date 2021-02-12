@@ -68,7 +68,8 @@ public class AsyncMethodProcessor
                                let fieldReference = instruction.Operand as FieldReference
                                where instruction.OpCode == OpCodes.Ldfld &&
                                      fieldReference != null &&
-                                     (fieldReference.Name.EndsWith("__state") || fieldReference.Name.EndsWith("$State"))
+                                     (fieldReference.Name.EndsWith("__state") ||
+                                      fieldReference.Name.EndsWith("$State"))
                                select instruction).FirstOrDefault();
         if (firstStateUsage is null)
         {
@@ -88,7 +89,8 @@ public class AsyncMethodProcessor
         }
 
         stateFieldDefinition = (from x in stateMachineTypeDefinition.Fields
-                      where x.Name.EndsWith("__state") || x.Name.EndsWith("$State")
+                      where x.Name.EndsWith("__state") ||
+                            x.Name.EndsWith("$State")
                       select x).First();
 
         stateFieldReference = new FieldReference(stateFieldDefinition.Name, stateFieldDefinition.FieldType, stateMachineTypeReference);

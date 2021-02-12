@@ -8,7 +8,7 @@ using Xunit;
 
 public class VBNetAssemblyWithInterceptorTests
 {
-    static readonly string assembly = "VBNetAssemblyWithInterceptor";
+    static string assembly = "VBNetAssemblyWithInterceptor";
     static FieldInfo methodBaseField;
     static FieldInfo messagesField;
     static TestResult testResult;
@@ -61,5 +61,4 @@ public class VBNetAssemblyWithInterceptorTests
         var methodBase = methodBases.First();
         Assert.Equal("MethodWithAwaitAsync", methodBase.Name);
     }
-
 }

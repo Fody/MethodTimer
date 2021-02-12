@@ -15,7 +15,8 @@ public static class CecilExtensions
             return false;
         }
 
-        if (typeReference.IsValueType || typeReference.IsGenericParameter)
+        if (typeReference.IsValueType ||
+            typeReference.IsGenericParameter)
         {
             return true;
         }
@@ -30,7 +31,9 @@ public static class CecilExtensions
 
     public static IEnumerable<MethodDefinition> ConcreteMethods(this TypeDefinition type)
     {
-        return type.Methods.Where(x => !x.IsAbstract && x.HasBody && !IsEmptyConstructor(x));
+        return type.Methods.Where(x => !x.IsAbstract &&
+                                       x.HasBody &&
+                                       !IsEmptyConstructor(x));
     }
 
     static bool IsEmptyConstructor(this MethodDefinition method)
@@ -43,6 +46,7 @@ public static class CecilExtensions
     {
         return type.Name == "MethodTimeLogger";
     }
+
     public static bool IsInstanceConstructor(this MethodDefinition methodDefinition)
     {
         return methodDefinition.IsConstructor && !methodDefinition.IsStatic;
@@ -65,6 +69,7 @@ public static class CecilExtensions
         {
             return $"{method.DeclaringType.Name}{method.Name} ";
         }
+
         return $"{method.DeclaringType.Name}.{method.Name} ";
     }
 
@@ -91,10 +96,12 @@ public static class CecilExtensions
         {
             return false;
         }
+
         if (!method.ReturnType.Name.StartsWith("IEnumerable"))
         {
             return false;
         }
+
         var stateMachinePrefix = $"<{method.Name}>";
         var nestedTypes = method.DeclaringType.NestedTypes;
         return nestedTypes.Any(x => x.Name.StartsWith(stateMachinePrefix));
@@ -112,31 +119,37 @@ public static class CecilExtensions
 
     public static bool IsLeaveInstruction(this Instruction instruction)
     {
-        return instruction.OpCode == OpCodes.Leave || instruction.OpCode == OpCodes.Leave_S;
+        return instruction.OpCode == OpCodes.Leave ||
+               instruction.OpCode == OpCodes.Leave_S;
     }
 
     public static MethodDefinition Method(this TypeDefinition type, string name)
     {
         var method = type.Methods.FirstOrDefault(x => x.Name == name);
+
         if (method is null)
         {
             throw new Exception($"Could not find method '{name}' on type {type.FullName}.");
         }
+
         return method;
     }
 
     public static MethodDefinition Method(this TypeDefinition type, string name, params string[] parameters)
     {
-        var method = type.Methods.FirstOrDefault(x =>
-        {
-            return x.Name == name &&
-                   parameters.Length == x.Parameters.Count &&
-                   x.Parameters.Select(y => y.ParameterType.Name).SequenceEqual(parameters);
-        });
+        var method = type.Methods
+            .FirstOrDefault(x =>
+            {
+                return x.Name == name &&
+                       parameters.Length == x.Parameters.Count &&
+                       x.Parameters.Select(y => y.ParameterType.Name).SequenceEqual(parameters);
+            });
+
         if (method is null)
         {
             throw new Exception($"Could not find method '{name}' on type {type.FullName}.");
         }
+
         return method;
     }
 
@@ -147,7 +160,7 @@ public static class CecilExtensions
         {
             throw new Exception($"Could not find type '{name}'.");
         }
+
         return type;
     }
-
 }

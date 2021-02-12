@@ -6,10 +6,11 @@ public abstract class AbstractClassWithAttributeOnMethod
     public abstract void Method();
 }
 
-public class GenericClassWithMethod<T> where T : class
- {
-     [Time]
-     public void Method()
-     {
-     }
- }
+public class GenericClassWithMethod<T>
+    where T : class
+{
+    [Time]
+    public void Method()
+    {
+    }
+}

@@ -5,7 +5,8 @@ public partial class ModuleWeaver
 {
     void ProcessAssembly()
     {
-        if (ModuleDefinition.Assembly.ContainsTimeAttribute() || ModuleDefinition.ContainsTimeAttribute())
+        if (ModuleDefinition.Assembly.ContainsTimeAttribute() ||
+            ModuleDefinition.ContainsTimeAttribute())
         {
             foreach (var type in types)
             {

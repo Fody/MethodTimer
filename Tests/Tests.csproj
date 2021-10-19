@@ -6,7 +6,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
-    <PackageReference Include="FodyHelpers" Version="6.5.3" />
+    <PackageReference Include="FodyHelpers" Version="6.5.4" />
     <PackageReference Include="Xunit" Version="2.4.1" />
     <PackageReference Include="Verify.Xunit" Version="13.3.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3" />

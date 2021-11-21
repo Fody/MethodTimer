@@ -1,6 +1,4 @@
-image: Visual Studio 2019
-skip_commits:
-  message: /doco|Merge pull request.*/
+image: Visual Studio 2022
 build_script:
 - cmd: dotnet build --configuration Release
 test:

@@ -10,7 +10,7 @@
     <PackageReference Include="Xunit" Version="2.4.1" />
     <PackageReference Include="Verify.Xunit" Version="17.4.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
     <ProjectReference Include="..\AssemblyToReference\AssemblyToReference.csproj" />
     <ProjectReference Include="..\AssemblyWithAttributeOnAssembly\AssemblyWithAttributeOnAssembly.csproj" />
     <ProjectReference Include="..\AssemblyWithAttributeOnModule\AssemblyWithAttributeOnModule.csproj" />

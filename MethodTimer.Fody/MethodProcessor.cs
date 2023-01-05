@@ -65,15 +65,22 @@ public class MethodProcessor
                 {
                     continue;
                 }
-                var methodReference = instruction.Operand as MethodReference;
+
+                if (!(instruction.Operand is MethodReference methodReference))
+                {
+                    continue;
+                }
+
                 if (methodReference.Name != ".ctor")
                 {
                     continue;
                 }
+
                 if (methodReference.DeclaringType != Method.DeclaringType.BaseType)
                 {
                     continue;
                 }
+
                 return instruction.Next;
             }
         }

@@ -11,9 +11,9 @@ public enum InterceptorType
 
 public static class MethodTimeLogger
 {
-    public static readonly List<MethodBase> MethodBase = new List<MethodBase>();
-    public static readonly List<string> Messages = new List<string>();
-    public static readonly List<string> InterceptorTypes = new List<string>();
+    public static List<MethodBase> MethodBase = new List<MethodBase>();
+    public static List<string> Messages = new List<string>();
+    public static List<string> InterceptorTypes = new List<string>();
 
     public static void Log(MethodBase methodBase, long milliseconds, string message)
     {

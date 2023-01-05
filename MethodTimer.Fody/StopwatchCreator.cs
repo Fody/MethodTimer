@@ -5,10 +5,14 @@ public partial class ModuleWeaver
 {
     public void InjectStopwatchType()
     {
-        var type = new TypeDefinition("MethodTimer","Stopwatch",TypeAttributes.BeforeFieldInit| TypeAttributes.AnsiClass| TypeAttributes.AutoClass, TypeSystem.ObjectReference);
+        var type = new TypeDefinition(
+            "MethodTimer",
+            "Stopwatch",
+            TypeAttributes.BeforeFieldInit | TypeAttributes.AnsiClass | TypeAttributes.AutoClass,
+            TypeSystem.ObjectReference);
         ModuleDefinition.Types.Add(type);
 
-        var startTicks = new FieldDefinition("startTicks",FieldAttributes.Private, TypeSystem.Int64Reference);
+        var startTicks = new FieldDefinition("startTicks", FieldAttributes.Private, TypeSystem.Int64Reference);
         type.Fields.Add(startTicks);
 
         var stopped = new FieldDefinition("stopped", FieldAttributes.Private, TypeSystem.BooleanReference);
@@ -17,14 +21,16 @@ public partial class ModuleWeaver
         var elapsedTicks = new FieldDefinition("elapsedTicks", FieldAttributes.Private, TypeSystem.Int64Reference);
         type.Fields.Add(elapsedTicks);
 
-        var currentTicks = new MethodDefinition("CurrentTicks",
-            MethodAttributes.HideBySig | MethodAttributes.Private| MethodAttributes.Static, TypeSystem.Int64Reference)
+        var currentTicks = new MethodDefinition(
+            "CurrentTicks",
+            MethodAttributes.HideBySig | MethodAttributes.Private | MethodAttributes.Static,
+            TypeSystem.Int64Reference)
+        {
+            Body =
             {
-                Body =
-                    {
-                        InitLocals = true
-                    }
-            };
+                InitLocals = true
+            }
+        };
         type.Methods.Add(currentTicks);
         var timeVariable = new VariableDefinition(DateTimeType);
         currentTicks.Body.Variables.Add(timeVariable);
@@ -35,29 +41,32 @@ public partial class ModuleWeaver
             Instruction.Create(OpCodes.Call, GetTicksMethod),
             Instruction.Create(OpCodes.Ret));
 
-
-        var constructor = new MethodDefinition(".ctor",
-            MethodAttributes.RTSpecialName|
-            MethodAttributes.SpecialName|
-            MethodAttributes.HideBySig|MethodAttributes.Public, TypeSystem.VoidReference);
+        var constructor = new MethodDefinition(
+            ".ctor",
+            MethodAttributes.RTSpecialName | MethodAttributes.SpecialName | MethodAttributes.HideBySig | MethodAttributes.Public,
+            TypeSystem.VoidReference);
         type.Methods.Add(constructor);
         constructor.Body.Add(
             Instruction.Create(OpCodes.Ldarg_0),
-            Instruction.Create(OpCodes.Call,currentTicks),
+            Instruction.Create(OpCodes.Call, currentTicks),
             Instruction.Create(OpCodes.Stfld, startTicks),
             Instruction.Create(OpCodes.Ldarg_0),
             Instruction.Create(OpCodes.Call, ObjectConstructorMethod),
             Instruction.Create(OpCodes.Ret));
 
-        var startNew = new MethodDefinition("StartNew",
-            MethodAttributes.HideBySig | MethodAttributes.Public | MethodAttributes.Static, type);
+        var startNew = new MethodDefinition(
+            "StartNew",
+            MethodAttributes.HideBySig | MethodAttributes.Public | MethodAttributes.Static,
+            type);
         type.Methods.Add(startNew);
         startNew.Body.Add(
             Instruction.Create(OpCodes.Newobj, constructor),
             Instruction.Create(OpCodes.Ret));
 
-        var stop = new MethodDefinition("Stop",
-            MethodAttributes.HideBySig | MethodAttributes.Public , TypeSystem.VoidReference);
+        var stop = new MethodDefinition(
+            "Stop",
+            MethodAttributes.HideBySig | MethodAttributes.Public,
+            TypeSystem.VoidReference);
         type.Methods.Add(stop);
         var stopReturn = Instruction.Create(OpCodes.Ret);
         stop.Body.Add(
@@ -66,26 +75,29 @@ public partial class ModuleWeaver
             Instruction.Create(OpCodes.Brtrue, stopReturn),
             Instruction.Create(OpCodes.Ldarg_0),
             Instruction.Create(OpCodes.Ldc_I4_1),
-            Instruction.Create(OpCodes.Stfld,stopped),
+            Instruction.Create(OpCodes.Stfld, stopped),
             Instruction.Create(OpCodes.Ldarg_0),
             Instruction.Create(OpCodes.Ldc_I4_0),
             Instruction.Create(OpCodes.Conv_I8),
-            Instruction.Create(OpCodes.Call,currentTicks),
+            Instruction.Create(OpCodes.Call, currentTicks),
             Instruction.Create(OpCodes.Ldarg_0),
-            Instruction.Create(OpCodes.Ldfld,startTicks),
+            Instruction.Create(OpCodes.Ldfld, startTicks),
             Instruction.Create(OpCodes.Sub),
-            Instruction.Create(OpCodes.Call,MaxMethod),
+            Instruction.Create(OpCodes.Call, MaxMethod),
             Instruction.Create(OpCodes.Stfld, elapsedTicks),
             stopReturn);
 
-        var elapsedMilliseconds = new MethodDefinition("GetElapsedMilliseconds", MethodAttributes.HideBySig | MethodAttributes.Public , TypeSystem.Int64Reference);
+        var elapsedMilliseconds = new MethodDefinition(
+            "GetElapsedMilliseconds",
+            MethodAttributes.HideBySig | MethodAttributes.Public,
+            TypeSystem.Int64Reference);
         type.Methods.Add(elapsedMilliseconds);
         elapsedMilliseconds.Body.Add(
             Instruction.Create(OpCodes.Ldarg_0),
             Instruction.Create(OpCodes.Call, stop),
             Instruction.Create(OpCodes.Ldarg_0),
-            Instruction.Create(OpCodes.Ldfld,elapsedTicks),
-            Instruction.Create(OpCodes.Ldc_I4,10000),
+            Instruction.Create(OpCodes.Ldfld, elapsedTicks),
+            Instruction.Create(OpCodes.Ldc_I4, 10000),
             Instruction.Create(OpCodes.Conv_I8),
             Instruction.Create(OpCodes.Div),
             Instruction.Create(OpCodes.Ret));

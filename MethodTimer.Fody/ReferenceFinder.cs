@@ -55,6 +55,11 @@ public partial class ModuleWeaver
         var voidType = FindTypeDefinition("System.Void");
         VoidType = ModuleDefinition.ImportReference(voidType);
 
+        var formatMethod = TypeSystem.StringDefinition.Method("Format", "String", "Object[]");
+        StringFormatWithArray = ModuleDefinition.ImportReference(formatMethod);
+        var concatMethod = TypeSystem.StringDefinition.Method("Concat", "Object", "Object", "Object");
+        ConcatMethod = ModuleDefinition.ImportReference(concatMethod);
+
         if (TryFindTypeDefinition("System.Diagnostics.Stopwatch", out var stopwatchType))
         {
             StopwatchType = ModuleDefinition.ImportReference(stopwatchType);
@@ -69,10 +74,5 @@ public partial class ModuleWeaver
             // Note: injected stopwatch is not supported for TimeSpan elapsed, should we error or add?
             InjectStopwatchType();
         }
-
-        var formatMethod = TypeSystem.StringDefinition.Method("Format", "String", "Object[]");
-        StringFormatWithArray = ModuleDefinition.ImportReference(formatMethod);
-        var concatMethod = TypeSystem.StringDefinition.Method("Concat", "Object", "Object", "Object");
-        ConcatMethod = ModuleDefinition.ImportReference(concatMethod);
     }
 }

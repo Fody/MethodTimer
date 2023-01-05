@@ -8,16 +8,12 @@ using MethodTimer;
 public class ClassWithAsyncMethod
 {
     [Time]
-    public async Task MethodWithAwaitAsync()
-    {
+    public async Task MethodWithAwaitAsync() =>
         await Task.Delay(500);
-    }
 
     [Time]
-    public async Task MethodWithAwaitAndExceptionAsync()
-    {
+    public async Task MethodWithAwaitAndExceptionAsync() =>
         await Task.Factory.StartNew(() => throw new Exception("Expected exception"));
-    }
 
     bool isRunning;
     bool isQueued;
@@ -59,7 +55,7 @@ public class ClassWithAsyncMethod
 
     public async Task MethodWithExceptionAsync_Expected()
     {
-        var sw = Stopwatch.StartNew();
+        var stopwatch = Stopwatch.StartNew();
 
         try
         {
@@ -68,8 +64,8 @@ public class ClassWithAsyncMethod
         }
         finally
         {
-            sw.Stop();
-            Trace.WriteLine($"Program.AsyncDelayWithTimer {sw.Elapsed}ms");
+            stopwatch.Stop();
+            Trace.WriteLine($"Program.AsyncDelayWithTimer {stopwatch.Elapsed}ms");
         }
     }
 }

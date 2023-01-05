@@ -24,38 +24,26 @@ public static class CecilExtensions
         return false;
     }
 
-    public static IEnumerable<MethodDefinition> AbstractMethods(this TypeDefinition type)
-    {
-        return type.Methods.Where(x => x.IsAbstract);
-    }
+    public static IEnumerable<MethodDefinition> AbstractMethods(this TypeDefinition type) =>
+        type.Methods.Where(x => x.IsAbstract);
 
-    public static IEnumerable<MethodDefinition> ConcreteMethods(this TypeDefinition type)
-    {
-        return type.Methods.Where(x => !x.IsAbstract &&
-                                       x.HasBody &&
-                                       !IsEmptyConstructor(x));
-    }
+    public static IEnumerable<MethodDefinition> ConcreteMethods(this TypeDefinition type) =>
+        type.Methods.Where(x => !x.IsAbstract &&
+                                x.HasBody &&
+                                !IsEmptyConstructor(x));
 
-    static bool IsEmptyConstructor(this MethodDefinition method)
-    {
-        return method.Name == ".ctor" &&
-               method.Body.Instructions.Count(x => x.OpCode != OpCodes.Nop) == 3;
-    }
+    static bool IsEmptyConstructor(this MethodDefinition method) =>
+        method.Name == ".ctor" &&
+        method.Body.Instructions.Count(x => x.OpCode != OpCodes.Nop) == 3;
 
-    public static bool IsInterceptor(this TypeReference type)
-    {
-        return type.Name == "MethodTimeLogger";
-    }
+    public static bool IsInterceptor(this TypeReference type) =>
+        type.Name == "MethodTimeLogger";
 
-    public static bool IsInstanceConstructor(this MethodDefinition methodDefinition)
-    {
-        return methodDefinition.IsConstructor && !methodDefinition.IsStatic;
-    }
+    public static bool IsInstanceConstructor(this MethodDefinition methodDefinition) =>
+        methodDefinition.IsConstructor && !methodDefinition.IsStatic;
 
-    public static void InsertBefore(this MethodBody body, Instruction target, Instruction instruction)
-    {
+    public static void InsertBefore(this MethodBody body, Instruction target, Instruction instruction) =>
         body.Instructions.InsertBefore(target, instruction);
-    }
 
     public static void InsertBefore(this Collection<Instruction> instructions, Instruction target, Instruction instruction)
     {
@@ -107,21 +95,15 @@ public static class CecilExtensions
         return nestedTypes.Any(x => x.Name.StartsWith(stateMachinePrefix));
     }
 
-    public static CustomAttribute GetAsyncStateMachineAttribute(this MethodDefinition method)
-    {
-        return method.CustomAttributes.FirstOrDefault(_ => _.AttributeType.Name == "AsyncStateMachineAttribute");
-    }
+    public static CustomAttribute GetAsyncStateMachineAttribute(this MethodDefinition method) =>
+        method.CustomAttributes.FirstOrDefault(_ => _.AttributeType.Name == "AsyncStateMachineAttribute");
 
-    public static bool IsAsync(this MethodDefinition method)
-    {
-        return GetAsyncStateMachineAttribute(method) != null;
-    }
+    public static bool IsAsync(this MethodDefinition method) =>
+        GetAsyncStateMachineAttribute(method) != null;
 
-    public static bool IsLeaveInstruction(this Instruction instruction)
-    {
-        return instruction.OpCode == OpCodes.Leave ||
-               instruction.OpCode == OpCodes.Leave_S;
-    }
+    public static bool IsLeaveInstruction(this Instruction instruction) =>
+        instruction.OpCode == OpCodes.Leave ||
+        instruction.OpCode == OpCodes.Leave_S;
 
     public static MethodDefinition Method(this TypeDefinition type, string name)
     {

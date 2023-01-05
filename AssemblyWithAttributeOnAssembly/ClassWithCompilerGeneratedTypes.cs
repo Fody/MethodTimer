@@ -9,8 +9,6 @@ public class ClassWithCompilerGeneratedTypes
         yield return "b";
     }
 
-    public async Task AsyncMethod()
-    {
+    public async Task AsyncMethod() =>
         await Task.Delay(100);
-    }
 }

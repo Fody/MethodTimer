@@ -84,6 +84,7 @@ public class MethodProcessor
                 return instruction.Next;
             }
         }
+
         return body.Instructions.First();
     }
 
@@ -102,9 +103,11 @@ public class MethodProcessor
                     instruction.Operand = lastRet;
                 }
             }
+
             instructions.Add(lastRet);
             return lastRet;
         }
+
         var returnVariable = new VariableDefinition(Method.ReturnType);
         body.Variables.Add(returnVariable);
         var lastLd = Instruction.Create(OpCodes.Ldloc, returnVariable);
@@ -119,6 +122,7 @@ public class MethodProcessor
                 instructions.Insert(index, Instruction.Create(OpCodes.Leave, lastLd));
             }
         }
+
         instructions.Add(lastLd);
         instructions.Add(Instruction.Create(OpCodes.Ret));
         return lastLd;

@@ -28,21 +28,17 @@ public class VBNetAssemblyWithInterceptorTests
         messagesField = methodTimeLogger.GetField("Messages");
     }
 
-    void ClearMessage()
+    static void ClearMessage()
     {
         methodBaseField.SetValue(null, new List<MethodBase>());
         messagesField.SetValue(null, new List<string>());
     }
 
-    List<MethodBase> GetMethodInfoField()
-    {
-        return (List<MethodBase>)methodBaseField.GetValue(null);
-    }
+    static List<MethodBase> GetMethodInfoField() =>
+        (List<MethodBase>)methodBaseField.GetValue(null);
 
-    List<string> GetMessagesField()
-    {
-        return (List<string>)messagesField.GetValue(null);
-    }
+    List<string> GetMessagesField() =>
+        (List<string>)messagesField.GetValue(null);
 
     [Fact]
     public void ClassWithAsyncMethod()

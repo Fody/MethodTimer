@@ -2,8 +2,6 @@
 
 public class ClassWithNoAttribute
 {
-    public void Method()
-    {
+    public void Method() =>
         Thread.Sleep(10);
-    }
 }

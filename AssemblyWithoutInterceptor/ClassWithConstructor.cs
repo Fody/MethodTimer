@@ -4,13 +4,10 @@ using MethodTimer;
 public class ClassWithConstructor
 {
     [Time]
-    public ClassWithConstructor()
-    {
+    public ClassWithConstructor() =>
         Thread.Sleep(10);
-    }
+
     [Time]
-    static ClassWithConstructor()
-    {
+    static ClassWithConstructor() =>
         Thread.Sleep(10);
-    }
 }

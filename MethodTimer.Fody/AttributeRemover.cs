@@ -2,8 +2,8 @@
 {
     void RemoveAttributes()
     {
-		ModuleDefinition.RemoveTimeAttribute();
-		ModuleDefinition.Assembly.RemoveTimeAttribute();
+        ModuleDefinition.RemoveTimeAttribute();
+        ModuleDefinition.Assembly.RemoveTimeAttribute();
         foreach (var typeDefinition in types)
         {
             typeDefinition.RemoveTimeAttribute();

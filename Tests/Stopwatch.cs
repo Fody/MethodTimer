@@ -7,10 +7,8 @@ class Stopwatch
     long elapsedTicks;
     bool stopped;
 
-    public static Stopwatch StartNew()
-    {
-        return new Stopwatch();
-    }
+    public static Stopwatch StartNew() =>
+        new Stopwatch();
 
     public void Stop()
     {
@@ -21,10 +19,8 @@ class Stopwatch
         }
     }
 
-    static long CurrentTicks()
-    {
-        return DateTime.UtcNow.Ticks;
-    }
+    static long CurrentTicks() =>
+        DateTime.UtcNow.Ticks;
 
     public long ElapsedMilliseconds
     {

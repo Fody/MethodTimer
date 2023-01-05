@@ -315,25 +315,19 @@ public class WithTimeSpanInterceptorAndFormattingTests
         Assert.Equal(InterceptorType.TimeSpan.ToString(), interceptorType);
     }
 
-    void ClearMessage()
+    static void ClearMessage()
     {
         methodBaseField.SetValue(null, new List<MethodBase>());
         messagesField.SetValue(null, new List<string>());
         interceptorTypesField.SetValue(null, new List<string>());
     }
 
-    List<MethodBase> GetMethodInfoField()
-    {
-        return (List<MethodBase>)methodBaseField.GetValue(null);
-    }
+    static List<MethodBase> GetMethodInfoField() =>
+        (List<MethodBase>)methodBaseField.GetValue(null);
 
-    List<string> GetMessagesField()
-    {
-        return (List<string>)messagesField.GetValue(null);
-    }
+    static List<string> GetMessagesField() =>
+        (List<string>)messagesField.GetValue(null);
 
-    List<string> GetInterceptorTypesField()
-    {
-        return (List<string>)interceptorTypesField.GetValue(null);
-    }
+    static List<string> GetInterceptorTypesField() =>
+        (List<string>)interceptorTypesField.GetValue(null);
 }

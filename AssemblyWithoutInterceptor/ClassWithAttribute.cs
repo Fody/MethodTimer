@@ -4,10 +4,8 @@ using MethodTimer;
 [Time]
 public class ClassWithAttribute
 {
-    public void Method()
-    {
+    public void Method() =>
         Thread.Sleep(10);
-    }
 }
 
 //TODO: recursive

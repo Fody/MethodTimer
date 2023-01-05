@@ -11,5 +11,4 @@ public class ClassWithYieldMethod
         yield return "C";
         yield return "X";
     }
-
 }

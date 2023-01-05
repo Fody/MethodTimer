@@ -54,21 +54,17 @@ public class WithInterceptorTests
         Assert.Equal(methodBase.DeclaringType, type);
     }
 
-    void ClearMessage()
+    static void ClearMessage()
     {
         methodBaseField.SetValue(null, new List<MethodBase>());
         messagesField.SetValue(null, new List<string>());
     }
 
-    List<MethodBase> GetMethodInfoField()
-    {
-        return (List<MethodBase>) methodBaseField.GetValue(null);
-    }
+    static List<MethodBase> GetMethodInfoField() =>
+        (List<MethodBase>) methodBaseField.GetValue(null);
 
-    List<string> GetMessagesField()
-    {
-        return (List<string>)messagesField.GetValue(null);
-    }
+    List<string> GetMessagesField() =>
+        (List<string>)messagesField.GetValue(null);
 
     [Fact]
     public void GenericClassWithMethod()
@@ -140,7 +136,7 @@ public class WithInterceptorTests
         });
 
         var methodBases = GetMethodInfoField();
-        
+
         // Make sure there are no 2, see https://github.com/Fody/MethodTimer/issues/124
         var allMethodBases = (from x in methodBases
                               where x.Name.Equals("MethodWithAwaitAndExceptionAsync")

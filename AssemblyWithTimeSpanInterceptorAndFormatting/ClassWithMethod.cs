@@ -5,16 +5,12 @@ using MethodTimer;
 public class ClassWithMethod
 {
     [Time]
-    public void MethodWithoutFormatting(string fileName, int id)
-    {
+    public void MethodWithoutFormatting(string fileName, int id) =>
         Thread.Sleep(10);
-    }
 
     [Time("File name '{fileName}' with id '{id}'")]
-    public void Method(string fileName, int id)
-    {
+    public void Method(string fileName, int id) =>
         Thread.Sleep(10);
-    }
 
     public void Method_Expected(string fileName, int id)
     {
@@ -52,8 +48,6 @@ public class ClassWithMethod
         }
     }
 
-    public override string ToString()
-    {
-        return "TEST VALUE";
-    }
+    public override string ToString() =>
+        "TEST VALUE";
 }

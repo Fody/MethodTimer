@@ -10,10 +10,8 @@ public static class AttributeChecker
         return customAttributes.FirstOrDefault(x => x.AttributeType.Name == "TimeAttribute");
     }
 
-    public static bool ContainsTimeAttribute(this ICustomAttributeProvider definition)
-    {
-        return GetTimeAttribute(definition) != null;
-    }
+    public static bool ContainsTimeAttribute(this ICustomAttributeProvider definition) =>
+        GetTimeAttribute(definition) != null;
 
     public static bool IsCompilerGenerated(this ICustomAttributeProvider definition)
     {
@@ -32,6 +30,5 @@ public static class AttributeChecker
         {
             customAttributes.Remove(timeAttribute);
         }
-
     }
 }

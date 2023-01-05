@@ -37,13 +37,9 @@ public class WithInterceptorInReferenceTests
         Assert.Equal(methodBase.DeclaringType, instance.GetType());
     }
 
-    void ClearMessage()
-    {
+    static void ClearMessage() =>
         methodBaseField.SetValue(null, new List<MethodBase>());
-    }
 
-    List<MethodBase> GetMethodInfoField()
-    {
-        return (List<MethodBase>)methodBaseField.GetValue(null);
-    }
+    static List<MethodBase> GetMethodInfoField() =>
+        (List<MethodBase>)methodBaseField.GetValue(null);
 }

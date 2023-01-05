@@ -1,6 +1,5 @@
 ﻿public partial class ModuleWeaver
 {
-
     void CheckForBadAttributes()
     {
         foreach (var typeDefinition in types)

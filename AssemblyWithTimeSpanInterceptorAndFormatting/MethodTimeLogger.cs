@@ -17,7 +17,7 @@ public static class MethodTimeLogger
 
     public static void Log(MethodBase methodBase, long milliseconds, string message)
     {
-        Console.WriteLine(methodBase.Name + " " + milliseconds + ": " + message);
+        Console.WriteLine($"{methodBase.Name} {milliseconds}: {message}");
 
         MethodBase.Add(methodBase);
         InterceptorTypes.Add(InterceptorType.Long.ToString());
@@ -30,7 +30,7 @@ public static class MethodTimeLogger
 
     public static void Log(MethodBase methodBase, TimeSpan elapsed, string message)
     {
-        Console.WriteLine(methodBase.Name + " " + elapsed + ": " + message);
+        Console.WriteLine($"{methodBase.Name} {elapsed}: {message}");
 
         MethodBase.Add(methodBase);
         InterceptorTypes.Add(InterceptorType.TimeSpan.ToString());

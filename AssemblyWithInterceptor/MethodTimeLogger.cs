@@ -4,7 +4,6 @@ using System.Reflection;
 
 public static class MethodTimeLogger
 {
-
     public static List<MethodBase> MethodBase = new List<MethodBase>();
     public static List<string> Messages = new List<string>();
 
@@ -18,5 +17,4 @@ public static class MethodTimeLogger
             Messages.Add(message);
         }
     }
-
 }

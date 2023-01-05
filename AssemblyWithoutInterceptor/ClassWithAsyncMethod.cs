@@ -24,16 +24,12 @@ public class ClassWithAsyncMethod
     }
 
     [Time]
-    public async Task MethodWithAwaitAsync()
-    {
+    public async Task MethodWithAwaitAsync() =>
         await Task.Delay(500);
-    }
 
     [Time]
-    public async Task MethodWithAwaitAndExceptionAsync()
-    {
+    public async Task MethodWithAwaitAndExceptionAsync() =>
         await Task.Factory.StartNew(() => throw new Exception("Expected exception"));
-    }
 
     bool isRunning;
     bool isQueued;
@@ -103,9 +99,6 @@ public class ClassWithAsyncMethod
         return true;
     }
 
-    public async Task MethodWithExceptionAsync()
-    {
+    public async Task MethodWithExceptionAsync() =>
         await Task.Factory.StartNew(() => throw new ArgumentOutOfRangeException());
-    }
-
 }

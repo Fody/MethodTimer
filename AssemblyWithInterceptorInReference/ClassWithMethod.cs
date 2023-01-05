@@ -4,8 +4,6 @@ using MethodTimer;
 public class ClassWithMethod
 {
     [Time]
-    public void Method()
-    {
+    public void Method() =>
         Thread.Sleep(10);
-    }
 }

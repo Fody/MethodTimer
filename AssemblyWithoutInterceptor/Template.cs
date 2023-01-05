@@ -18,21 +18,22 @@ class Template
             Trace.WriteLine("ClassWithAsyncMethod.MethodWithAwaitExpected " + stopwatch.ElapsedMilliseconds + "ms");
         }
     }
+
     public void MethodAndCatchReThrow()
     {
         var stopwatch = Stopwatch.StartNew();
         try
         {
 
-        try
-        {
-            Thread.Sleep(10);
-        }
-        catch (Exception)
-        {
+            try
+            {
+                Thread.Sleep(10);
+            }
+            catch (Exception)
+            {
                 Trace.WriteLine("sdf");
-            throw;
-        }
+                throw;
+            }
         }
         finally
         {

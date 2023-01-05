@@ -6,8 +6,6 @@ using MethodTimer;
 [Time]
 public class MiscMethods
 {
-
-
     public int MethodWithReturn()
     {
         Thread.Sleep(10);
@@ -27,6 +25,7 @@ public class MiscMethods
             throw;
         }
     }
+
     public void MethodAndCatchReThrow()
     {
         try
@@ -119,6 +118,7 @@ public class MiscMethods
             return 1;
         }
     }
+
     public int MethodWithThrowNewException()
     {
         try

@@ -31,11 +31,9 @@ public partial class ModuleWeaver: BaseModuleWeaver
         RemoveAttributes();
     }
 
-    MethodReference GetPreferredLogMethod()
-    {
-        // TimeSpan first, then long
-        return LogWithMessageMethodUsingTimeSpan ?? LogMethodUsingTimeSpan ?? LogWithMessageMethodUsingLong ?? LogMethodUsingLong;
-    }
+    // TimeSpan first, then long
+    MethodReference GetPreferredLogMethod() =>
+        LogWithMessageMethodUsingTimeSpan ?? LogMethodUsingTimeSpan ?? LogWithMessageMethodUsingLong ?? LogMethodUsingLong;
 
     public override IEnumerable<string> GetAssembliesForScanning()
     {

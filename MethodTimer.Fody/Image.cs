@@ -51,19 +51,15 @@ public static class Image
         return true;
     }
 
-    static ushort ReadUInt16(this Stream stream)
-    {
-        return (ushort)(stream.ReadByte()
-                        | (stream.ReadByte() << 8));
-    }
+    static ushort ReadUInt16(this Stream stream) =>
+        (ushort)(stream.ReadByte()
+                 | (stream.ReadByte() << 8));
 
-    static uint ReadUInt32(this Stream stream)
-    {
-        return (uint)(stream.ReadByte()
-                      | (stream.ReadByte() << 8)
-                      | (stream.ReadByte() << 16)
-                      | (stream.ReadByte() << 24));
-    }
+    static uint ReadUInt32(this Stream stream) =>
+        (uint)(stream.ReadByte()
+               | (stream.ReadByte() << 8)
+               | (stream.ReadByte() << 16)
+               | (stream.ReadByte() << 24));
 
     public static bool IsAssembly(string file)
     {

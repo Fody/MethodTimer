@@ -100,7 +100,7 @@ public partial class ModuleWeaver
 
                     if (string.Equals(parameterName, "this"))
                     {
-                        // IL_0028: ldarg.0  
+                        // IL_0028: ldarg.0
                         yield return Instruction.Create(OpCodes.Ldarg_0);
                     }
                     else
@@ -134,11 +134,12 @@ public partial class ModuleWeaver
         // inject as variable
         var stopwatchVar = new VariableDefinition(StopwatchType);
         body.Variables.Add(stopwatchVar);
-        body.Insert(index, new List<Instruction>(new[] {
-            Instruction.Create(OpCodes.Call, StartNewMethod),
-            Instruction.Create(OpCodes.Stloc, stopwatchVar)
-        }));
+        body.Insert(index, new List<Instruction>(
+            new[]
+            {
+                Instruction.Create(OpCodes.Call, StartNewMethod),
+                Instruction.Create(OpCodes.Stloc, stopwatchVar)
+            }));
         return stopwatchVar;
     }
-
 }

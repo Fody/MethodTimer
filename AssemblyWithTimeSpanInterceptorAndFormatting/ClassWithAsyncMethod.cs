@@ -36,10 +36,8 @@ public class ClassWithAsyncMethod
     }
 
     [Time("File name '{fileName}' with id '{id}'")]
-    public async Task MethodWithAwaitButUnusedParametersAsync(string fileName, int id)
-    {
+    public async Task MethodWithAwaitButUnusedParametersAsync(string fileName, int id) =>
         await Task.Delay(500);
-    }
 
     [Time("File name '{fileName}' with id '{id}'")]
     public async Task MethodWithAwaitAndExceptionAsync(string fileName, int id)
@@ -82,8 +80,6 @@ public class ClassWithAsyncMethod
         isRunning = false;
     }
 
-    public override string ToString()
-    {
-        return "TEST VALUE";
-    }
+    public override string ToString() =>
+        "TEST VALUE";
 }

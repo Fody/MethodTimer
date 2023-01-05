@@ -2,8 +2,6 @@
 
 public static class IgnoreCodes
 {
-    public static IEnumerable<string> GetIgnoreCoders()
-    {
-        return new[] { "0x80131869" };
-    }
+    public static IEnumerable<string> GetIgnoreCoders() =>
+        new[] { "0x80131869" };
 }

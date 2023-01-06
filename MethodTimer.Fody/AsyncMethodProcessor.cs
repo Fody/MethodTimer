@@ -17,7 +17,7 @@ public class AsyncMethodProcessor
     TypeDefinition stateMachineTypeDefinition;
     TypeReference stateMachineTypeReference;
     MethodDefinition stopStopwatchMethod;
-    ParameterFormattingProcessor parameterFormattingProcessor = new ParameterFormattingProcessor();
+    ParameterFormattingProcessor parameterFormattingProcessor = new();
 
     public void Process()
     {
@@ -27,7 +27,7 @@ public class AsyncMethodProcessor
         }
         catch (Exception exception)
         {
-            throw new Exception($"An error occurred processing '{Method.FullName}'. Error: {exception.Message}", exception);
+            throw new($"An error occurred processing '{Method.FullName}'. Error: {exception.Message}", exception);
         }
     }
 
@@ -93,7 +93,7 @@ public class AsyncMethodProcessor
                             x.Name.EndsWith("$State")
                       select x).First();
 
-        stateFieldReference = new FieldReference(stateFieldDefinition.Name, stateFieldDefinition.FieldType, stateMachineTypeReference);
+        stateFieldReference = new(stateFieldDefinition.Name, stateFieldDefinition.FieldType, stateMachineTypeReference);
 
         InjectStopwatchStart(index, body.Instructions[index]);
         InjectStopwatchStopMethod();
@@ -132,10 +132,10 @@ public class AsyncMethodProcessor
         var boolVariable = new VariableDefinition(ModuleWeaver.BooleanType.Resolve());
         body.Variables.Add(boolVariable);
 
-        stopwatchFieldDefinition = new FieldDefinition("methodTimerStopwatch", new FieldAttributes(), ModuleWeaver.StopwatchType);
+        stopwatchFieldDefinition = new("methodTimerStopwatch", new(), ModuleWeaver.StopwatchType);
         stateMachineTypeDefinition.Fields.Add(stopwatchFieldDefinition);
 
-        stopwatchFieldReference = new FieldReference(stopwatchFieldDefinition.Name, stopwatchFieldDefinition.FieldType, stateMachineTypeReference);
+        stopwatchFieldReference = new(stopwatchFieldDefinition.Name, stopwatchFieldDefinition.FieldType, stateMachineTypeReference);
 
         body.Insert(index, new[]
         {
@@ -324,7 +324,7 @@ public class AsyncMethodProcessor
             var formattedFieldDefinition = stateMachineTypeDefinition.Fields.FirstOrDefault(x => x.Name.Equals("methodTimerMessage"));
             if (formattedFieldDefinition is null)
             {
-                formattedFieldDefinition = new FieldDefinition("methodTimerMessage", FieldAttributes.Private | FieldAttributes.CompilerControlled, ModuleWeaver.TypeSystem.StringReference);
+                formattedFieldDefinition = new("methodTimerMessage", FieldAttributes.Private | FieldAttributes.CompilerControlled, ModuleWeaver.TypeSystem.StringReference);
                 stateMachineTypeDefinition.Fields.Add(formattedFieldDefinition);
             }
 

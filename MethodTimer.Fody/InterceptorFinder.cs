@@ -213,7 +213,7 @@ public partial class ModuleWeaver
         catch (Exception exception)
         {
             var message = $"Failed to read {referencePath}. {exception.Message}";
-            throw new Exception(message, exception);
+            throw new(message, exception);
         }
     }
 }

@@ -30,4 +30,9 @@ class Stopwatch
             return elapsedTicks / TicksPerMillisecond;
         }
     }
+
+    public TimeSpan Elapsed
+    {
+        get => new TimeSpan(elapsedTicks);
+    }
 }

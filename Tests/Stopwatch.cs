@@ -32,6 +32,6 @@ class Stopwatch
 
     public TimeSpan Elapsed
     {
-        get => new TimeSpan(elapsedTicks);
+        get => new(elapsedTicks);
     }
 }

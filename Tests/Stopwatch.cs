@@ -2,9 +2,14 @@ using System;
 
 class Stopwatch
 {
-    long startTicks = CurrentTicks();
+    long startTicks;
     long elapsedTicks;
     bool stopped;
+
+    public Stopwatch()
+    {
+        startTicks = CurrentTicks();
+    }
 
     public static Stopwatch StartNew() => new();
 

@@ -20,10 +20,14 @@ public partial class ModuleWeaver
         {
             if (logMethodUsingLong is null && logMethodUsingTimeSpan is null)
             {
+                var elapsedMillisecondsVariable = new VariableDefinition(TypeSystem.Int64Reference);
+                methodDefinition.Body.Variables.Add(elapsedMillisecondsVariable);
                 yield return Instruction.Create(OpCodes.Ldstr, methodDefinition.MethodName());
                 yield return Instruction.Create(OpCodes.Ldloc, stopwatchVariableDefinition);
                 yield return Instruction.Create(OpCodes.Call, ElapsedMilliseconds);
-                yield return Instruction.Create(OpCodes.Box, TypeSystem.Int64Reference);
+                yield return Instruction.Create(OpCodes.Stloc, elapsedMillisecondsVariable);
+                yield return Instruction.Create(OpCodes.Ldloca, elapsedMillisecondsVariable);
+                yield return Instruction.Create(OpCodes.Call, Int64ToString);
                 yield return Instruction.Create(OpCodes.Ldstr, "ms");
                 yield return Instruction.Create(OpCodes.Call, ConcatMethod);
                 yield return Instruction.Create(OpCodes.Call, TraceWriteLineMethod);

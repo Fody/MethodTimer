@@ -5,7 +5,7 @@ public class ParameterFormattingInfo
     public ParameterFormattingInfo()
     {
         Format = string.Empty;
-        ParameterNames = new List<string>();
+        ParameterNames = new();
     }
 
     public string Format { get; set; }

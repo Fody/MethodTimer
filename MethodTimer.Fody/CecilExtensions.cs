@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -111,7 +110,7 @@ public static class CecilExtensions
 
         if (method is null)
         {
-            throw new Exception($"Could not find method '{name}' on type {type.FullName}.");
+            throw new($"Could not find method '{name}' on type {type.FullName}.");
         }
 
         return method;
@@ -129,7 +128,7 @@ public static class CecilExtensions
 
         if (method is null)
         {
-            throw new Exception($"Could not find method '{name}' on type {type.FullName}.");
+            throw new($"Could not find method '{name}' on type {type.FullName}.");
         }
 
         return method;
@@ -140,7 +139,7 @@ public static class CecilExtensions
         var type = types.FirstOrDefault(x => x.Name == name);
         if (type is null)
         {
-            throw new Exception($"Could not find type '{name}'.");
+            throw new($"Could not find type '{name}'.");
         }
 
         return type;

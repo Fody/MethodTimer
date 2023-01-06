@@ -370,7 +370,13 @@ public class AsyncMethodProcessor
         if (timeAttribute != null)
         {
             var value = timeAttribute.ConstructorArguments.FirstOrDefault().Value as string;
-            if (!string.IsNullOrWhiteSpace(value))
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                // Load null a string
+                yield return Instruction.Create(OpCodes.Ldarg_0);
+                yield return Instruction.Create(OpCodes.Ldnull);
+            }
+            else
             {
                 // Note: no need to validate, already done in AssemblyProcessor::ProcessMethod
                 var info = parameterFormattingProcessor.ParseParameterFormatting(value);
@@ -419,12 +425,6 @@ public class AsyncMethodProcessor
                 }
 
                 yield return Instruction.Create(OpCodes.Call, ModuleWeaver.StringFormatWithArray);
-            }
-            else
-            {
-                // Load null a string
-                yield return Instruction.Create(OpCodes.Ldarg_0);
-                yield return Instruction.Create(OpCodes.Ldnull);
             }
 
             yield return Instruction.Create(OpCodes.Stfld, formattedFieldReference);

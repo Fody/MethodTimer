@@ -79,54 +79,56 @@ public partial class ModuleWeaver
     {
         // Load everything for a string format
         var timeAttribute = methodDefinition.GetTimeAttribute();
-        if (timeAttribute != null)
+        if (timeAttribute == null)
         {
-            var value = timeAttribute.ConstructorArguments.FirstOrDefault().Value as string;
-            if (!string.IsNullOrWhiteSpace(value))
+            yield break;
+        }
+
+        var value = timeAttribute.ConstructorArguments.FirstOrDefault().Value as string;
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            // Load null a string
+            yield return Instruction.Create(OpCodes.Ldnull);
+        }
+        else
+        {
+            var info = parameterFormattingProcessor.ParseParameterFormatting(value);
+
+            yield return Instruction.Create(OpCodes.Ldstr, info.Format);
+            yield return Instruction.Create(OpCodes.Ldc_I4, info.ParameterNames.Count);
+            yield return Instruction.Create(OpCodes.Newarr, TypeSystem.ObjectReference);
+
+            for (var i = 0; i < info.ParameterNames.Count; i++)
             {
-                var info = parameterFormattingProcessor.ParseParameterFormatting(value);
+                // Note: no need to validate, already done in AssemblyProcessor::ProcessMethod
+                var parameterName = info.ParameterNames[i];
 
-                yield return Instruction.Create(OpCodes.Ldstr, info.Format);
-                yield return Instruction.Create(OpCodes.Ldc_I4, info.ParameterNames.Count);
-                yield return Instruction.Create(OpCodes.Newarr, TypeSystem.ObjectReference);
+                yield return Instruction.Create(OpCodes.Dup);
+                yield return Instruction.Create(OpCodes.Ldc_I4, i);
 
-                for (var i = 0; i < info.ParameterNames.Count; i++)
+                if (string.Equals(parameterName, "this"))
                 {
-                    // Note: no need to validate, already done in AssemblyProcessor::ProcessMethod
-                    var parameterName = info.ParameterNames[i];
+                    // IL_0028: ldarg.0
+                    yield return Instruction.Create(OpCodes.Ldarg_0);
+                }
+                else
+                {
+                    var parameter = methodDefinition.Parameters.First(x => x.Name.Equals(parameterName));
+                    yield return Instruction.Create(OpCodes.Ldarg, parameter);
 
-                    yield return Instruction.Create(OpCodes.Dup);
-                    yield return Instruction.Create(OpCodes.Ldc_I4, i);
-
-                    if (string.Equals(parameterName, "this"))
+                    if (parameter.ParameterType.IsBoxingRequired(TypeSystem.ObjectReference))
                     {
-                        // IL_0028: ldarg.0
-                        yield return Instruction.Create(OpCodes.Ldarg_0);
+                        yield return Instruction.Create(OpCodes.Box, ModuleDefinition.ImportReference(parameter.ParameterType));
                     }
-                    else
-                    {
-                        var parameter = methodDefinition.Parameters.First(x => x.Name.Equals(parameterName));
-                        yield return Instruction.Create(OpCodes.Ldarg, parameter);
-
-                        if (parameter.ParameterType.IsBoxingRequired(TypeSystem.ObjectReference))
-                        {
-                            yield return Instruction.Create(OpCodes.Box, ModuleDefinition.ImportReference(parameter.ParameterType));
-                        }
-                    }
-
-                    yield return Instruction.Create(OpCodes.Stelem_Ref);
                 }
 
-                yield return Instruction.Create(OpCodes.Call, StringFormatWithArray);
-            }
-            else
-            {
-                // Load null a string
-                yield return Instruction.Create(OpCodes.Ldnull);
+                yield return Instruction.Create(OpCodes.Stelem_Ref);
             }
 
-            yield return Instruction.Create(OpCodes.Stloc, formattedVariableDefinition);
+            yield return Instruction.Create(OpCodes.Call, StringFormatWithArray);
         }
+
+        yield return Instruction.Create(OpCodes.Stloc, formattedVariableDefinition);
     }
 
     public VariableDefinition InjectStopwatch(MethodBody body, int index)

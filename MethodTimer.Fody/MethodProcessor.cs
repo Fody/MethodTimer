@@ -66,7 +66,7 @@ public class MethodProcessor
                     continue;
                 }
 
-                if (!(instruction.Operand is MethodReference methodReference))
+                if (instruction.Operand is not MethodReference methodReference)
                 {
                     continue;
                 }

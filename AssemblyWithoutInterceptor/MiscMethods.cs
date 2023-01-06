@@ -128,7 +128,7 @@ public class MiscMethods
         }
         catch (Exception e)
         {
-            throw new Exception("dd", e);
+            throw new("dd", e);
         }
     }
 
@@ -144,7 +144,7 @@ public class MiscMethods
             }
             catch (Exception e)
             {
-                throw new Exception("dd", e);
+                throw new("dd", e);
             }
         }
 // ReSharper disable once RedundantCatchClause

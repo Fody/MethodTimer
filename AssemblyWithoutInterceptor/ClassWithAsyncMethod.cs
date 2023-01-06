@@ -29,7 +29,7 @@ public class ClassWithAsyncMethod
 
     [Time]
     public async Task MethodWithAwaitAndExceptionAsync() =>
-        await Task.Factory.StartNew(() => throw new Exception("Expected exception"));
+        await Task.Factory.StartNew(() => throw new("Expected exception"));
 
     bool isRunning;
     bool isQueued;

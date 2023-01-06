@@ -1,12 +1,20 @@
-﻿using System.Threading;
+﻿using System;
+using System.Diagnostics;
+using System.Threading;
 
 public class StopWatchTemplateUsage
 {
-    public static long Foo()
+    public static void Foo()
     {
         var stopwatch = Stopwatch.StartNew();
-        Thread.Sleep(100);
-
-        return stopwatch.GetElapsedMilliseconds();
+        try
+        {
+            Thread.Sleep(100);
+        }
+        finally
+        {
+            stopwatch.Stop();
+            Trace.WriteLine("ClassWithAttribute.Method " + stopwatch.GetElapsedMilliseconds() + "ms");
+        }
     }
 }

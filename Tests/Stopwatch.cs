@@ -22,13 +22,10 @@ class Stopwatch
     static long CurrentTicks() =>
         DateTime.UtcNow.Ticks;
 
-    public long ElapsedMilliseconds
+    public long GetElapsedMilliseconds()
     {
-        get
-        {
-            Stop();
-            return elapsedTicks / 10000;
-        }
+        Stop();
+        return elapsedTicks / 10000;
     }
 
     public TimeSpan Elapsed

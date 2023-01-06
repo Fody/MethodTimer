@@ -129,7 +129,7 @@ public class AsyncMethodProcessor
 
     void InjectStopwatchStart(int index, Instruction nextInstruction)
     {
-        var boolVariable = new VariableDefinition(ModuleWeaver.BooleanType.Resolve());
+        var boolVariable = new VariableDefinition(ModuleWeaver.TypeSystem.BooleanReference);
         body.Variables.Add(boolVariable);
 
         stopwatchFieldDefinition = new("methodTimerStopwatch", new(), ModuleWeaver.StopwatchType);
@@ -165,7 +165,7 @@ public class AsyncMethodProcessor
             return;
         }
 
-        var method = new MethodDefinition("StopMethodTimerStopwatch", MethodAttributes.Private, ModuleWeaver.VoidType);
+        var method = new MethodDefinition("StopMethodTimerStopwatch", MethodAttributes.Private, ModuleWeaver.TypeSystem.VoidReference);
 
         var methodBody = method.Body;
         methodBody.SimplifyMacros();

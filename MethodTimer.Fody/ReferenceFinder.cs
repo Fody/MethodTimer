@@ -18,8 +18,6 @@ public partial class ModuleWeaver
     public MethodReference GetTicksMethod;
     public MethodReference UtcNowMethod;
     public TypeReference DateTimeType;
-    public TypeReference BooleanType;
-    public TypeReference VoidType;
 
     public void FindReferences()
     {
@@ -34,7 +32,7 @@ public partial class ModuleWeaver
         var writeLine = traceType.Method("WriteLine", "String");
         TraceWriteLineMethod = ModuleDefinition.ImportReference(writeLine);
 
-        var objectConstructor = FindTypeDefinition("System.Object").Method(".ctor");
+        var objectConstructor = TypeSystem.ObjectDefinition.Method(".ctor");
         ObjectConstructorMethod = ModuleDefinition.ImportReference(objectConstructor);
 
         var mathType = FindTypeDefinition("System.Math");
@@ -48,12 +46,6 @@ public partial class ModuleWeaver
         var methodBaseType = FindTypeDefinition("System.Reflection.MethodBase");
         var methodBase = methodBaseType.Method("GetMethodFromHandle", "RuntimeMethodHandle", "RuntimeTypeHandle");
         GetMethodFromHandle = ModuleDefinition.ImportReference(methodBase);
-
-        var booleanType = FindTypeDefinition("System.Boolean");
-        BooleanType = ModuleDefinition.ImportReference(booleanType);
-
-        var voidType = FindTypeDefinition("System.Void");
-        VoidType = ModuleDefinition.ImportReference(voidType);
 
         var formatMethod = TypeSystem.StringDefinition.Method("Format", "String", "Object[]");
         StringFormatWithArray = ModuleDefinition.ImportReference(formatMethod);

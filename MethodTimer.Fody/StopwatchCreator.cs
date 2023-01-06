@@ -101,8 +101,25 @@ public partial class ModuleWeaver
             Instruction.Create(OpCodes.Conv_I8),
             Instruction.Create(OpCodes.Div),
             Instruction.Create(OpCodes.Ret));
-
         ElapsedMilliseconds = elapsedMilliseconds;
+
+        var elapsed = new MethodDefinition(
+            "GetElapsed",
+            MethodAttributes.HideBySig | MethodAttributes.Public,
+            TimeSpanType);
+        type.Methods.Add(elapsed);
+        elapsed.Body.Add(
+            Instruction.Create(OpCodes.Ldarg_0),
+            Instruction.Create(OpCodes.Call, stop),
+            Instruction.Create(OpCodes.Ldarg_0),
+            Instruction.Create(OpCodes.Ldfld, elapsedTicks),
+            Instruction.Create(OpCodes.Newobj, TimeSpanConstructorMethod),
+            Instruction.Create(OpCodes.Ret));
+        
+        
+        IsRunning = ModuleDefinition.ImportReference(stopwatchType.Method("get_IsRunning"));
+
+        Elapsed = elapsed;
         StopMethod = stop;
         StopwatchType = type;
         StartNewMethod = startNew;

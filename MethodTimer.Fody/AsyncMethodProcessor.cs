@@ -266,14 +266,14 @@ public class AsyncMethodProcessor
         // Check if stopwatch is actually running
         yield return stopwatchRunningCheck;
         yield return Instruction.Create(OpCodes.Ldfld, stopwatchFieldReference);
-        yield return Instruction.Create(OpCodes.Callvirt, ModuleWeaver.IsRunning);
+        yield return Instruction.Create(OpCodes.Call, ModuleWeaver.IsRunning);
         yield return Instruction.Create(OpCodes.Ldc_I4_0);
         yield return Instruction.Create(OpCodes.Ceq);
         yield return Instruction.Create(OpCodes.Brfalse_S, startOfRealMethod);
         yield return Instruction.Create(OpCodes.Ret);
 
         yield return startOfRealMethod; // Ldarg_0
-        yield return Instruction.Create(OpCodes.Ldfld, stopwatchFieldReference);
+        yield return Instruction.Create(OpCodes.Ldflda, stopwatchFieldReference);
         yield return Instruction.Create(OpCodes.Call, ModuleWeaver.StopMethod);
 
         var logWithMessageMethodUsingLong = ModuleWeaver.LogWithMessageMethodUsingLong;

@@ -7,7 +7,7 @@ public partial class ModuleWeaver
 {
     public IEnumerable<Instruction> GetWriteTimeInstruction(VariableDefinition stopwatchVariableDefinition, MethodDefinition methodDefinition)
     {
-        yield return Instruction.Create(OpCodes.Ldloc, stopwatchVariableDefinition);
+        yield return Instruction.Create(OpCodes.Ldloca, stopwatchVariableDefinition);
         yield return Instruction.Create(OpCodes.Call, StopMethod);
 
         var logWithMessageMethodUsingLong = LogWithMessageMethodUsingLong;
@@ -21,7 +21,7 @@ public partial class ModuleWeaver
             if (logMethodUsingLong is null && logMethodUsingTimeSpan is null)
             {
                 yield return Instruction.Create(OpCodes.Ldstr, methodDefinition.MethodName());
-                yield return Instruction.Create(OpCodes.Ldloc, stopwatchVariableDefinition);
+                yield return Instruction.Create(OpCodes.Ldloca, stopwatchVariableDefinition);
                 yield return Instruction.Create(OpCodes.Call, ElapsedMilliseconds);
                 yield return Instruction.Create(OpCodes.Box, TypeSystem.Int64Reference);
                 yield return Instruction.Create(OpCodes.Ldstr, "ms");
@@ -34,7 +34,7 @@ public partial class ModuleWeaver
             yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition);
             yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition.DeclaringType);
             yield return Instruction.Create(OpCodes.Call, GetMethodFromHandle);
-            yield return Instruction.Create(OpCodes.Ldloc, stopwatchVariableDefinition);
+            yield return Instruction.Create(OpCodes.Ldloca, stopwatchVariableDefinition);
 
             if (logMethodUsingTimeSpan != null)
             {
@@ -60,7 +60,7 @@ public partial class ModuleWeaver
         yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition);
         yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition.DeclaringType);
         yield return Instruction.Create(OpCodes.Call, GetMethodFromHandle);
-        yield return Instruction.Create(OpCodes.Ldloc, stopwatchVariableDefinition);
+        yield return Instruction.Create(OpCodes.Ldloca, stopwatchVariableDefinition);
 
         if (logWithMessageMethodUsingTimeSpan is null)
         {

@@ -5,11 +5,12 @@ public partial class ModuleWeaver
 {
     public void InjectStopwatchType()
     {
+        var valueType = FindTypeDefinition("System.ValueType");
         var type = new TypeDefinition(
             "MethodTimer",
             "Stopwatch",
-            TypeAttributes.BeforeFieldInit | TypeAttributes.AnsiClass | TypeAttributes.AutoClass,
-            TypeSystem.ObjectReference);
+            TypeAttributes.Sealed |TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit | TypeAttributes.SequentialLayout | TypeAttributes.NotPublic,
+            ModuleDefinition.ImportReference(valueType));
         ModuleDefinition.Types.Add(type);
 
         var startTicks = new FieldDefinition("startTicks", FieldAttributes.Private, TypeSystem.Int64Reference);
@@ -48,10 +49,15 @@ public partial class ModuleWeaver
         type.Methods.Add(constructor);
         constructor.Body.Add(
             Instruction.Create(OpCodes.Ldarg_0),
+            Instruction.Create(OpCodes.Ldc_I4_0),
+            Instruction.Create(OpCodes.Conv_I8),
+            Instruction.Create(OpCodes.Stfld, elapsedTicks),
+            Instruction.Create(OpCodes.Ldarg_0),
+            Instruction.Create(OpCodes.Ldc_I4_0),
+            Instruction.Create(OpCodes.Stfld, stopped),
+            Instruction.Create(OpCodes.Ldarg_0),
             Instruction.Create(OpCodes.Call, currentTicks),
             Instruction.Create(OpCodes.Stfld, startTicks),
-            Instruction.Create(OpCodes.Ldarg_0),
-            Instruction.Create(OpCodes.Call, ObjectConstructorMethod),
             Instruction.Create(OpCodes.Ret));
 
         var startNew = new MethodDefinition(

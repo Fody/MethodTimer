@@ -7,8 +7,7 @@ class Stopwatch
     long elapsedTicks;
     bool stopped;
 
-    public static Stopwatch StartNew() =>
-        new Stopwatch();
+    public static Stopwatch StartNew() => new();
 
     public void Stop()
     {

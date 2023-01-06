@@ -8,7 +8,7 @@ using Mono.Cecil.Cil;
 public partial class ModuleWeaver
 {
     const string LongType = "System.Int64";
-    const string TimeSpanType = "System.TimeSpan";
+    const string TimeSpanTypeName = "System.TimeSpan";
 
     public MethodReference LogMethodUsingLong;
     public MethodReference LogWithMessageMethodUsingLong;
@@ -28,8 +28,8 @@ public partial class ModuleWeaver
             LogMethodUsingLong = FindLogMethod(interceptor, LongType);
             LogWithMessageMethodUsingLong = FindLogWithMessageMethod(interceptor, LongType);
 
-            LogMethodUsingTimeSpan = FindLogMethod(interceptor, TimeSpanType);
-            LogWithMessageMethodUsingTimeSpan = FindLogWithMessageMethod(interceptor, TimeSpanType);
+            LogMethodUsingTimeSpan = FindLogMethod(interceptor, TimeSpanTypeName);
+            LogWithMessageMethodUsingTimeSpan = FindLogWithMessageMethod(interceptor, TimeSpanTypeName);
 
             if (LogMethodUsingLong is null && LogWithMessageMethodUsingLong is null &&
                 LogMethodUsingTimeSpan is null && LogWithMessageMethodUsingTimeSpan is null)
@@ -85,13 +85,13 @@ public partial class ModuleWeaver
                 LogWithMessageMethodUsingLong = ModuleDefinition.ImportReference(logWithMessageMethodUsingLong);
             }
 
-            var logMethodUsingTimeSpan = FindLogMethod(interceptor, TimeSpanType);
+            var logMethodUsingTimeSpan = FindLogMethod(interceptor, TimeSpanTypeName);
             if (logMethodUsingTimeSpan != null)
             {
                 LogMethodUsingTimeSpan = ModuleDefinition.ImportReference(logMethodUsingTimeSpan);
             }
 
-            var logWithMessageMethodUsingTimeSpan = FindLogWithMessageMethod(interceptor, TimeSpanType);
+            var logWithMessageMethodUsingTimeSpan = FindLogWithMessageMethod(interceptor, TimeSpanTypeName);
             if (logWithMessageMethodUsingTimeSpan != null)
             {
                 LogWithMessageMethodUsingTimeSpan = ModuleDefinition.ImportReference(logWithMessageMethodUsingTimeSpan);

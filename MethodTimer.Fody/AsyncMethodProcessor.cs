@@ -170,9 +170,7 @@ public class AsyncMethodProcessor
         var methodBody = method.Body;
         methodBody.SimplifyMacros();
 
-        var stopwatchInstructions = GetWriteTimeInstruction().ToList();
-
-        foreach (var instruction in stopwatchInstructions)
+        foreach (var instruction in GetWriteTimeInstruction(methodBody))
         {
             methodBody.Instructions.Add(instruction);
         }
@@ -251,7 +249,7 @@ public class AsyncMethodProcessor
         }
     }
 
-    IEnumerable<Instruction> GetWriteTimeInstruction()
+    IEnumerable<Instruction> GetWriteTimeInstruction(MethodBody methodBody)
     {
         var stopwatchRunningCheck = Instruction.Create(OpCodes.Ldarg_0);
         var startOfRealMethod = Instruction.Create(OpCodes.Ldarg_0);
@@ -286,11 +284,15 @@ public class AsyncMethodProcessor
         {
             if (logMethodUsingLong is null && logMethodUsingTimeSpan is null)
             {
+                var elapsedMillisecondsVariable = new VariableDefinition(ModuleWeaver.TypeSystem.Int64Reference);
+                methodBody.Variables.Add(elapsedMillisecondsVariable);
                 yield return Instruction.Create(OpCodes.Ldstr, Method.MethodName());
                 yield return Instruction.Create(OpCodes.Ldarg_0);
                 yield return Instruction.Create(OpCodes.Ldfld, stopwatchFieldReference);
                 yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);
-                yield return Instruction.Create(OpCodes.Box, ModuleWeaver.TypeSystem.Int64Reference);
+                yield return Instruction.Create(OpCodes.Stloc, elapsedMillisecondsVariable);
+                yield return Instruction.Create(OpCodes.Ldloca, elapsedMillisecondsVariable);
+                yield return Instruction.Create(OpCodes.Call, ModuleWeaver.Int64ToString);
                 yield return Instruction.Create(OpCodes.Ldstr, "ms");
                 yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ConcatMethod);
                 yield return Instruction.Create(OpCodes.Call, ModuleWeaver.TraceWriteLineMethod);

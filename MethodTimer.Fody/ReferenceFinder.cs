@@ -18,6 +18,7 @@ public partial class ModuleWeaver
     public MethodReference GetTicksMethod;
     public MethodReference UtcNowMethod;
     public TypeReference DateTimeType;
+    public MethodReference Int64ToString;
 
     public void FindReferences()
     {
@@ -47,9 +48,12 @@ public partial class ModuleWeaver
         var methodBase = methodBaseType.Method("GetMethodFromHandle", "RuntimeMethodHandle", "RuntimeTypeHandle");
         GetMethodFromHandle = ModuleDefinition.ImportReference(methodBase);
 
+        var int64ToString = TypeSystem.Int64Definition.Method("ToString");
+        Int64ToString = ModuleDefinition.ImportReference(int64ToString);
+
         var formatMethod = TypeSystem.StringDefinition.Method("Format", "String", "Object[]");
         StringFormatWithArray = ModuleDefinition.ImportReference(formatMethod);
-        var concatMethod = TypeSystem.StringDefinition.Method("Concat", "Object", "Object", "Object");
+        var concatMethod = TypeSystem.StringDefinition.Method("Concat", "String", "String", "String");
         ConcatMethod = ModuleDefinition.ImportReference(concatMethod);
 
         if (TryFindTypeDefinition("System.Diagnostics.Stopwatch", out var stopwatchType))

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Threading.Tasks;
 using MethodTimer;
 #pragma warning disable 414
@@ -13,7 +12,7 @@ public class ClassWithAsyncMethod
 
     [Time]
     public async Task MethodWithAwaitAndExceptionAsync() =>
-        await Task.Factory.StartNew(() => throw new Exception("Expected exception"));
+        await Task.Factory.StartNew(() => throw new("Expected exception"));
 
     bool isRunning;
     bool isQueued;
@@ -50,7 +49,7 @@ public class ClassWithAsyncMethod
     public async Task MethodWithExceptionAsync()
     {
         await Task.Delay(1000);
-        throw new Exception();
+        throw new();
     }
 
     public async Task MethodWithExceptionAsync_Expected()
@@ -60,7 +59,7 @@ public class ClassWithAsyncMethod
         try
         {
             await Task.Delay(1000);
-            throw new Exception();
+            throw new();
         }
         finally
         {

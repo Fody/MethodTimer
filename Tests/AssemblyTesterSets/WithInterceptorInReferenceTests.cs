@@ -13,7 +13,7 @@ public class WithInterceptorInReferenceTests
     {
         var weavingTask = new ModuleWeaver
         {
-            ReferenceCopyLocalPaths = new List<string>
+            ReferenceCopyLocalPaths = new()
             {
                 "AssemblyToReference.dll"
             }

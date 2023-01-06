@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 public class MyTraceListener : TraceListener
 {
-    public List<string> Messages = new List<string>();
+    public List<string> Messages = new();
 
     public override void Write(string message) =>
         Messages.Add(message);

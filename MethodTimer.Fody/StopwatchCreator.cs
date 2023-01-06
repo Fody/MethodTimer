@@ -116,7 +116,7 @@ public partial class ModuleWeaver
             Instruction.Create(OpCodes.Ret));
 
         var isRunning = new MethodDefinition(
-            "IsRunning",
+            "GetIsRunning",
             MethodAttributes.HideBySig | MethodAttributes.Public,
             TypeSystem.BooleanReference);
         type.Methods.Add(isRunning);

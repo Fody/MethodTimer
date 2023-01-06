@@ -1,6 +1,6 @@
 using System;
 
-class Stopwatch
+struct Stopwatch
 {
     long startTicks;
     long elapsedTicks;

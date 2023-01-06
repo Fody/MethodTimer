@@ -3,7 +3,6 @@ using System;
 class Stopwatch
 {
     long startTicks = CurrentTicks();
-    const long TicksPerMillisecond = 10000;
     long elapsedTicks;
     bool stopped;
 
@@ -28,7 +27,7 @@ class Stopwatch
         get
         {
             Stop();
-            return elapsedTicks / TicksPerMillisecond;
+            return elapsedTicks / 10000;
         }
     }
 

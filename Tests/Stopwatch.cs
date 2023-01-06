@@ -18,6 +18,8 @@ class Stopwatch
         }
     }
 
+    public bool IsRunning { get => !stopped; }
+
     static long CurrentTicks() =>
         DateTime.UtcNow.Ticks;
 
@@ -32,6 +34,10 @@ class Stopwatch
 
     public TimeSpan Elapsed
     {
-        get => new(elapsedTicks);
+        get
+        {
+            Stop();
+            return new(elapsedTicks);
+        }
     }
 }

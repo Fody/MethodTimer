@@ -24,7 +24,6 @@ class Template
         var stopwatch = Stopwatch.StartNew();
         try
         {
-
             try
             {
                 Thread.Sleep(10);
@@ -37,11 +36,9 @@ class Template
         }
         finally
         {
-
             stopwatch.Stop();
             Trace.WriteLine("ClassWithAsyncMethod.MethodWithAwaitExpected " + stopwatch.ElapsedMilliseconds + "ms");
         }
-
     }
 
     public async Task<bool> MethodWithAwaitExpected(bool expectedReturn)

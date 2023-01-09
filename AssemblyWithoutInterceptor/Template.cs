@@ -15,7 +15,21 @@ class Template
         finally
         {
             stopwatch.Stop();
-            Trace.WriteLine("ClassWithAsyncMethod.MethodWithAwaitExpected " + stopwatch.ElapsedMilliseconds + "ms");
+            Trace.WriteLine("Template.MethodWithAwaitExpected " + stopwatch.ElapsedMilliseconds + "ms");
+        }
+    }
+
+    public void Method()
+    {
+        var stopwatch = Stopwatch.StartNew();
+        try
+        {
+            Thread.Sleep(500);
+        }
+        finally
+        {
+            stopwatch.Stop();
+            Trace.WriteLine("Template.Method " + stopwatch.ElapsedMilliseconds + "ms");
         }
     }
 
@@ -24,7 +38,6 @@ class Template
         var stopwatch = Stopwatch.StartNew();
         try
         {
-
             try
             {
                 Thread.Sleep(10);
@@ -37,11 +50,9 @@ class Template
         }
         finally
         {
-
             stopwatch.Stop();
-            Trace.WriteLine("ClassWithAsyncMethod.MethodWithAwaitExpected " + stopwatch.ElapsedMilliseconds + "ms");
+            Trace.WriteLine("Template.MethodWithAwaitExpected " + stopwatch.ElapsedMilliseconds + "ms");
         }
-
     }
 
     public async Task<bool> MethodWithAwaitExpected(bool expectedReturn)
@@ -51,7 +62,7 @@ class Template
         if (expectedReturn)
         {
             stopwatch.Stop();
-            Trace.WriteLine("ClassWithAsyncMethod.MethodWithAwaitExpected " + stopwatch.ElapsedMilliseconds + "ms");
+            Trace.WriteLine("Template.MethodWithAwaitExpected " + stopwatch.ElapsedMilliseconds + "ms");
 
             return false;
         }
@@ -59,7 +70,7 @@ class Template
         await Task.Delay(500);
 
         stopwatch.Stop();
-        Trace.WriteLine("ClassWithAsyncMethod.MethodWithAwaitExpected " + stopwatch.ElapsedMilliseconds + "ms");
+        Trace.WriteLine("Template.MethodWithAwaitExpected " + stopwatch.ElapsedMilliseconds + "ms");
 
         return true;
     }
@@ -75,6 +86,6 @@ class Template
     //    Thread.Sleep(2222);
 
     //    stopwatch.Stop();
-    //    Debug.WriteLine("ClassWithAsyncMethod.MethodWithAwaitExpected " + stopwatch.ElapsedMilliseconds + "ms");
+    //    Debug.WriteLine("Template.MethodWithAwaitExpected " + stopwatch.ElapsedMilliseconds + "ms");
     //}
 }

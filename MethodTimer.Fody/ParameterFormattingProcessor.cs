@@ -2,7 +2,7 @@
 
 public class ParameterFormattingProcessor
 {
-    Regex regex = new Regex("{.*?}");
+    Regex regex = new("{.*?}");
 
     public ParameterFormattingInfo ParseParameterFormatting(string formatting)
     {

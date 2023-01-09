@@ -7,11 +7,11 @@ public partial class ModuleWeaver: BaseModuleWeaver
 {
     List<TypeDefinition> types;
 
-    ParameterFormattingProcessor parameterFormattingProcessor = new ParameterFormattingProcessor();
+    ParameterFormattingProcessor parameterFormattingProcessor = new();
 
     public ModuleWeaver()
     {
-        ReferenceCopyLocalPaths = new List<string>();
+        ReferenceCopyLocalPaths = new();
     }
 
     public override void Execute()

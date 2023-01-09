@@ -4,7 +4,7 @@ using System.Reflection;
 
 public static class MethodTimeLogger
 {
-    public static List<MethodBase> MethodBase = new List<MethodBase>();
+    public static List<MethodBase> MethodBase = new();
 
     public static void Log(MethodBase methodBase, long milliseconds)
     {

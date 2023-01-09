@@ -22,6 +22,7 @@ public partial class ModuleWeaver
     public TypeReference TimeSpanType;
     public TypeReference BooleanType;
     public TypeReference VoidType;
+    public MethodReference Int64ToString;
 
     public void FindReferences()
     {
@@ -36,7 +37,7 @@ public partial class ModuleWeaver
         var writeLine = traceType.Method("WriteLine", "String");
         TraceWriteLineMethod = ModuleDefinition.ImportReference(writeLine);
 
-        var objectConstructor = FindTypeDefinition("System.Object").Method(".ctor");
+        var objectConstructor = TypeSystem.ObjectDefinition.Method(".ctor");
         ObjectConstructorMethod = ModuleDefinition.ImportReference(objectConstructor);
 
         var timeSpanDefinition = FindTypeDefinition("System.TimeSpan");
@@ -56,15 +57,12 @@ public partial class ModuleWeaver
         var methodBase = methodBaseType.Method("GetMethodFromHandle", "RuntimeMethodHandle", "RuntimeTypeHandle");
         GetMethodFromHandle = ModuleDefinition.ImportReference(methodBase);
 
-        var booleanType = FindTypeDefinition("System.Boolean");
-        BooleanType = ModuleDefinition.ImportReference(booleanType);
-
-        var voidType = FindTypeDefinition("System.Void");
-        VoidType = ModuleDefinition.ImportReference(voidType);
+        var int64ToString = TypeSystem.Int64Definition.Method("ToString");
+        Int64ToString = ModuleDefinition.ImportReference(int64ToString);
 
         var formatMethod = TypeSystem.StringDefinition.Method("Format", "String", "Object[]");
         StringFormatWithArray = ModuleDefinition.ImportReference(formatMethod);
-        var concatMethod = TypeSystem.StringDefinition.Method("Concat", "Object", "Object", "Object");
+        var concatMethod = TypeSystem.StringDefinition.Method("Concat", "String", "String", "String");
         ConcatMethod = ModuleDefinition.ImportReference(concatMethod);
 
         InjectStopwatchType();

@@ -129,7 +129,7 @@ public class AsyncMethodProcessor
 
     void InjectStopwatchStart(int index, Instruction nextInstruction)
     {
-        var boolVariable = new VariableDefinition(ModuleWeaver.BooleanType.Resolve());
+        var boolVariable = new VariableDefinition(ModuleWeaver.TypeSystem.BooleanReference);
         body.Variables.Add(boolVariable);
 
         stopwatchFieldDefinition = new("methodTimerStopwatch", new(), ModuleWeaver.StopwatchType);
@@ -165,14 +165,12 @@ public class AsyncMethodProcessor
             return;
         }
 
-        var method = new MethodDefinition("StopMethodTimerStopwatch", MethodAttributes.Private, ModuleWeaver.VoidType);
+        var method = new MethodDefinition("StopMethodTimerStopwatch", MethodAttributes.Private, ModuleWeaver.TypeSystem.VoidReference);
 
         var methodBody = method.Body;
         methodBody.SimplifyMacros();
 
-        var stopwatchInstructions = GetWriteTimeInstruction().ToList();
-
-        foreach (var instruction in stopwatchInstructions)
+        foreach (var instruction in GetWriteTimeInstruction(methodBody))
         {
             methodBody.Instructions.Add(instruction);
         }
@@ -251,7 +249,7 @@ public class AsyncMethodProcessor
         }
     }
 
-    IEnumerable<Instruction> GetWriteTimeInstruction()
+    IEnumerable<Instruction> GetWriteTimeInstruction(MethodBody methodBody)
     {
         var stopwatchRunningCheck = Instruction.Create(OpCodes.Ldarg_0);
         var startOfRealMethod = Instruction.Create(OpCodes.Ldarg_0);
@@ -286,11 +284,15 @@ public class AsyncMethodProcessor
         {
             if (logMethodUsingLong is null && logMethodUsingTimeSpan is null)
             {
+                var elapsedMillisecondsVariable = new VariableDefinition(ModuleWeaver.TypeSystem.Int64Reference);
+                methodBody.Variables.Add(elapsedMillisecondsVariable);
                 yield return Instruction.Create(OpCodes.Ldstr, Method.MethodName());
                 yield return Instruction.Create(OpCodes.Ldarg_0);
                 yield return Instruction.Create(OpCodes.Ldfld, stopwatchFieldReference);
                 yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);
-                yield return Instruction.Create(OpCodes.Box, ModuleWeaver.TypeSystem.Int64Reference);
+                yield return Instruction.Create(OpCodes.Stloc, elapsedMillisecondsVariable);
+                yield return Instruction.Create(OpCodes.Ldloca, elapsedMillisecondsVariable);
+                yield return Instruction.Create(OpCodes.Call, ModuleWeaver.Int64ToString);
                 yield return Instruction.Create(OpCodes.Ldstr, "ms");
                 yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ConcatMethod);
                 yield return Instruction.Create(OpCodes.Call, ModuleWeaver.TraceWriteLineMethod);
@@ -368,7 +370,13 @@ public class AsyncMethodProcessor
         if (timeAttribute != null)
         {
             var value = timeAttribute.ConstructorArguments.FirstOrDefault().Value as string;
-            if (!string.IsNullOrWhiteSpace(value))
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                // Load null a string
+                yield return Instruction.Create(OpCodes.Ldarg_0);
+                yield return Instruction.Create(OpCodes.Ldnull);
+            }
+            else
             {
                 // Note: no need to validate, already done in AssemblyProcessor::ProcessMethod
                 var info = parameterFormattingProcessor.ParseParameterFormatting(value);
@@ -417,12 +425,6 @@ public class AsyncMethodProcessor
                 }
 
                 yield return Instruction.Create(OpCodes.Call, ModuleWeaver.StringFormatWithArray);
-            }
-            else
-            {
-                // Load null a string
-                yield return Instruction.Create(OpCodes.Ldarg_0);
-                yield return Instruction.Create(OpCodes.Ldnull);
             }
 
             yield return Instruction.Create(OpCodes.Stfld, formattedFieldReference);

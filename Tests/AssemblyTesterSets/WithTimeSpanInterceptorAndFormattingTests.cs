@@ -57,7 +57,7 @@ public class WithTimeSpanInterceptorAndFormattingTests
         Assert.Single(interceptorTypes);
 
         var interceptorType = interceptorTypes.First();
-        Assert.Equal(InterceptorType.TimeSpan.ToString(), interceptorType);
+        Assert.Equal(nameof(InterceptorType.TimeSpan), interceptorType);
     }
 
     [Fact]
@@ -87,7 +87,7 @@ public class WithTimeSpanInterceptorAndFormattingTests
         Assert.Single(interceptorTypes);
 
         var interceptorType = interceptorTypes.First();
-        Assert.Equal(InterceptorType.TimeSpan.ToString(), interceptorType);
+        Assert.Equal(nameof(InterceptorType.TimeSpan), interceptorType);
     }
 
     [Fact]
@@ -114,7 +114,7 @@ public class WithTimeSpanInterceptorAndFormattingTests
         Assert.Single(interceptorTypes);
 
         var interceptorType = interceptorTypes.First();
-        Assert.Equal(InterceptorType.TimeSpan.ToString(), interceptorType);
+        Assert.Equal(nameof(InterceptorType.TimeSpan), interceptorType);
     }
 
     [Fact]
@@ -147,7 +147,7 @@ public class WithTimeSpanInterceptorAndFormattingTests
         Assert.Single(interceptorTypes);
 
         var interceptorType = interceptorTypes.First();
-        Assert.Equal(InterceptorType.TimeSpan.ToString(), interceptorType);
+        Assert.Equal(nameof(InterceptorType.TimeSpan), interceptorType);
     }
 
     [Fact]
@@ -180,7 +180,7 @@ public class WithTimeSpanInterceptorAndFormattingTests
         Assert.Single(interceptorTypes);
 
         var interceptorType = interceptorTypes.First();
-        Assert.Equal(InterceptorType.TimeSpan.ToString(), interceptorType);
+        Assert.Equal(nameof(InterceptorType.TimeSpan), interceptorType);
     }
 
     [Fact]
@@ -210,7 +210,7 @@ public class WithTimeSpanInterceptorAndFormattingTests
         Assert.Single(interceptorTypes);
 
         var interceptorType = interceptorTypes.First();
-        Assert.Equal(InterceptorType.TimeSpan.ToString(), interceptorType);
+        Assert.Equal(nameof(InterceptorType.TimeSpan), interceptorType);
     }
 
     // Note: in DEBUG because this only needs to run against optimized libraries
@@ -275,7 +275,7 @@ public class WithTimeSpanInterceptorAndFormattingTests
         Assert.Single(interceptorTypes);
 
         var interceptorType = interceptorTypes.First();
-        Assert.Equal(InterceptorType.TimeSpan.ToString(), interceptorType);
+        Assert.Equal(nameof(InterceptorType.TimeSpan), interceptorType);
     }
 
     [Theory]
@@ -312,7 +312,7 @@ public class WithTimeSpanInterceptorAndFormattingTests
         Assert.Equal(recurse ? 2 : 1, interceptorTypes.Count);
 
         var interceptorType = interceptorTypes.First();
-        Assert.Equal(InterceptorType.TimeSpan.ToString(), interceptorType);
+        Assert.Equal(nameof(InterceptorType.TimeSpan), interceptorType);
     }
 
     static void ClearMessage()

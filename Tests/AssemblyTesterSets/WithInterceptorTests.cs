@@ -195,4 +195,32 @@ public class WithInterceptorTests
         var methodBase = methodBases.Last();
         Assert.Equal("MethodWithFastPathAsync", methodBase.Name);
     }
+
+    [Fact]
+    public void LocalInstanceMethod()
+    {
+        ClearMessage();
+        var type = testResult.Assembly.GetType("ClassWithLocalMethods");
+        var instance = (dynamic) Activator.CreateInstance(type);
+        instance.MethodWithLocalInstanceMethod();
+        var methodBases = GetMethodInfoField();
+        Assert.Single(methodBases);
+        var methodBase = methodBases.First();
+        Assert.Contains("LocalInstanceMethodToTime", methodBase.Name);
+        Assert.Equal(methodBase.DeclaringType, type);
+    }
+
+    [Fact]
+    public void LocalStaticMethod()
+    {
+        ClearMessage();
+        var type = testResult.Assembly.GetType("ClassWithLocalMethods");
+        var instance = (dynamic) Activator.CreateInstance(type);
+        instance.MethodWithLocalStaticMethod();
+        var methodBases = GetMethodInfoField();
+        Assert.Single(methodBases);
+        var methodBase = methodBases.First();
+        Assert.Contains("LocalStaticMethodToTime", methodBase.Name);
+        Assert.Equal(methodBase.DeclaringType, type);
+    }
 }

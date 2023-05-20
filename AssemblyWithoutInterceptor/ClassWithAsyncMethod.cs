@@ -116,8 +116,15 @@ public class ClassWithGenericResultAsyncMethodBase
 
 public class ClassWithGenericResultAsyncMethod : ClassWithGenericResultAsyncMethodBase
 {
+    [Time()]
+    public async Task<List<T>> DoSomethingWithoutMessageAsync<T>()
+    {
+        var result = await base.DoSomethingAsync<T>();
+        return result;
+    }
+
     [Time("some message")]
-    public override async Task<List<T>> DoSomethingAsync<T>()
+    public async Task<List<T>> DoSomethingWithMessageAsync<T>()
     {
         var result = await base.DoSomethingAsync<T>();
         return result;

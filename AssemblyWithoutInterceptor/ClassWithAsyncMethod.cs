@@ -122,11 +122,4 @@ public class ClassWithGenericResultAsyncMethod : ClassWithGenericResultAsyncMeth
         var result = await base.DoSomethingAsync<T>();
         return result;
     }
-
-    [Time("some message")]
-    public async Task<List<T>> DoSomethingWithMessageAsync<T>()
-    {
-        var result = await base.DoSomethingAsync<T>();
-        return result;
-    }
 }

@@ -58,33 +58,18 @@ public partial class WithoutInterceptorTests
     }
 
     [Fact]
-    public void ClassWithGenericTaskWithoutMessageAsyncMethod()
+    public async Task ClassWithGenericTaskWithoutMessageAsyncMethod()
     {
         var type = testResult.Assembly.GetType("ClassWithGenericResultAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
-        var message = TraceRunner.Capture(() =>
+        var message = await TraceRunner.CaptureAsync(async () =>
         {
             var task = (Task)instance.DoSomethingWithoutMessageAsync<int>();
-            task.Wait();
+            await task;
         });
 
         Assert.Single(message);
         Assert.StartsWith("ClassWithGenericResultAsyncMethod.DoSomethingWithoutMessageAsync", message.First());
-    }
-
-    [Fact]
-    public void ClassWithGenericTaskWithMessageAsyncMethod()
-    {
-        var type = testResult.Assembly.GetType("ClassWithGenericResultAsyncMethod");
-        var instance = (dynamic)Activator.CreateInstance(type);
-        var message = TraceRunner.Capture(() =>
-        {
-            var task = (Task)instance.DoSomethingWithMessageAsync<int>();
-            task.Wait();
-        });
-
-        Assert.Single(message);
-        Assert.StartsWith("ClassWithGenericResultAsyncMethod.DoSomethingWithMessageAsync", message.First());
     }
 
     [Theory]

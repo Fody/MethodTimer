@@ -199,6 +199,30 @@ public class WithInterceptorAndFormattingTests
         Assert.Equal("File name '123' with id '42'", message);
     }
 
+    [Fact]
+    public void ClassWithGenericAsyncMethod()
+    {
+        ClearMessage();
+
+        var type = testResult.Assembly.GetType("ClassWithAsyncMethod");
+        var instance = (dynamic)Activator.CreateInstance(type);
+        TraceRunner.Capture(() =>
+        {
+            var task = (Task)instance.MethodWithGenericResultAsync<int>();
+            task.Wait();
+        });
+
+        var methodBases = GetMethodInfoField();
+        var methodBase = methodBases.Last();
+        Assert.Equal("MethodWithGenericResultAsync", methodBase.Name);
+
+        var messages = GetMessagesField();
+        Assert.Single(messages);
+
+        var message = messages.First();
+        Assert.Equal("some message", message);
+    }
+
     static void ClearMessage()
     {
         methodBaseField.SetValue(null, new List<MethodBase>());

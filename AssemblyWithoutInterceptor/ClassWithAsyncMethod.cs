@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using MethodTimer;
 #pragma warning disable 414
@@ -101,4 +102,24 @@ public class ClassWithAsyncMethod
 
     public async Task MethodWithExceptionAsync() =>
         await Task.Factory.StartNew(() => throw new ArgumentOutOfRangeException());
+}
+
+public class ClassWithGenericResultAsyncMethodBase
+{
+    public virtual async Task<List<T>> DoSomethingAsync<T>()
+    {
+        await Task.Delay(50);
+
+        return new List<T>();
+    }
+}
+
+public class ClassWithGenericResultAsyncMethod : ClassWithGenericResultAsyncMethodBase
+{
+    [Time()]
+    public async Task<List<T>> DoSomethingWithoutMessageAsync<T>()
+    {
+        var result = await base.DoSomethingAsync<T>();
+        return result;
+    }
 }

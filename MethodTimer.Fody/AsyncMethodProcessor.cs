@@ -348,14 +348,14 @@ public class AsyncMethodProcessor
             {
                 yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);
                 yield return Instruction.Create(OpCodes.Ldarg_0);
-                yield return Instruction.Create(OpCodes.Ldfld, formattedFieldDefinition);
+                yield return Instruction.Create(OpCodes.Ldfld, formattedFieldReference);
                 yield return Instruction.Create(OpCodes.Call, logWithMessageMethodUsingLong);
             }
             else
             {
                 yield return Instruction.Create(OpCodes.Call, ModuleWeaver.Elapsed);
                 yield return Instruction.Create(OpCodes.Ldarg_0);
-                yield return Instruction.Create(OpCodes.Ldfld, formattedFieldDefinition);
+                yield return Instruction.Create(OpCodes.Ldfld, formattedFieldReference);
                 yield return Instruction.Create(OpCodes.Call, logWithMessageMethodUsingTimeSpan);
             }
         }

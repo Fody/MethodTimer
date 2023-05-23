@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using MethodTimer;
 #pragma warning disable 414
@@ -78,6 +79,14 @@ public class ClassWithAsyncMethod
         }
 
         isRunning = false;
+    }
+
+    [Time("some message")]
+    public async Task<List<T>> MethodWithGenericResultAsync<T>()
+    {
+        await Task.Delay(50);
+
+        return new List<T>();
     }
 
     public override string ToString() =>

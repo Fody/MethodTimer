@@ -117,7 +117,7 @@ public partial class ModuleWeaver
                 }
                 else
                 {
-                    var parameter = methodDefinition.Parameters.First(x => x.Name.Equals(parameterName));
+                    var parameter = methodDefinition.Parameters.First(_ => _.Name.Equals(parameterName));
                     yield return Instruction.Create(OpCodes.Ldarg, parameter);
 
                     if (parameter.ParameterType.IsBoxingRequired(TypeSystem.ObjectReference))

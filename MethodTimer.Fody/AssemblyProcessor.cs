@@ -51,7 +51,7 @@ public partial class ModuleWeaver
                 continue;
             }
 
-            foreach (var method in type.ConcreteMethods().Where(x => x.ContainsTimeAttribute()))
+            foreach (var method in type.ConcreteMethods().Where(_ => _.ContainsTimeAttribute()))
             {
                 ProcessMethod(method);
             }
@@ -103,7 +103,7 @@ public partial class ModuleWeaver
                     }
                     else
                     {
-                        var containsParameter = method.Parameters.Any(x => x.Name.Equals(parameterName));
+                        var containsParameter = method.Parameters.Any(_ => _.Name.Equals(parameterName));
                         if (!containsParameter)
                         {
                             hasErrors = true;

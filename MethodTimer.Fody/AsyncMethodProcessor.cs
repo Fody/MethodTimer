@@ -55,7 +55,7 @@ public class AsyncMethodProcessor
         }
 
         var moveNextMethod = stateMachineTypeDefinition.Methods
-            .Single(x => x.Name == "MoveNext");
+            .Single(_ => _.Name == "MoveNext");
         body = moveNextMethod.Body;
 
         body.SimplifyMacros();
@@ -323,7 +323,7 @@ public class AsyncMethodProcessor
             // 1. Because async works with state machines, use the state machine & fields instead of method & variables.
             // 2. The ldarg_0 calls are required to load the state machine class and is required before every field call.
 
-            var formattedFieldDefinition = stateMachineTypeDefinition.Fields.FirstOrDefault(x => x.Name.Equals("methodTimerMessage"));
+            var formattedFieldDefinition = stateMachineTypeDefinition.Fields.FirstOrDefault(_ => _.Name.Equals("methodTimerMessage"));
             if (formattedFieldDefinition is null)
             {
                 formattedFieldDefinition = new("methodTimerMessage", FieldAttributes.Private | FieldAttributes.CompilerControlled, ModuleWeaver.TypeSystem.StringReference);
@@ -402,7 +402,7 @@ public class AsyncMethodProcessor
                     yield return Instruction.Create(OpCodes.Dup);
                     yield return Instruction.Create(OpCodes.Ldc_I4, i);
 
-                    var field = stateMachineTypeDefinition.Fields.FirstOrDefault(x => x.Name.Equals(parameterName));
+                    var field = stateMachineTypeDefinition.Fields.FirstOrDefault(_ => _.Name.Equals(parameterName));
                     if (field is null)
                     {
                         ModuleWeaver.WriteError($"Parameter '{parameterName}' is not available on the async state machine. Probably it has been optimized away by the compiler. Please update the format so it excludes this parameter.");
@@ -435,7 +435,7 @@ public class AsyncMethodProcessor
     {
         const string fieldName = "<>4__this";
 
-        if (stateMachineTypeDefinition.Fields.Any(x => x.Name.Equals(fieldName)))
+        if (stateMachineTypeDefinition.Fields.Any(_ => _.Name.Equals(fieldName)))
         {
             return;
         }

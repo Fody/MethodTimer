@@ -22,7 +22,7 @@ public partial class ModuleWeaver
     {
         WriteDebug("Searching for an interceptor");
 
-        var interceptor = types.FirstOrDefault(x => x.IsInterceptor());
+        var interceptor = types.FirstOrDefault(_ => _.IsInterceptor());
         if (interceptor != null)
         {
             LogMethodUsingLong = FindLogMethod(interceptor, LongType);
@@ -61,7 +61,7 @@ public partial class ModuleWeaver
 
             interceptor = moduleDefinition
                 .GetTypes()
-                .FirstOrDefault(x => x.IsInterceptor());
+                .FirstOrDefault(_ => _.IsInterceptor());
             if (interceptor is null)
             {
                 continue;
@@ -110,7 +110,7 @@ public partial class ModuleWeaver
     {
         var requiredParameterTypes = new[] { "System.Reflection.MethodBase", elapsedParameterTypeName };
 
-        var logMethod = interceptorType.Methods.FirstOrDefault(x => x.Name == "Log" &&
+        var logMethod = interceptorType.Methods.FirstOrDefault(_ => _.Name == "Log" &&
                                                                x.Parameters.Count == 2 &&
                                                                x.Parameters[0].ParameterType.FullName == requiredParameterTypes[0] &&
                                                                x.Parameters[1].ParameterType.FullName == requiredParameterTypes[1]);
@@ -130,7 +130,7 @@ public partial class ModuleWeaver
     {
         var requiredParameterTypes = new[] { "System.Reflection.MethodBase", elapsedParameterTypeName, "System.String" };
 
-        var logMethod = interceptorType.Methods.FirstOrDefault(x => x.Name == "Log" &&
+        var logMethod = interceptorType.Methods.FirstOrDefault(_ => _.Name == "Log" &&
                                                                     x.Parameters.Count == 3 &&
                                                                     x.Parameters[0].ParameterType.FullName == requiredParameterTypes[0] &&
                                                                     x.Parameters[1].ParameterType.FullName == requiredParameterTypes[1] &&

@@ -5,6 +5,8 @@
 
 Injects some very basic method timing code.
 
+**See [Milestones](../../milestones?state=closed) for release notes.**
+
 
 ### This is an add-in for [Fody](https://github.com/Fody/Home/)
 

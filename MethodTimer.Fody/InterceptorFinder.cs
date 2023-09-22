@@ -108,12 +108,17 @@ public partial class ModuleWeaver
 
     MethodDefinition FindLogMethod(TypeDefinition interceptorType, string elapsedParameterTypeName)
     {
-        var requiredParameterTypes = new[] { "System.Reflection.MethodBase", elapsedParameterTypeName };
+        var requiredParameterTypes = new[]
+        {
+            "System.Reflection.MethodBase",
+            elapsedParameterTypeName
+        };
 
-        var logMethod = interceptorType.Methods.FirstOrDefault(_ => _.Name == "Log" &&
-                                                               x.Parameters.Count == 2 &&
-                                                               x.Parameters[0].ParameterType.FullName == requiredParameterTypes[0] &&
-                                                               x.Parameters[1].ParameterType.FullName == requiredParameterTypes[1]);
+        var logMethod = interceptorType.Methods
+            .FirstOrDefault(_ => _.Name == "Log" &&
+                                 _.Parameters.Count == 2 &&
+                                 _.Parameters[0].ParameterType.FullName == requiredParameterTypes[0] &&
+                                 _.Parameters[1].ParameterType.FullName == requiredParameterTypes[1]);
         if (logMethod is null)
         {
             return null;
@@ -128,13 +133,19 @@ public partial class ModuleWeaver
 
     MethodDefinition FindLogWithMessageMethod(TypeDefinition interceptorType, string elapsedParameterTypeName)
     {
-        var requiredParameterTypes = new[] { "System.Reflection.MethodBase", elapsedParameterTypeName, "System.String" };
+        var requiredParameterTypes = new[]
+        {
+            "System.Reflection.MethodBase",
+            elapsedParameterTypeName,
+            "System.String"
+        };
 
-        var logMethod = interceptorType.Methods.FirstOrDefault(_ => _.Name == "Log" &&
-                                                                    x.Parameters.Count == 3 &&
-                                                                    x.Parameters[0].ParameterType.FullName == requiredParameterTypes[0] &&
-                                                                    x.Parameters[1].ParameterType.FullName == requiredParameterTypes[1] &&
-                                                                    x.Parameters[2].ParameterType.FullName == requiredParameterTypes[2]);
+        var logMethod = interceptorType.Methods
+            .FirstOrDefault(_ => _.Name == "Log" &&
+                                 _.Parameters.Count == 3 &&
+                                 _.Parameters[0].ParameterType.FullName == requiredParameterTypes[0] &&
+                                 _.Parameters[1].ParameterType.FullName == requiredParameterTypes[1] &&
+                                 _.Parameters[2].ParameterType.FullName == requiredParameterTypes[2]);
         if (logMethod is null)
         {
             return null;

@@ -86,7 +86,7 @@ public class ClassWithAsyncMethod
     {
         await Task.Delay(50);
 
-        return new List<T>();
+        return new();
     }
 
     public override string ToString() =>

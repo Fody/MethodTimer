@@ -110,7 +110,7 @@ public class ClassWithGenericResultAsyncMethodBase
     {
         await Task.Delay(50);
 
-        return new List<T>();
+        return new();
     }
 }
 

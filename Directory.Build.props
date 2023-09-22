@@ -4,6 +4,6 @@
     <Version>3.2.2</Version>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <LangVersion>preview</LangVersion>
-    <NoWarn>NU5118</NoWarn>
+    <NoWarn>NU5118;xUnit1031</NoWarn>
   </PropertyGroup>
 </Project>

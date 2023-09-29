@@ -216,8 +216,7 @@ public class AsyncMethodProcessor
 
             for (var i = catchEndIndex; i >= catchStartIndex; i--)
             {
-                if (body.Instructions[i].Operand is MethodReference methodReference &&
-                    methodReference.Name == "SetException")
+                if (body.Instructions[i].Operand is MethodReference {Name: "SetException"})
                 {
                     // Insert before
                     for (var j = 0; j < stopwatchInstructions.Count; j++)
@@ -232,8 +231,7 @@ public class AsyncMethodProcessor
         // 2: end of the method (either SetResult or end of the method)
         for (var i = body.Instructions.Count - 1; i >= 0; i--)
         {
-            if (body.Instructions[i].Operand is MethodReference methodReference &&
-                methodReference.Name == "SetResult")
+            if (body.Instructions[i].Operand is MethodReference {Name: "SetResult"})
             {
                 // Next index, we want this to appear *after* the SetResult call
                 endInstruction = body.Instructions[i + 1];

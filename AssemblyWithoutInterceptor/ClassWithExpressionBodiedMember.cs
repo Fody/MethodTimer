@@ -10,7 +10,7 @@ public class ClassWithExpressionBodiedMember
         Trace.WriteLine(fooBar);
     }
 
-    public bool FooBar => Inner != null && Inner.Foobar;
+    public bool FooBar => Inner is {Foobar: true};
     public Bar Inner;
 
     public class Bar

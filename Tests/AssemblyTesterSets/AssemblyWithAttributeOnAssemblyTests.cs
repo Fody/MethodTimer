@@ -10,8 +10,8 @@ public class AssemblyWithAttributeOnAssemblyTests
 
     static AssemblyWithAttributeOnAssemblyTests()
     {
-        var weavingTask = new ModuleWeaver();
-        testResult = weavingTask.ExecuteTestRun(
+        var weaver = new ModuleWeaver();
+        testResult = weaver.ExecuteTestRun(
             assemblyPath: "AssemblyWithAttributeOnAssembly.dll",
             ignoreCodes: IgnoreCodes.GetIgnoreCoders()
 #if NETCOREAPP2_1

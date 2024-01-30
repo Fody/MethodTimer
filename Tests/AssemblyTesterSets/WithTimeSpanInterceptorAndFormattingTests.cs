@@ -15,9 +15,10 @@ public class WithTimeSpanInterceptorAndFormattingTests
 
     static WithTimeSpanInterceptorAndFormattingTests()
     {
-        var weavingTask = new ModuleWeaver();
+        var weaver = new ModuleWeaver();
 
-        testResult = weavingTask.ExecuteTestRun("AssemblyWithTimeSpanInterceptorAndFormatting.dll",
+        testResult = weaver.ExecuteTestRun(
+            "AssemblyWithTimeSpanInterceptorAndFormatting.dll",
             ignoreCodes: IgnoreCodes.GetIgnoreCoders()
 #if NETCOREAPP2_1
             , runPeVerify: false

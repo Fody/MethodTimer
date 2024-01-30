@@ -15,8 +15,8 @@ public class VBNetAssemblyWithInterceptorTests
 
     static VBNetAssemblyWithInterceptorTests()
     {
-        var weavingTask = new ModuleWeaver();
-        testResult = weavingTask.ExecuteTestRun($"{assembly}.dll",
+        var weaver = new ModuleWeaver();
+        testResult = weaver.ExecuteTestRun($"{assembly}.dll",
             ignoreCodes: IgnoreCodes.GetIgnoreCoders()
 #if NETCOREAPP2_1
             , runPeVerify: false

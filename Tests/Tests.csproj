@@ -7,9 +7,9 @@
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" Condition="'$(TargetFramework)' == 'net48'" />
     <PackageReference Include="FodyHelpers" Version="6.8.0" />
-    <PackageReference Include="Xunit" Version="2.6.1" />
+    <PackageReference Include="Xunit" Version="2.7.0" />
     <PackageReference Include="Verify.Xunit" Version="22.5.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.7" PrivateAssets="all" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <ProjectReference Include="..\AssemblyToReference\AssemblyToReference.csproj" />
     <ProjectReference Include="..\AssemblyWithAttributeOnAssembly\AssemblyWithAttributeOnAssembly.csproj" />

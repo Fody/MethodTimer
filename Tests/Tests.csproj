@@ -18,7 +18,7 @@
     <ProjectReference Include="..\AssemblyWithInterceptorAndFormattingWithThisInStaticMember\AssemblyWithInterceptorAndFormattingWithThisInStaticMember.csproj" />
     <ProjectReference Include="..\AssemblyWithInterceptorAndFormattingWithWrongParameters\AssemblyWithInterceptorAndFormattingWithWrongParameters.csproj" />
     <ProjectReference Include="..\AssemblyWithInterceptorAndFormatting\AssemblyWithInterceptorAndFormatting.csproj" />
-    <ProjectReference Include="..\AssemblyWIthInterceptorInReference\AssemblyWithInterceptorInReference.csproj" />
+    <ProjectReference Include="..\AssemblyWithInterceptorInReference\AssemblyWithInterceptorInReference.csproj" />
     <ProjectReference Include="..\AssemblyWithInterceptor\AssemblyWithInterceptor.csproj" />
     <ProjectReference Include="..\AssemblyWithNopInterceptor\AssemblyWithNopInterceptor.csproj" />
     <ProjectReference Include="..\AssemblyWithoutInterceptor\AssemblyWithoutInterceptor.csproj" />

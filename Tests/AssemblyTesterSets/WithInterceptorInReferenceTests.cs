@@ -11,11 +11,11 @@ public class WithInterceptorInReferenceTests
 
     static WithInterceptorInReferenceTests()
     {
-        var weaver = new ModuleWeaver
+        var weavingTask = new ModuleWeaver
         {
             ReferenceCopyLocalPaths = ["AssemblyToReference.dll"]
         };
-        testResult = weaver.ExecuteTestRun(
+        testResult = weavingTask.ExecuteTestRun(
             assemblyPath: "AssemblyWithInterceptorInReference.dll",
             ignoreCodes: new []{ "0x80131869" });
         methodBaseField = typeof(AssemblyToReference.MethodTimeLogger).GetField("MethodBase");

@@ -10,8 +10,8 @@ public partial class WithoutInterceptorTests
 
     static WithoutInterceptorTests()
     {
-        var weaver = new ModuleWeaver();
-        testResult = weaver.ExecuteTestRun("AssemblyWithoutInterceptor.dll",
+        var weavingTask = new ModuleWeaver();
+        testResult = weavingTask.ExecuteTestRun("AssemblyWithoutInterceptor.dll",
             ignoreCodes: IgnoreCodes.GetIgnoreCoders()
 #if NETCOREAPP2_1
             , runPeVerify: false

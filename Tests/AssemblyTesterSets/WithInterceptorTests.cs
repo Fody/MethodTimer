@@ -14,9 +14,8 @@ public class WithInterceptorTests
 
     static WithInterceptorTests()
     {
-        var weaver = new ModuleWeaver();
-        testResult = weaver.ExecuteTestRun(
-            "AssemblyWithInterceptor.dll",
+        var weavingTask = new ModuleWeaver();
+        testResult = weavingTask.ExecuteTestRun("AssemblyWithInterceptor.dll",
             ignoreCodes: IgnoreCodes.GetIgnoreCoders()
 #if NETCOREAPP2_1
             , runPeVerify: false

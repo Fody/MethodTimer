@@ -8,8 +8,8 @@ public class WithNopInterceptorTests
 
     static WithNopInterceptorTests()
     {
-        var weaver = new ModuleWeaver();
-        testResult = weaver.ExecuteTestRun("AssemblyWithNopInterceptor.dll");
+        var weavingTask = new ModuleWeaver();
+        testResult = weavingTask.ExecuteTestRun("AssemblyWithNopInterceptor.dll");
     }
 
     [Fact]

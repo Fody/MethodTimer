@@ -14,9 +14,9 @@ public class WithInterceptorAndFormattingTests
 
     static WithInterceptorAndFormattingTests()
     {
-        var weaver = new ModuleWeaver();
+        var weavingTask = new ModuleWeaver();
 
-        testResult = weaver.ExecuteTestRun("AssemblyWithInterceptorAndFormatting.dll",
+        testResult = weavingTask.ExecuteTestRun("AssemblyWithInterceptorAndFormatting.dll",
             ignoreCodes: IgnoreCodes.GetIgnoreCoders()
 #if NETCOREAPP2_1
             , runPeVerify: false

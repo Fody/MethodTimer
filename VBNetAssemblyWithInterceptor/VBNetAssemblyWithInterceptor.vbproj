@@ -10,7 +10,7 @@
     <AssemblyName>VBNetAssemblyWithInterceptor</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <Deterministic>true</Deterministic>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
@@ -34,8 +34,14 @@
   </PropertyGroup>
   <PropertyGroup>
     <OptionExplicit>On</OptionExplicit>
+  </PropertyGroup>
+  <PropertyGroup>
     <OptionCompare>Binary</OptionCompare>
+  </PropertyGroup>
+  <PropertyGroup>
     <OptionStrict>Off</OptionStrict>
+  </PropertyGroup>
+  <PropertyGroup>
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
   <ItemGroup>
@@ -46,6 +52,8 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Net.Http" />
+  </ItemGroup>
+  <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
     <Import Include="System" />
     <Import Include="System.Collections" />
@@ -55,8 +63,12 @@
     <Import Include="System.Linq" />
     <Import Include="System.Xml.Linq" />
     <Import Include="System.Threading.Tasks" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="ClassWithAsyncMethod.vb" />
     <Compile Include="MethodTimeLogger.vb" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\MethodTimer\MethodTimer.csproj">
       <Project>{B5AEB0E8-28F4-4955-A055-9C200F7113F0}</Project>
       <Name>MethodTimer</Name>

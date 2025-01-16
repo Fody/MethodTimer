@@ -1,6 +1,5 @@
 # <img src="/package_icon.png" height="30px"> MethodTimer.Fody
 
-[![Chat on Gitter](https://img.shields.io/gitter/room/fody/fody.svg)](https://gitter.im/Fody/Fody)
 [![NuGet Status](https://img.shields.io/nuget/v/MethodTimer.Fody.svg)](https://www.nuget.org/packages/MethodTimer.Fody/)
 
 Injects some very basic method timing code.

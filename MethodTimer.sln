@@ -16,7 +16,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MethodTimer", "MethodTimer\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssemblyToReference", "AssemblyToReference\AssemblyToReference.csproj", "{8A015E68-6B29-4E20-879A-3E3F47B34A0B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssemblyWithInterceptorInReference", "AssemblyWIthInterceptorInReference\AssemblyWithInterceptorInReference.csproj", "{918E4285-60A4-4C1A-8CAA-E257F6A0C564}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssemblyWithInterceptorInReference", "AssemblyWithInterceptorInReference\AssemblyWithInterceptorInReference.csproj", "{918E4285-60A4-4C1A-8CAA-E257F6A0C564}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssemblyWithInterceptor", "AssemblyWithInterceptor\AssemblyWithInterceptor.csproj", "{EB33F608-2124-4128-820F-DC4E07E88028}"
 EndProject
@@ -35,6 +35,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4C58DB24-EE4E-4500-99EF-949B6877AFC5}"
 	ProjectSection(SolutionItems) = preProject
 		Directory.Build.props = Directory.Build.props
+		global.json = global.json
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssemblyWithTimeSpanInterceptorAndFormatting", "AssemblyWithTimeSpanInterceptorAndFormatting\AssemblyWithTimeSpanInterceptorAndFormatting.csproj", "{738F52D9-7ACA-4BCC-907E-5771D9A9B351}"

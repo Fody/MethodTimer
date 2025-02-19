@@ -26,7 +26,7 @@ public class ClassWithMethod
         finally
         {
             stopwatch.Stop();
-            var methodTimerMessage = string.Format("File name '{0}' with id '{1}'", new object[] { fileName, id });
+            var methodTimerMessage = $"File name '{fileName}' with id '{id}'";
             MethodTimeLogger.Log(null, stopwatch.ElapsedMilliseconds, methodTimerMessage);
         }
     }
@@ -47,7 +47,7 @@ public class ClassWithMethod
         finally
         {
             stopwatch.Stop();
-            var methodTimerMessage = string.Format("Current object: '{0}' | File name '{1}' with id '{2}'", new object[] { this, fileName, id });
+            var methodTimerMessage = $"Current object: '{this}' | File name '{fileName}' with id '{id}'";
             MethodTimeLogger.Log(null, stopwatch.ElapsedMilliseconds, methodTimerMessage);
         }
     }

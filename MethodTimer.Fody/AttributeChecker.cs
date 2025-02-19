@@ -7,7 +7,7 @@ public static class AttributeChecker
     {
         var customAttributes = definition.CustomAttributes;
 
-        return customAttributes.FirstOrDefault(x => x.AttributeType.Name == "TimeAttribute");
+        return customAttributes.FirstOrDefault(_ => _.AttributeType.Name == "TimeAttribute");
     }
 
     public static bool ContainsTimeAttribute(this ICustomAttributeProvider definition) =>
@@ -17,14 +17,14 @@ public static class AttributeChecker
     {
         var customAttributes = definition.CustomAttributes;
 
-        return customAttributes.Any(x => x.AttributeType.Name == "CompilerGeneratedAttribute");
+        return customAttributes.Any(_ => _.AttributeType.Name == "CompilerGeneratedAttribute");
     }
 
     public static void RemoveTimeAttribute(this ICustomAttributeProvider definition)
     {
         var customAttributes = definition.CustomAttributes;
 
-        var timeAttribute = customAttributes.FirstOrDefault(x => x.AttributeType.Name == "TimeAttribute");
+        var timeAttribute = customAttributes.FirstOrDefault(_ => _.AttributeType.Name == "TimeAttribute");
 
         if (timeAttribute != null)
         {

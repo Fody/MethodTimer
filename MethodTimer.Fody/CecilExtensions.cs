@@ -24,7 +24,7 @@ public static class CecilExtensions
     }
 
     public static IEnumerable<MethodDefinition> AbstractMethods(this TypeDefinition type) =>
-        type.Methods.Where(x => x.IsAbstract);
+        type.Methods.Where(_ => _.IsAbstract);
 
     public static IEnumerable<MethodDefinition> ConcreteMethods(this TypeDefinition type) =>
         type.Methods.Where(x => !x.IsAbstract &&
@@ -33,7 +33,7 @@ public static class CecilExtensions
 
     static bool IsEmptyConstructor(this MethodDefinition method) =>
         method.Name == ".ctor" &&
-        method.Body.Instructions.Count(x => x.OpCode != OpCodes.Nop) == 3;
+        method.Body.Instructions.Count(_ => _.OpCode != OpCodes.Nop) == 3;
 
     public static bool IsInterceptor(this TypeReference type) =>
         type.Name == "MethodTimeLogger";
@@ -91,7 +91,7 @@ public static class CecilExtensions
 
         var stateMachinePrefix = $"<{method.Name}>";
         var nestedTypes = method.DeclaringType.NestedTypes;
-        return nestedTypes.Any(x => x.Name.StartsWith(stateMachinePrefix));
+        return nestedTypes.Any(_ => _.Name.StartsWith(stateMachinePrefix));
     }
 
     public static CustomAttribute GetAsyncStateMachineAttribute(this MethodDefinition method) =>
@@ -106,7 +106,7 @@ public static class CecilExtensions
 
     public static MethodDefinition Method(this TypeDefinition type, string name)
     {
-        var method = type.Methods.FirstOrDefault(x => x.Name == name);
+        var method = type.Methods.FirstOrDefault(_ => _.Name == name);
 
         if (method is null)
         {
@@ -136,7 +136,7 @@ public static class CecilExtensions
 
     public static TypeDefinition Type(this List<TypeDefinition> types, string name)
     {
-        var type = types.FirstOrDefault(x => x.Name == name);
+        var type = types.FirstOrDefault(_ => _.Name == name);
         if (type is null)
         {
             throw new($"Could not find type '{name}'.");

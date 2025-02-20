@@ -10,11 +10,11 @@ public partial class ModuleWeaver
     const string LongType = "System.Int64";
     const string TimeSpanTypeName = "System.TimeSpan";
 
-    public MethodReference LogMethodUsingLong;
-    public MethodReference LogWithMessageMethodUsingLong;
+    public MethodReference? LogMethodUsingLong;
+    public MethodReference? LogWithMessageMethodUsingLong;
 
-    public MethodReference LogMethodUsingTimeSpan;
-    public MethodReference LogWithMessageMethodUsingTimeSpan;
+    public MethodReference? LogMethodUsingTimeSpan;
+    public MethodReference? LogWithMessageMethodUsingTimeSpan;
 
     public bool LogMethodIsNop;
 
@@ -106,7 +106,7 @@ public partial class ModuleWeaver
         }
     }
 
-    MethodDefinition FindLogMethod(TypeDefinition interceptorType, string elapsedParameterTypeName)
+    MethodDefinition? FindLogMethod(TypeDefinition interceptorType, string elapsedParameterTypeName)
     {
         var requiredParameterTypes = new[]
         {
@@ -131,7 +131,7 @@ public partial class ModuleWeaver
         return logMethod;
     }
 
-    MethodDefinition FindLogWithMessageMethod(TypeDefinition interceptorType, string elapsedParameterTypeName)
+    MethodDefinition? FindLogWithMessageMethod(TypeDefinition interceptorType, string elapsedParameterTypeName)
     {
         var requiredParameterTypes = new[]
         {

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29201.188
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.35806.103 d17.14
 MinimumVisualStudioVersion = 16.0.29201.188
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MethodTimer.Fody", "MethodTimer.Fody\MethodTimer.Fody.csproj", "{C3578A7B-09A6-4444-9383-0DEAFA4958BD}"
 EndProject
@@ -43,6 +43,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssemblyWithInterceptorAndFormattingWithThisInStaticMember", "AssemblyWithInterceptorAndFormattingWithThisInStaticMember\AssemblyWithInterceptorAndFormattingWithThisInStaticMember.csproj", "{12DDBBCA-230F-40A5-BF41-1B79732993DC}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "VBNetAssemblyWithInterceptor", "VBNetAssemblyWithInterceptor\VBNetAssemblyWithInterceptor.vbproj", "{43900789-E1BA-4204-8766-FCEDB7129EEA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleAssembly", "ExampleAssembly\ExampleAssembly.csproj", "{557AA7AF-D013-DA32-3486-1441B786E7D7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -162,6 +164,14 @@ Global
 		{43900789-E1BA-4204-8766-FCEDB7129EEA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{43900789-E1BA-4204-8766-FCEDB7129EEA}.Release|x86.ActiveCfg = Release|Any CPU
 		{43900789-E1BA-4204-8766-FCEDB7129EEA}.Release|x86.Build.0 = Release|Any CPU
+		{557AA7AF-D013-DA32-3486-1441B786E7D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{557AA7AF-D013-DA32-3486-1441B786E7D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{557AA7AF-D013-DA32-3486-1441B786E7D7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{557AA7AF-D013-DA32-3486-1441B786E7D7}.Debug|x86.Build.0 = Debug|Any CPU
+		{557AA7AF-D013-DA32-3486-1441B786E7D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{557AA7AF-D013-DA32-3486-1441B786E7D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{557AA7AF-D013-DA32-3486-1441B786E7D7}.Release|x86.ActiveCfg = Release|Any CPU
+		{557AA7AF-D013-DA32-3486-1441B786E7D7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

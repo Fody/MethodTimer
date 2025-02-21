@@ -9,18 +9,22 @@ public class TestClass
         long startTimestamp;
         long endTimestamp;
         long elapsed;
-        long ticks;
         TimeSpan elapsedTimeSpan;
 
         startTimestamp = Stopwatch.GetTimestamp();
 
-        // Do something
+        try
+        {
+            // Do something
+            Console.WriteLine("Hello, World!");
+        }
+        finally
+        {
+            endTimestamp = Stopwatch.GetTimestamp();
 
-        endTimestamp = Stopwatch.GetTimestamp();
-
-        elapsed = endTimestamp - startTimestamp;
-        ticks = (long)(MethodTimerHelper.TimestampToTicks * elapsed);
-        elapsedTimeSpan = new TimeSpan(ticks);
+            elapsed = endTimestamp - startTimestamp;
+            elapsedTimeSpan = new TimeSpan((long)(MethodTimerHelper.TimestampToTicks * elapsed));
+        }
     }
 
     public async Task AsyncMethod()
@@ -28,17 +32,19 @@ public class TestClass
         long startTimestamp;
         long endTimestamp;
         long elapsed;
-        long ticks;
         TimeSpan elapsedTimeSpan;
 
         startTimestamp = Stopwatch.GetTimestamp();
+        try
+        {
+            await Task.Delay(10);
+        }
+        finally
+        {
+            endTimestamp = Stopwatch.GetTimestamp();
 
-        await Task.Delay(10);
-
-        endTimestamp = Stopwatch.GetTimestamp();
-
-        elapsed = endTimestamp - startTimestamp;
-        ticks = (long)(MethodTimerHelper.TimestampToTicks * elapsed);
-        elapsedTimeSpan = new TimeSpan(ticks);
+            elapsed = endTimestamp - startTimestamp;
+            elapsedTimeSpan = new TimeSpan((long)(MethodTimerHelper.TimestampToTicks * elapsed));
+        }
     }
 }

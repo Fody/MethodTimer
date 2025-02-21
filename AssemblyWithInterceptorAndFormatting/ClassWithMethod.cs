@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using MethodTimer;
 
@@ -18,16 +19,18 @@ public class ClassWithMethod
 
     public void Method_Expected(string fileName, int id)
     {
-        var stopwatch = Stopwatch.StartNew();
+        var start = Stopwatch.GetTimestamp();
         try
         {
             Thread.Sleep(10);
         }
         finally
         {
-            stopwatch.Stop();
+            var end = Stopwatch.GetTimestamp();
+            var duration = end - start;
+            var elapsedTimeSpan = new TimeSpan((long)(MethodTimerHelper.TimestampToTicks * duration));
             var methodTimerMessage = $"File name '{fileName}' with id '{id}'";
-            MethodTimeLogger.Log(null, stopwatch.ElapsedMilliseconds, methodTimerMessage);
+            MethodTimeLogger.Log(null, (long)elapsedTimeSpan.TotalMilliseconds, methodTimerMessage);
         }
     }
 

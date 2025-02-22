@@ -349,11 +349,11 @@ public partial class AsyncMethodProcessor
                 yield return Instruction.Create(OpCodes.Ldtoken, Method.DeclaringType);
                 yield return Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle);
                 yield return Instruction.Create(OpCodes.Ldarg_0);
-                yield return Instruction.Create(OpCodes.Ldflda, durationTimespanFieldReference);
 
                 if (logMethodUsingTimeSpan is null)
                 {
                     // Use .TotalMilliseconds converted to long
+                    yield return Instruction.Create(OpCodes.Ldflda, durationTimespanFieldReference);
                     yield return Instruction.Create(OpCodes.Call, ModuleWeaver.TimeSpan_TotalMillisecondsMethod);
                     yield return Instruction.Create(OpCodes.Conv_I8);
                     yield return Instruction.Create(OpCodes.Call, logMethodUsingLong);
@@ -361,6 +361,7 @@ public partial class AsyncMethodProcessor
                 else
                 {
                     // Use timespan directly
+                    yield return Instruction.Create(OpCodes.Ldfld, durationTimespanFieldReference);
                     yield return Instruction.Create(OpCodes.Call, logMethodUsingTimeSpan);
                 }
             }
@@ -390,11 +391,11 @@ public partial class AsyncMethodProcessor
             yield return Instruction.Create(OpCodes.Ldtoken, Method.DeclaringType);
             yield return Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle);
             yield return Instruction.Create(OpCodes.Ldarg_0);
-            yield return Instruction.Create(OpCodes.Ldfld, durationTimespanFieldReference);
 
             if (logWithMessageMethodUsingTimeSpan is null)
             {
                 // Use .TotalMilliseconds converted to long
+                yield return Instruction.Create(OpCodes.Ldflda, durationTimespanFieldReference);
                 yield return Instruction.Create(OpCodes.Call, ModuleWeaver.TimeSpan_TotalMillisecondsMethod);
                 yield return Instruction.Create(OpCodes.Conv_I8);
                 yield return Instruction.Create(OpCodes.Ldarg_0);
@@ -404,6 +405,7 @@ public partial class AsyncMethodProcessor
             else
             {
                 // Use timespan directly
+                yield return Instruction.Create(OpCodes.Ldfld, durationTimespanFieldReference);
                 yield return Instruction.Create(OpCodes.Ldarg_0);
                 yield return Instruction.Create(OpCodes.Ldfld, formattedFieldReference);
                 yield return Instruction.Create(OpCodes.Call, logWithMessageMethodUsingTimeSpan);

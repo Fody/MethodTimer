@@ -201,15 +201,15 @@ public partial class MethodProcessor
             yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition);
             yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition.DeclaringType);
             yield return Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle);
-            yield return Instruction.Create(OpCodes.Ldloca, durationTimespanVar);
 
-            if (logMethodUsingTimeSpan != null)
+            if (logMethodUsingTimeSpan is not null)
             {
-                //yield return Instruction.Create(OpCodes.Call, Elapsed);
+                yield return Instruction.Create(OpCodes.Ldloc, durationTimespanVar);
                 yield return Instruction.Create(OpCodes.Call, logMethodUsingTimeSpan);
                 yield break;
             }
 
+            yield return Instruction.Create(OpCodes.Ldloca, durationTimespanVar);
             yield return Instruction.Create(OpCodes.Call, ModuleWeaver.TimeSpan_TotalMillisecondsMethod);
             yield return Instruction.Create(OpCodes.Conv_I8);
             yield return Instruction.Create(OpCodes.Call, logMethodUsingLong);
@@ -228,10 +228,10 @@ public partial class MethodProcessor
         yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition);
         yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition.DeclaringType);
         yield return Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle);
-        yield return Instruction.Create(OpCodes.Ldloca, durationTimespanVar);
 
         if (logWithMessageMethodUsingTimeSpan is null)
         {
+            yield return Instruction.Create(OpCodes.Ldloca, durationTimespanVar);
             yield return Instruction.Create(OpCodes.Call, ModuleWeaver.TimeSpan_TotalMillisecondsMethod);
             yield return Instruction.Create(OpCodes.Conv_I8);
             yield return Instruction.Create(OpCodes.Ldloc, formattedVariableDefinition);
@@ -239,7 +239,7 @@ public partial class MethodProcessor
             yield break;
         }
 
-        //yield return Instruction.Create(OpCodes.Call, Elapsed);
+        yield return Instruction.Create(OpCodes.Ldloc, durationTimespanVar);
         yield return Instruction.Create(OpCodes.Ldloc, formattedVariableDefinition);
         yield return Instruction.Create(OpCodes.Call, logWithMessageMethodUsingTimeSpan);
     }

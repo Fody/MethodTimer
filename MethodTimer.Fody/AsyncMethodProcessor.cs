@@ -5,19 +5,26 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
 
-public class AsyncMethodProcessor
+public partial class AsyncMethodProcessor
 {
     public ModuleWeaver ModuleWeaver;
     public MethodDefinition Method;
     MethodBody body;
-    FieldDefinition stopwatchFieldDefinition;
-    FieldReference stopwatchFieldReference;
     FieldDefinition stateFieldDefinition;
     FieldReference stateFieldReference;
     TypeDefinition stateMachineTypeDefinition;
     TypeReference stateMachineTypeReference;
     MethodDefinition stopStopwatchMethod;
     ParameterFormattingProcessor parameterFormattingProcessor = new();
+
+    FieldDefinition startTimestampField;
+    FieldReference startTimestampFieldReference;
+    FieldDefinition endTimestampField;
+    FieldReference endTimestampFieldReference;
+    FieldDefinition durationTimestampField;
+    FieldReference durationTimestampFieldReference;
+    FieldDefinition durationTimespanField;
+    FieldReference durationTimespanFieldReference;
 
     public void Process()
     {
@@ -89,9 +96,9 @@ public class AsyncMethodProcessor
         }
 
         stateFieldDefinition = (from x in stateMachineTypeDefinition.Fields
-                      where x.Name.EndsWith("__state") ||
-                            x.Name.EndsWith("$State")
-                      select x).First();
+                                where x.Name.EndsWith("__state") ||
+                                      x.Name.EndsWith("$State")
+                                select x).First();
 
         stateFieldReference = new(stateFieldDefinition.Name, stateFieldDefinition.FieldType, stateMachineTypeReference);
 
@@ -132,29 +139,38 @@ public class AsyncMethodProcessor
         var boolVariable = new VariableDefinition(ModuleWeaver.TypeSystem.BooleanReference);
         body.Variables.Add(boolVariable);
 
-        stopwatchFieldDefinition = new("methodTimerStopwatch", new(), ModuleWeaver.StopwatchType);
-        stateMachineTypeDefinition.Fields.Add(stopwatchFieldDefinition);
+        // Field definitions
+        startTimestampField = InjectStartTimestamp(stateMachineTypeDefinition);
+        startTimestampFieldReference = new(startTimestampField.Name, startTimestampField.FieldType, stateMachineTypeReference);
 
-        stopwatchFieldReference = new(stopwatchFieldDefinition.Name, stopwatchFieldDefinition.FieldType, stateMachineTypeReference);
+        endTimestampField = InjectEndTimestamp(stateMachineTypeDefinition);
+        endTimestampFieldReference = new(endTimestampField.Name, endTimestampField.FieldType, stateMachineTypeReference);
+
+        durationTimestampField = InjectDurationTimestamp(stateMachineTypeDefinition);
+        durationTimestampFieldReference = new(durationTimestampField.Name, durationTimestampField.FieldType, stateMachineTypeReference);
+
+        durationTimespanField = InjectDurationTimespan(stateMachineTypeDefinition);
+        durationTimespanFieldReference = new(durationTimespanField.Name, durationTimespanField.FieldType, stateMachineTypeReference);
 
         body.Insert(index, new[]
         {
             // This code looks like this:
-            // if (_stopwatch is null)
+            // if (_startTimestamp == 0L)
             // {
-            //    _stopwatch = Stopwatch.StartNew();
+            //    _startTimestamp = Stopwatch.GetTimestamp();
             // }
 
             Instruction.Create(OpCodes.Ldarg_0),
-            Instruction.Create(OpCodes.Ldfld, stopwatchFieldReference),
-            Instruction.Create(OpCodes.Ldnull),
+            Instruction.Create(OpCodes.Ldfld, startTimestampFieldReference),
+            Instruction.Create(OpCodes.Ldc_I4_0),
+            Instruction.Create(OpCodes.Conv_I8),
             Instruction.Create(OpCodes.Ceq),
             Instruction.Create(OpCodes.Stloc, boolVariable),
             Instruction.Create(OpCodes.Ldloc, boolVariable),
             Instruction.Create(OpCodes.Brfalse_S, nextInstruction),
             Instruction.Create(OpCodes.Ldarg_0),
-            Instruction.Create(OpCodes.Call, ModuleWeaver.StartNewMethod),
-            Instruction.Create(OpCodes.Stfld, stopwatchFieldReference)
+            Instruction.Create(OpCodes.Call, ModuleWeaver.Stopwatch_GetTimestampMethod),
+            Instruction.Create(OpCodes.Stfld, startTimestampFieldReference)
         });
     }
 
@@ -165,7 +181,9 @@ public class AsyncMethodProcessor
             return;
         }
 
-        var method = new MethodDefinition("StopMethodTimerStopwatch", MethodAttributes.Private, ModuleWeaver.TypeSystem.VoidReference);
+        var method = new MethodDefinition("StopMethodTimerStopwatch",
+            MethodAttributes.Private,
+            ModuleWeaver.TypeSystem.VoidReference);
 
         var methodBody = method.Body;
         methodBody.SimplifyMacros();
@@ -216,7 +234,7 @@ public class AsyncMethodProcessor
 
             for (var i = catchEndIndex; i >= catchStartIndex; i--)
             {
-                if (body.Instructions[i].Operand is MethodReference {Name: "SetException"})
+                if (body.Instructions[i].Operand is MethodReference { Name: "SetException" })
                 {
                     // Insert before
                     for (var j = 0; j < stopwatchInstructions.Count; j++)
@@ -231,7 +249,7 @@ public class AsyncMethodProcessor
         // 2: end of the method (either SetResult or end of the method)
         for (var i = body.Instructions.Count - 1; i >= 0; i--)
         {
-            if (body.Instructions[i].Operand is MethodReference {Name: "SetResult"})
+            if (body.Instructions[i].Operand is MethodReference { Name: "SetResult" })
             {
                 // Next index, we want this to appear *after* the SetResult call
                 endInstruction = body.Instructions[i + 1];
@@ -249,6 +267,9 @@ public class AsyncMethodProcessor
 
     IEnumerable<Instruction> GetWriteTimeInstruction(MethodBody methodBody)
     {
+        var boolVariable = new VariableDefinition(ModuleWeaver.TypeSystem.BooleanReference);
+        methodBody.Variables.Add(boolVariable);
+
         var stopwatchRunningCheck = Instruction.Create(OpCodes.Ldarg_0);
         var startOfRealMethod = Instruction.Create(OpCodes.Ldarg_0);
 
@@ -259,18 +280,39 @@ public class AsyncMethodProcessor
         yield return Instruction.Create(OpCodes.Beq_S, stopwatchRunningCheck);
         yield return Instruction.Create(OpCodes.Ret);
 
-        // Check if stopwatch is actually running
+        // Check if there is a start timestamp
         yield return stopwatchRunningCheck;
-        yield return Instruction.Create(OpCodes.Ldfld, stopwatchFieldReference);
-        yield return Instruction.Create(OpCodes.Call, ModuleWeaver.IsRunning);
+
+        yield return Instruction.Create(OpCodes.Ldarg_0);
+        yield return Instruction.Create(OpCodes.Ldfld, startTimestampFieldReference);
         yield return Instruction.Create(OpCodes.Ldc_I4_0);
+        yield return Instruction.Create(OpCodes.Conv_I8);
         yield return Instruction.Create(OpCodes.Ceq);
+        yield return Instruction.Create(OpCodes.Stloc, boolVariable);
+        yield return Instruction.Create(OpCodes.Ldloc, boolVariable);
         yield return Instruction.Create(OpCodes.Brfalse_S, startOfRealMethod);
         yield return Instruction.Create(OpCodes.Ret);
 
         yield return startOfRealMethod; // Ldarg_0
-        yield return Instruction.Create(OpCodes.Ldflda, stopwatchFieldReference);
-        yield return Instruction.Create(OpCodes.Call, ModuleWeaver.StopMethod);
+
+        yield return Instruction.Create(OpCodes.Call, ModuleWeaver.Stopwatch_GetTimestampMethod);
+        yield return Instruction.Create(OpCodes.Stfld, endTimestampFieldReference);
+
+        // durationTimestamp = endTimestampVar - endTimestampVar;
+        yield return Instruction.Create(OpCodes.Ldfld, endTimestampFieldReference);
+        yield return Instruction.Create(OpCodes.Ldfld, startTimestampFieldReference);
+        yield return Instruction.Create(OpCodes.Sub);
+        yield return Instruction.Create(OpCodes.Stfld, durationTimestampFieldReference);
+
+        // durationTimespanVar = new TimeSpan((long)(MethodTimerHelper.TimestampToTicks * (double)durationTimestamp));
+
+        yield return Instruction.Create(OpCodes.Ldflda, durationTimespanFieldReference);
+        yield return Instruction.Create(OpCodes.Ldsfld, ModuleWeaver.MethodTimerHelper_TimestampToTicks);
+        yield return Instruction.Create(OpCodes.Ldfld, durationTimestampFieldReference);
+        yield return Instruction.Create(OpCodes.Conv_R8);
+        yield return Instruction.Create(OpCodes.Mul);
+        yield return Instruction.Create(OpCodes.Conv_I8);
+        yield return Instruction.Create(OpCodes.Call, ModuleWeaver.TimeSpan_ConstructorMethod);
 
         var logWithMessageMethodUsingLong = ModuleWeaver.LogWithMessageMethodUsingLong;
         var logWithMessageMethodUsingTimeSpan = ModuleWeaver.LogWithMessageMethodUsingTimeSpan;
@@ -286,8 +328,9 @@ public class AsyncMethodProcessor
                 methodBody.Variables.Add(elapsedMillisecondsVariable);
                 yield return Instruction.Create(OpCodes.Ldstr, Method.MethodName());
                 yield return Instruction.Create(OpCodes.Ldarg_0);
-                yield return Instruction.Create(OpCodes.Ldfld, stopwatchFieldReference);
-                yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);
+                yield return Instruction.Create(OpCodes.Ldflda, durationTimestampFieldReference);
+                yield return Instruction.Create(OpCodes.Call, ModuleWeaver.TimeSpan_TotalMillisecondsMethod);
+                yield return Instruction.Create(OpCodes.Conv_I8);
                 yield return Instruction.Create(OpCodes.Stloc, elapsedMillisecondsVariable);
                 yield return Instruction.Create(OpCodes.Ldloca, elapsedMillisecondsVariable);
                 yield return Instruction.Create(OpCodes.Call, ModuleWeaver.Int64ToString);
@@ -301,16 +344,16 @@ public class AsyncMethodProcessor
                 yield return Instruction.Create(OpCodes.Ldtoken, Method.DeclaringType);
                 yield return Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle);
                 yield return Instruction.Create(OpCodes.Ldarg_0);
-                yield return Instruction.Create(OpCodes.Ldfld, stopwatchFieldReference);
+                yield return Instruction.Create(OpCodes.Ldflda, durationTimestampFieldReference);
 
                 if (logMethodUsingTimeSpan is null)
                 {
-                    yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);
+                    yield return Instruction.Create(OpCodes.Call, ModuleWeaver.TimeSpan_TotalMillisecondsMethod);
+                    yield return Instruction.Create(OpCodes.Conv_I8);
                     yield return Instruction.Create(OpCodes.Call, logMethodUsingLong);
                 }
                 else
                 {
-                    yield return Instruction.Create(OpCodes.Call, ModuleWeaver.Elapsed);
                     yield return Instruction.Create(OpCodes.Call, logMethodUsingTimeSpan);
                 }
             }
@@ -340,18 +383,18 @@ public class AsyncMethodProcessor
             yield return Instruction.Create(OpCodes.Ldtoken, Method.DeclaringType);
             yield return Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle);
             yield return Instruction.Create(OpCodes.Ldarg_0);
-            yield return Instruction.Create(OpCodes.Ldfld, stopwatchFieldReference);
+            yield return Instruction.Create(OpCodes.Ldflda, durationTimestampFieldReference);
 
             if (logWithMessageMethodUsingTimeSpan is null)
             {
-                yield return Instruction.Create(OpCodes.Call, ModuleWeaver.ElapsedMilliseconds);
+                yield return Instruction.Create(OpCodes.Call, ModuleWeaver.TimeSpan_TotalMillisecondsMethod);
+                yield return Instruction.Create(OpCodes.Conv_I8);
                 yield return Instruction.Create(OpCodes.Ldarg_0);
                 yield return Instruction.Create(OpCodes.Ldfld, formattedFieldReference);
                 yield return Instruction.Create(OpCodes.Call, logWithMessageMethodUsingLong);
             }
             else
             {
-                yield return Instruction.Create(OpCodes.Call, ModuleWeaver.Elapsed);
                 yield return Instruction.Create(OpCodes.Ldarg_0);
                 yield return Instruction.Create(OpCodes.Ldfld, formattedFieldReference);
                 yield return Instruction.Create(OpCodes.Call, logWithMessageMethodUsingTimeSpan);

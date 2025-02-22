@@ -5,14 +5,14 @@ using Mono.Cecil;
 public partial class ModuleWeaver
 {
     public MethodReference TraceWriteLineMethod;
-    public MethodReference StartNewMethod;
-    public MethodReference StopMethod;
+    //public MethodReference StartNewMethod;
+    //public MethodReference StopMethod;
     public TypeReference StopwatchType;
     public MethodReference StringFormatWithArray;
     public MethodReference ConcatMethod;
-    public MethodReference IsRunning;
-    public MethodReference Elapsed;
-    public MethodReference ElapsedMilliseconds;
+    //public MethodReference IsRunning;
+    //public MethodReference Elapsed;
+    //public MethodReference ElapsedMilliseconds;
     public MethodReference GetMethodFromHandle;
     public MethodReference ObjectConstructorMethod;
     public MethodReference MaxMethod;
@@ -92,20 +92,20 @@ public partial class ModuleWeaver
             throw new WeavingException($"Could not find 'System.Diagnostics.Stopwatch', this seems to be an unsupported platform.");
         }
 
-        var startNewMethod = stopwatchType.Method("StartNew");
-        StartNewMethod = ModuleDefinition.ImportReference(startNewMethod);
+        //var startNewMethod = stopwatchType.Method("StartNew");
+        //StartNewMethod = ModuleDefinition.ImportReference(startNewMethod);
 
-        var stopMethod = stopwatchType.Method("Stop");
-        StopMethod = ModuleDefinition.ImportReference(stopMethod);
+        //var stopMethod = stopwatchType.Method("Stop");
+        //StopMethod = ModuleDefinition.ImportReference(stopMethod);
 
-        var getElapsedMillisecondsMethod = stopwatchType.Method("get_ElapsedMilliseconds");
-        ElapsedMilliseconds = ModuleDefinition.ImportReference(getElapsedMillisecondsMethod);
+        //var getElapsedMillisecondsMethod = stopwatchType.Method("get_ElapsedMilliseconds");
+        //ElapsedMilliseconds = ModuleDefinition.ImportReference(getElapsedMillisecondsMethod);
 
-        var getElapsedMethod = stopwatchType.Method("get_Elapsed");
-        Elapsed = ModuleDefinition.ImportReference(getElapsedMethod);
+        //var getElapsedMethod = stopwatchType.Method("get_Elapsed");
+        //Elapsed = ModuleDefinition.ImportReference(getElapsedMethod);
 
-        var getIsRunning = stopwatchType.Method("get_IsRunning");
-        IsRunning = ModuleDefinition.ImportReference(getIsRunning);
+        //var getIsRunning = stopwatchType.Method("get_IsRunning");
+        //IsRunning = ModuleDefinition.ImportReference(getIsRunning);
 
         var stopwatch_GetTimestampMethod = stopwatchType.Method("GetTimestamp");
         Stopwatch_GetTimestampMethod = ModuleDefinition.ImportReference(stopwatch_GetTimestampMethod);

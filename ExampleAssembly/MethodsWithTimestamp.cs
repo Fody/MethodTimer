@@ -29,22 +29,29 @@ public class TestClassWithTimestamp
 
     public async Task AsyncMethod()
     {
-        long startTimestamp;
+        long startTimestamp = default;
         long endTimestamp;
         long elapsed;
         TimeSpan elapsedTimeSpan;
 
-        startTimestamp = Stopwatch.GetTimestamp();
+        if (startTimestamp == 0)
+        {
+            startTimestamp = Stopwatch.GetTimestamp();
+        }
+
         try
         {
             await Task.Delay(5);
         }
         finally
         {
-            endTimestamp = Stopwatch.GetTimestamp();
+            if (startTimestamp != 0)
+            {
+                endTimestamp = Stopwatch.GetTimestamp();
 
-            elapsed = endTimestamp - startTimestamp;
-            elapsedTimeSpan = new TimeSpan((long)(MethodTimerHelper.TimestampToTicks * elapsed));
+                elapsed = endTimestamp - startTimestamp;
+                elapsedTimeSpan = new TimeSpan((long)(MethodTimerHelper.TimestampToTicks * elapsed));
+            }
         }
     }
 }

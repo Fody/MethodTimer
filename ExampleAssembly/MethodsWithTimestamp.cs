@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-public class TestClass
+public class TestClassWithTimestamp
 {
     public void SyncMethod()
     {
@@ -16,7 +16,7 @@ public class TestClass
         try
         {
             // Do something
-            Console.WriteLine("Hello, World!");
+            //Console.WriteLine("Hello, World!");
         }
         finally
         {
@@ -37,7 +37,7 @@ public class TestClass
         startTimestamp = Stopwatch.GetTimestamp();
         try
         {
-            await Task.Delay(10);
+            await Task.Delay(5);
         }
         finally
         {

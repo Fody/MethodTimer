@@ -333,7 +333,7 @@ public partial class AsyncMethodProcessor
                 methodBody.Variables.Add(elapsedMillisecondsVariable);
                 yield return Instruction.Create(OpCodes.Ldstr, Method.MethodName());
                 yield return Instruction.Create(OpCodes.Ldarg_0);
-                yield return Instruction.Create(OpCodes.Ldflda, durationTimestampFieldReference);
+                yield return Instruction.Create(OpCodes.Ldflda, durationTimespanFieldReference);
                 yield return Instruction.Create(OpCodes.Call, ModuleWeaver.TimeSpan_TotalMillisecondsMethod);
                 yield return Instruction.Create(OpCodes.Conv_I8);
                 yield return Instruction.Create(OpCodes.Stloc, elapsedMillisecondsVariable);
@@ -349,7 +349,7 @@ public partial class AsyncMethodProcessor
                 yield return Instruction.Create(OpCodes.Ldtoken, Method.DeclaringType);
                 yield return Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle);
                 yield return Instruction.Create(OpCodes.Ldarg_0);
-                yield return Instruction.Create(OpCodes.Ldflda, durationTimestampFieldReference);
+                yield return Instruction.Create(OpCodes.Ldflda, durationTimespanFieldReference);
 
                 if (logMethodUsingTimeSpan is null)
                 {
@@ -404,7 +404,6 @@ public partial class AsyncMethodProcessor
             else
             {
                 // Use timespan directly
-                yield return Instruction.Create(OpCodes.Ldflda, durationTimestampFieldReference);
                 yield return Instruction.Create(OpCodes.Ldarg_0);
                 yield return Instruction.Create(OpCodes.Ldfld, formattedFieldReference);
                 yield return Instruction.Create(OpCodes.Call, logWithMessageMethodUsingTimeSpan);

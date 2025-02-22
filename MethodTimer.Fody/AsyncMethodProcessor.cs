@@ -390,7 +390,7 @@ public partial class AsyncMethodProcessor
             yield return Instruction.Create(OpCodes.Ldtoken, Method.DeclaringType);
             yield return Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle);
             yield return Instruction.Create(OpCodes.Ldarg_0);
-            yield return Instruction.Create(OpCodes.Ldflda, durationTimespanFieldReference);
+            yield return Instruction.Create(OpCodes.Ldfld, durationTimespanFieldReference);
 
             if (logWithMessageMethodUsingTimeSpan is null)
             {

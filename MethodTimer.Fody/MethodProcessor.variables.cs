@@ -17,7 +17,7 @@ public partial class MethodProcessor
         return startTimestampVariable;
     }
 
-    public VariableDefinition InjectEndTimestamp(MethodBody body, int index)
+    public VariableDefinition InjectEndTimestamp(MethodBody body)
     {
         // inject as variable
         var endTimestampVariable = new VariableDefinition(ModuleWeaver.TypeSystem.Int64Reference);
@@ -26,7 +26,7 @@ public partial class MethodProcessor
         return endTimestampVariable;
     }
 
-    public VariableDefinition InjectDurationTimestamp(MethodBody body, int index)
+    public VariableDefinition InjectDurationTimestamp(MethodBody body)
     {
         // inject as variable
         var durationTimestampVariable = new VariableDefinition(ModuleWeaver.TypeSystem.Int64Reference);
@@ -35,7 +35,7 @@ public partial class MethodProcessor
         return durationTimestampVariable;
     }
 
-    public VariableDefinition InjectDurationTimespan(MethodBody body, int index)
+    public VariableDefinition InjectDurationTimespan(MethodBody body)
     {
         // inject as variable
         var durationTimespan = new VariableDefinition(ModuleWeaver.TimeSpanType);

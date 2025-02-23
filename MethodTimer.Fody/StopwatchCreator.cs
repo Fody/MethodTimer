@@ -43,17 +43,15 @@ public partial class ModuleWeaver
 
         var timestampToTicksField = new FieldDefinition("TimestampToTicks",
             FieldAttributes.Assembly | FieldAttributes.Static | FieldAttributes.InitOnly,
-            Float64Type);
+            TypeSystem.DoubleReference);
         type.Fields.Add(timestampToTicksField);
 
         var staticConstructor = new MethodDefinition(".cctor",
             MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName | MethodAttributes.Static,
-            VoidType);
+            TypeSystem.VoidReference);
         staticConstructor.Body.Add(
             // Note: it's a const (10000000)
             Instruction.Create(OpCodes.Ldc_R8, 10000000d),
-            //Instruction.Create(OpCodes.Ldsfld, TimeSpan_TicksPerSecondField),
-            //Instruction.Create(OpCodes.Conv_R8),
             Instruction.Create(OpCodes.Ldsfld, Stopwatch_GetFrequencyField),
             Instruction.Create(OpCodes.Conv_R8),
             Instruction.Create(OpCodes.Div),
@@ -62,7 +60,6 @@ public partial class ModuleWeaver
 
         type.Methods.Add(staticConstructor);
 
-        MethodTimerHelperType = type;
         MethodTimerHelper_TimestampToTicks = timestampToTicksField;
     }
 }

@@ -3,7 +3,7 @@ using Mono.Cecil;
 
 public static class AttributeChecker
 {
-    public static CustomAttribute GetTimeAttribute(this ICustomAttributeProvider definition)
+    public static CustomAttribute? GetTimeAttribute(this ICustomAttributeProvider definition)
     {
         var customAttributes = definition.CustomAttributes;
 

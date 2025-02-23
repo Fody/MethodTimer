@@ -42,9 +42,9 @@ public partial class MethodProcessor
         var returnInstruction = FixReturns();
 
         startTimestampVar = InjectStartTimestamp(body, indexOf);
-        endTimestampVar = InjectEndTimestamp(body, indexOf);
-        durationTimestampVar = InjectDurationTimestamp(body, indexOf);
-        durationTimespanVar = InjectDurationTimespan(body, indexOf);
+        endTimestampVar = InjectEndTimestamp(body);
+        durationTimestampVar = InjectDurationTimestamp(body);
+        durationTimespanVar = InjectDurationTimespan(body);
 
         var beforeReturn = Instruction.Create(OpCodes.Nop);
         body.InsertBefore(returnInstruction, beforeReturn);
@@ -156,7 +156,7 @@ public partial class MethodProcessor
         yield return Instruction.Create(OpCodes.Call, ModuleWeaver.Stopwatch_GetTimestampMethod);
         yield return Instruction.Create(OpCodes.Stloc, endTimestampVar);
 
-        // durationTimestamp = endTimestampVar - endTimestampVar;
+        // durationTimestamp = endTimestampVar - startTimestampVar;
         yield return Instruction.Create(OpCodes.Ldloc, endTimestampVar);
         yield return Instruction.Create(OpCodes.Ldloc, startTimestampVar);
         yield return Instruction.Create(OpCodes.Sub);
@@ -182,6 +182,9 @@ public partial class MethodProcessor
         {
             if (logMethodUsingLong is null && logMethodUsingTimeSpan is null)
             {
+                // var elapsedMillisecondsVariable = (long)durationTimespanVar.TotalMilliseconds;
+                // Trace.WriteLine(string.Concat(methodName, elapsedMillisecondsVariable.ToString(), "ms"))
+                
                 var elapsedMillisecondsVariable = new VariableDefinition(ModuleWeaver.TypeSystem.Int64Reference);
                 methodDefinition.Body.Variables.Add(elapsedMillisecondsVariable);
                 yield return Instruction.Create(OpCodes.Ldstr, methodDefinition.MethodName());
@@ -198,17 +201,20 @@ public partial class MethodProcessor
                 yield break;
             }
 
+            // push the MethodBase
             yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition);
             yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition.DeclaringType);
             yield return Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle);
 
             if (logMethodUsingTimeSpan is not null)
             {
+                // logMethod(MethodBase, TimeSpan)
                 yield return Instruction.Create(OpCodes.Ldloc, durationTimespanVar);
                 yield return Instruction.Create(OpCodes.Call, logMethodUsingTimeSpan);
                 yield break;
             }
 
+            // logMethod(MethodBase, long)
             yield return Instruction.Create(OpCodes.Ldloca, durationTimespanVar);
             yield return Instruction.Create(OpCodes.Call, ModuleWeaver.TimeSpan_TotalMillisecondsMethod);
             yield return Instruction.Create(OpCodes.Conv_I8);
@@ -219,18 +225,20 @@ public partial class MethodProcessor
         var formattedVariableDefinition = new VariableDefinition(ModuleWeaver.TypeSystem.StringReference);
         methodDefinition.Body.Variables.Add(formattedVariableDefinition);
 
+        // formattedVariableDefinition = <message to log> 
         foreach (var instruction in ProcessTimeAttribute(methodDefinition, formattedVariableDefinition))
         {
             yield return instruction;
         }
 
-        // Handle call to log method
+        // push the MethodBase
         yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition);
         yield return Instruction.Create(OpCodes.Ldtoken, methodDefinition.DeclaringType);
         yield return Instruction.Create(OpCodes.Call, ModuleWeaver.GetMethodFromHandle);
 
         if (logWithMessageMethodUsingTimeSpan is null)
         {
+            // logMethod(MethodBase, long, string)
             yield return Instruction.Create(OpCodes.Ldloca, durationTimespanVar);
             yield return Instruction.Create(OpCodes.Call, ModuleWeaver.TimeSpan_TotalMillisecondsMethod);
             yield return Instruction.Create(OpCodes.Conv_I8);
@@ -239,6 +247,7 @@ public partial class MethodProcessor
             yield break;
         }
 
+        // logMethod(MethodBase, TimeSpan, string)
         yield return Instruction.Create(OpCodes.Ldloc, durationTimespanVar);
         yield return Instruction.Create(OpCodes.Ldloc, formattedVariableDefinition);
         yield return Instruction.Create(OpCodes.Call, logWithMessageMethodUsingTimeSpan);
@@ -256,7 +265,7 @@ public partial class MethodProcessor
         var value = timeAttribute.ConstructorArguments.FirstOrDefault().Value as string;
         if (string.IsNullOrWhiteSpace(value))
         {
-            // Load null a string
+            // Load a null string
             yield return Instruction.Create(OpCodes.Ldnull);
         }
         else
@@ -277,12 +286,11 @@ public partial class MethodProcessor
 
                 if (string.Equals(parameterName, "this"))
                 {
-                    // IL_0028: ldarg.0
                     yield return Instruction.Create(OpCodes.Ldarg_0);
                 }
                 else
                 {
-                    var parameter = methodDefinition.Parameters.First(_ => _.Name.Equals(parameterName));
+                    var parameter = methodDefinition.Parameters.First(p => p.Name.Equals(parameterName));
                     yield return Instruction.Create(OpCodes.Ldarg, parameter);
 
                     if (parameter.ParameterType.IsBoxingRequired(ModuleWeaver.TypeSystem.ObjectReference))

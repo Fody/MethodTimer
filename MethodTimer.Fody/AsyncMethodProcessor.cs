@@ -14,7 +14,7 @@ public partial class AsyncMethodProcessor
     FieldReference stateFieldReference;
     TypeDefinition stateMachineTypeDefinition;
     TypeReference stateMachineTypeReference;
-    MethodDefinition stopStopwatchMethod;
+    MethodDefinition? stopStopwatchMethod;
     ParameterFormattingProcessor parameterFormattingProcessor = new();
 
     FieldDefinition startTimestampField;
@@ -136,9 +136,6 @@ public partial class AsyncMethodProcessor
 
     void InjectStopwatchStart(int index, Instruction nextInstruction)
     {
-        var boolVariable = new VariableDefinition(ModuleWeaver.TypeSystem.BooleanReference);
-        body.Variables.Add(boolVariable);
-
         // Field definitions
         startTimestampField = InjectStartTimestamp(stateMachineTypeDefinition);
         startTimestampFieldReference = new(startTimestampField.Name, startTimestampField.FieldType, stateMachineTypeReference);
@@ -165,8 +162,6 @@ public partial class AsyncMethodProcessor
             Instruction.Create(OpCodes.Ldc_I4_0),
             Instruction.Create(OpCodes.Conv_I8),
             Instruction.Create(OpCodes.Ceq),
-            Instruction.Create(OpCodes.Stloc, boolVariable),
-            Instruction.Create(OpCodes.Ldloc, boolVariable),
             Instruction.Create(OpCodes.Brfalse_S, nextInstruction),
             Instruction.Create(OpCodes.Ldarg_0),
             Instruction.Create(OpCodes.Call, ModuleWeaver.Stopwatch_GetTimestampMethod),
@@ -267,9 +262,6 @@ public partial class AsyncMethodProcessor
 
     IEnumerable<Instruction> GetWriteTimeInstruction(MethodBody methodBody)
     {
-        var boolVariable = new VariableDefinition(ModuleWeaver.TypeSystem.BooleanReference);
-        methodBody.Variables.Add(boolVariable);
-
         var stopwatchRunningCheck = Instruction.Create(OpCodes.Ldarg_0);
         var startOfRealMethod = Instruction.Create(OpCodes.Ldarg_0);
 
@@ -287,8 +279,6 @@ public partial class AsyncMethodProcessor
         yield return Instruction.Create(OpCodes.Ldc_I4_0);
         yield return Instruction.Create(OpCodes.Conv_I8);
         yield return Instruction.Create(OpCodes.Ceq);
-        yield return Instruction.Create(OpCodes.Stloc, boolVariable);
-        yield return Instruction.Create(OpCodes.Ldloc, boolVariable);
         yield return Instruction.Create(OpCodes.Brfalse_S, startOfRealMethod);
         yield return Instruction.Create(OpCodes.Ret);
 
@@ -329,6 +319,9 @@ public partial class AsyncMethodProcessor
         {
             if (logMethodUsingLong is null && logMethodUsingTimeSpan is null)
             {
+                // var elapsedMillisecondsVariable = (long)durationTimespanVar.TotalMilliseconds;
+                // Trace.WriteLine(string.Concat(methodName, elapsedMillisecondsVariable.ToString(), "ms"))
+
                 var elapsedMillisecondsVariable = new VariableDefinition(ModuleWeaver.TypeSystem.Int64Reference);
                 methodBody.Variables.Add(elapsedMillisecondsVariable);
                 yield return Instruction.Create(OpCodes.Ldstr, Method.MethodName());

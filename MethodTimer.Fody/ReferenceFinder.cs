@@ -9,22 +9,13 @@ public partial class ModuleWeaver
     public MethodReference StringFormatWithArray;
     public MethodReference ConcatMethod;
     public MethodReference GetMethodFromHandle;
-    public MethodReference ObjectConstructorMethod;
-    public MethodReference MaxMethod;
-    public MethodReference GetTicksMethod;
     public MethodReference Stopwatch_GetTimestampMethod;
     public FieldReference Stopwatch_GetFrequencyField;
-    public MethodReference UtcNowMethod;
     public MethodReference TimeSpan_ConstructorMethod;
     public MethodReference TimeSpan_TotalMillisecondsMethod;
-    public FieldReference TimeSpan_TicksPerSecondField;
     public FieldDefinition MethodTimerHelper_TimestampToTicks;
-    public TypeReference DateTimeType;
     public TypeReference TimeSpanType;
     public TypeReference BooleanType;
-    public TypeReference VoidType;
-    public TypeReference Float64Type;
-    public TypeReference MethodTimerHelperType;
     public MethodReference Int64ToString;
 
     public void FindReferences()
@@ -40,12 +31,6 @@ public partial class ModuleWeaver
         var writeLine = traceType.Method("WriteLine", "String");
         TraceWriteLineMethod = ModuleDefinition.ImportReference(writeLine);
 
-        var objectConstructor = TypeSystem.ObjectDefinition.Method(".ctor");
-        ObjectConstructorMethod = ModuleDefinition.ImportReference(objectConstructor);
-
-        var voidType = FindTypeDefinition("System.Void");
-        VoidType = ModuleDefinition.ImportReference(voidType);
-
         var timeSpanDefinition = FindTypeDefinition("System.TimeSpan");
         TimeSpanType = ModuleDefinition.ImportReference(timeSpanDefinition);
         var timeSpanConstructor = timeSpanDefinition.Method(".ctor","Int64");
@@ -53,17 +38,6 @@ public partial class ModuleWeaver
 
         var timeSpanTotalMilliseconds = timeSpanDefinition.Method("get_TotalMilliseconds");
         TimeSpan_TotalMillisecondsMethod = ModuleDefinition.ImportReference(timeSpanTotalMilliseconds);
-
-        var timeSpanTicksPerSecond = timeSpanDefinition.Fields.First(x => x.Name == "TicksPerSecond");
-        TimeSpan_TicksPerSecondField = ModuleDefinition.ImportReference(timeSpanTicksPerSecond);
-
-        var mathType = FindTypeDefinition("System.Math");
-        MaxMethod = ModuleDefinition.ImportReference(mathType.Method("Max", "Int64", "Int64"));
-
-        var dateTimeType = FindTypeDefinition("System.DateTime");
-        DateTimeType = ModuleDefinition.ImportReference(dateTimeType);
-        UtcNowMethod = ModuleDefinition.ImportReference(dateTimeType.Method("get_UtcNow"));
-        GetTicksMethod = ModuleDefinition.ImportReference(dateTimeType.Method("get_Ticks"));
 
         var methodBaseType = FindTypeDefinition("System.Reflection.MethodBase");
         var methodBase = methodBaseType.Method("GetMethodFromHandle", "RuntimeMethodHandle", "RuntimeTypeHandle");
@@ -77,14 +51,11 @@ public partial class ModuleWeaver
         var concatMethod = TypeSystem.StringDefinition.Method("Concat", "String", "String", "String");
         ConcatMethod = ModuleDefinition.ImportReference(concatMethod);
 
-        var float64Type = FindTypeDefinition("System.Double");
-        Float64Type = ModuleDefinition.ImportReference(float64Type);
-
         var stopwatchType = FindTypeDefinition("System.Diagnostics.Stopwatch");
         StopwatchType = ModuleDefinition.ImportReference(stopwatchType);
         if (StopwatchType is null)
         {
-            throw new WeavingException($"Could not find 'System.Diagnostics.Stopwatch', this seems to be an unsupported platform.");
+            throw new WeavingException("Could not find 'System.Diagnostics.Stopwatch', this seems to be an unsupported platform.");
         }
 
         var stopwatch_GetTimestampMethod = stopwatchType.Method("GetTimestamp");

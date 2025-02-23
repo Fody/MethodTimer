@@ -4,6 +4,8 @@
 
 Injects some very basic method timing code.
 
+The implementation uses an allocation-free method to determine the duration of a method.
+
 **See [Milestones](../../milestones?state=closed) for release notes.**
 
 
@@ -62,7 +64,7 @@ public class MyClass
 {
     public void MyMethod()
     {
-        var stopwatch = Stopwatch.StartNew();
+        var start = Stopwatch.GetTimestamp();
         try
         {
             //Some code u are curious how long it takes
@@ -70,8 +72,10 @@ public class MyClass
         }
         finally
         {
-            stopwatch.Stop();
-            Trace.WriteLine("MyClass.MyMethod " + stopwatch.ElapsedMilliseconds + "ms");
+            var end = Stopwatch.GetTimestamp();
+            var elapsed = end - start;
+            var elapsedTimeSpan = new TimeSpan(...);
+            Trace.WriteLine("MyClass.MyMethod " + elapsedTimeSpan.TotalMilliseconds + "ms");
         }
     }
 }
@@ -106,7 +110,7 @@ public class MyClass
 {
     public void MyMethod()
     {
-        var stopwatch = Stopwatch.StartNew();
+        var start = Stopwatch.GetTimestamp();
         try
         {
             //Some code u are curious how long it takes
@@ -114,8 +118,10 @@ public class MyClass
         }
         finally
         {
-            stopwatch.Stop();
-            MethodTimeLogger.Log(methodof(MyClass.MyMethod), stopwatch.ElapsedMilliseconds);
+            var end = Stopwatch.GetTimestamp();
+            var elapsed = end - start;
+            var elapsedTimeSpan = new TimeSpan(...);
+            MethodTimeLogger.Log(methodof(MyClass.MyMethod), (long)elapsedTimeSpan.TotalMilliseconds);
         }
     }
 }
@@ -141,7 +147,7 @@ public class MyClass
 {
     public void MyMethod()
     {
-        var stopwatch = Stopwatch.StartNew();
+        var start = Stopwatch.GetTimestamp();
         try
         {
             //Some code u are curious how long it takes
@@ -149,8 +155,10 @@ public class MyClass
         }
         finally
         {
-            stopwatch.Stop();
-            MethodTimeLogger.Log(methodof(MyClass.MyMethod), stopwatch.Elapsed);
+            var end = Stopwatch.GetTimestamp();
+            var elapsed = end - start;
+            var elapsedTimeSpan = new TimeSpan(...);
+            MethodTimeLogger.Log(methodof(MyClass.MyMethod), elapsedTimeSpan);
         }
     }
 }
@@ -180,7 +188,7 @@ public class MyClass
 {
     public void MyMethod(string fileName)
     {
-        var stopwatch = Stopwatch.StartNew();
+        var start = Stopwatch.GetTimestamp();
         try
         {
             //Some code u are curious how long it takes
@@ -188,9 +196,11 @@ public class MyClass
         }
         finally
         {
-            stopwatch.Stop();
+            var end = Stopwatch.GetTimestamp();
+            var elapsed = end - start;
+            var elapsedTimeSpan = new TimeSpan(...);
             var message = string.Format("File name: '{0}'", fileName);
-            MethodTimeLogger.Log(methodof(MyClass.MyMethod), stopwatch.ElapsedMilliseconds, message);
+            MethodTimeLogger.Log(methodof(MyClass.MyMethod), (long)elapsedTimeSpan.TotalMilliseconds, message);
         }
     }
 }

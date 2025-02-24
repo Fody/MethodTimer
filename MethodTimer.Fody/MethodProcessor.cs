@@ -184,7 +184,7 @@ public partial class MethodProcessor
             {
                 // var elapsedMillisecondsVariable = (long)durationTimespanVar.TotalMilliseconds;
                 // Trace.WriteLine(string.Concat(methodName, elapsedMillisecondsVariable.ToString(), "ms"))
-                
+
                 var elapsedMillisecondsVariable = new VariableDefinition(ModuleWeaver.TypeSystem.Int64Reference);
                 methodDefinition.Body.Variables.Add(elapsedMillisecondsVariable);
                 yield return Instruction.Create(OpCodes.Ldstr, methodDefinition.MethodName());
@@ -225,7 +225,7 @@ public partial class MethodProcessor
         var formattedVariableDefinition = new VariableDefinition(ModuleWeaver.TypeSystem.StringReference);
         methodDefinition.Body.Variables.Add(formattedVariableDefinition);
 
-        // formattedVariableDefinition = <message to log> 
+        // formattedVariableDefinition = <message to log>
         foreach (var instruction in ProcessTimeAttribute(methodDefinition, formattedVariableDefinition))
         {
             yield return instruction;

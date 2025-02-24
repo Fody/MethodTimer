@@ -67,12 +67,12 @@ public partial class AsyncMethodProcessor
 
         // Check roslyn usage
         var firstStateUsage = (from instruction in body.Instructions
-                               let fieldReference = instruction.Operand as FieldReference
-                               where instruction.OpCode == OpCodes.Ldfld &&
-                                     fieldReference != null &&
-                                     (fieldReference.Name.EndsWith("__state") ||
-                                      fieldReference.Name.EndsWith("$State"))
-                               select instruction).FirstOrDefault();
+            let fieldReference = instruction.Operand as FieldReference
+            where instruction.OpCode == OpCodes.Ldfld &&
+                  fieldReference != null &&
+                  (fieldReference.Name.EndsWith("__state") ||
+                   fieldReference.Name.EndsWith("$State"))
+            select instruction).FirstOrDefault();
         if (firstStateUsage is null)
         {
             // Probably compiled without roslyn, inject at first line
@@ -91,10 +91,10 @@ public partial class AsyncMethodProcessor
         }
 
         stateFieldDefinition = (from x in stateMachineTypeDefinition.Fields
-                                where x.Name.EndsWith("__state") ||
-                                      x.Name.EndsWith("$State")
-                                select x).First();
-        
+            where x.Name.EndsWith("__state") ||
+                  x.Name.EndsWith("$State")
+            select x).First();
+
         InjectStopwatchStart(index, body.Instructions[index]);
         InjectStopwatchStopMethod();
         InjectStopwatchStopCalls();
@@ -135,8 +135,8 @@ public partial class AsyncMethodProcessor
         durationTimestampField = InjectDurationTimestamp(stateMachineTypeDefinition);
         durationTimespanField = InjectDurationTimespan(stateMachineTypeDefinition);
 
-        body.Insert(index, new[]
-        {
+        body.Insert(index,
+        [
             // This code looks like this:
             // if (_startTimestamp == 0L)
             // {
@@ -152,7 +152,7 @@ public partial class AsyncMethodProcessor
             Instruction.Create(OpCodes.Ldarg_0),
             Instruction.Create(OpCodes.Call, ModuleWeaver.Stopwatch_GetTimestampMethod),
             Instruction.Create(OpCodes.Stfld, startTimestampField)
-        });
+        ]);
     }
 
     void InjectStopwatchStopMethod()
@@ -206,8 +206,8 @@ public partial class AsyncMethodProcessor
 
         // 1: SetException: We will search for the last known catch block, and implement a finally there with the stopwatch code
         var exceptionHandler = (from handler in body.ExceptionHandlers
-                                orderby handler.HandlerEnd.Offset descending
-                                select handler).FirstOrDefault();
+            orderby handler.HandlerEnd.Offset descending
+            select handler).FirstOrDefault();
         if (exceptionHandler != null)
         {
             var catchStartIndex = body.Instructions.IndexOf(exceptionHandler.HandlerStart);
@@ -215,13 +215,14 @@ public partial class AsyncMethodProcessor
 
             for (var i = catchEndIndex; i >= catchStartIndex; i--)
             {
-                if (body.Instructions[i].Operand is MethodReference { Name: "SetException" })
+                if (body.Instructions[i].Operand is MethodReference {Name: "SetException"})
                 {
                     // Insert before
                     for (var j = 0; j < stopwatchInstructions.Count; j++)
                     {
                         body.Instructions.Insert(i + j, stopwatchInstructions[j]);
                     }
+
                     break;
                 }
             }
@@ -230,7 +231,7 @@ public partial class AsyncMethodProcessor
         // 2: end of the method (either SetResult or end of the method)
         for (var i = body.Instructions.Count - 1; i >= 0; i--)
         {
-            if (body.Instructions[i].Operand is MethodReference { Name: "SetResult" })
+            if (body.Instructions[i].Operand is MethodReference {Name: "SetResult"})
             {
                 // Next index, we want this to appear *after* the SetResult call
                 endInstruction = body.Instructions[i + 1];

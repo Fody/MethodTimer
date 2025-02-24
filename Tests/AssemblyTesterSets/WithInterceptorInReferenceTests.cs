@@ -17,7 +17,7 @@ public class WithInterceptorInReferenceTests
         };
         testResult = weavingTask.ExecuteTestRun(
             assemblyPath: "AssemblyWithInterceptorInReference.dll",
-            ignoreCodes: new []{ "0x80131869" });
+            ignoreCodes: ["0x80131869"]);
         methodBaseField = typeof(AssemblyToReference.MethodTimeLogger).GetField("MethodBase");
     }
 

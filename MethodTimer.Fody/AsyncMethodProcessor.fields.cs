@@ -1,11 +1,11 @@
 using Mono.Cecil;
-using Mono.Cecil.Cil;
 
 public partial class AsyncMethodProcessor
 {
     public FieldDefinition InjectStartTimestamp(TypeDefinition typeDefinition)
     {
-        var startTimestampField = new FieldDefinition("_MethodTimer_StartTimestamp", 
+        var startTimestampField = new FieldDefinition(
+            "_MethodTimer_StartTimestamp",
             FieldAttributes.Private,
             ModuleWeaver.TypeSystem.Int64Reference);
 
@@ -17,8 +17,9 @@ public partial class AsyncMethodProcessor
     public FieldDefinition InjectEndTimestamp(TypeDefinition typeDefinition)
     {
         // inject as variable
-        var endTimestampField = new FieldDefinition("_MethodTimer_EndTimestamp",
-            FieldAttributes.Private, 
+        var endTimestampField = new FieldDefinition(
+            "_MethodTimer_EndTimestamp",
+            FieldAttributes.Private,
             ModuleWeaver.TypeSystem.Int64Reference);
 
         typeDefinition.Fields.Add(endTimestampField);
@@ -29,7 +30,8 @@ public partial class AsyncMethodProcessor
     public FieldDefinition InjectDurationTimestamp(TypeDefinition typeDefinition)
     {
         // inject as variable
-        var durationTimestampField = new FieldDefinition("_MethodTimer_DurationTimestamp",
+        var durationTimestampField = new FieldDefinition(
+            "_MethodTimer_DurationTimestamp",
             FieldAttributes.Private,
             ModuleWeaver.TypeSystem.Int64Reference);
 

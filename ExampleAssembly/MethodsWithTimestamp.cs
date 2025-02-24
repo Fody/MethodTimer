@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using System.Reflection;
 using System.Threading.Tasks;
 
 public class TestClassWithTimestamp
@@ -24,7 +23,7 @@ public class TestClassWithTimestamp
             endTimestamp = Stopwatch.GetTimestamp();
 
             elapsed = endTimestamp - startTimestamp;
-            elapsedTimeSpan = new TimeSpan((long)(MethodTimerHelper.TimestampToTicks * elapsed));
+            elapsedTimeSpan = new((long)(MethodTimerHelper.TimestampToTicks * elapsed));
         }
     }
 

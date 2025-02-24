@@ -9,11 +9,10 @@ public partial class MethodProcessor
         var startTimestampVariable = new VariableDefinition(ModuleWeaver.TypeSystem.Int64Reference);
         body.Variables.Add(startTimestampVariable);
         body.Insert(index, new List<Instruction>(
-            new[]
-            {
-                Instruction.Create(OpCodes.Call, ModuleWeaver.Stopwatch_GetTimestampMethod),
-                Instruction.Create(OpCodes.Stloc, startTimestampVariable)
-            }));
+        [
+            Instruction.Create(OpCodes.Call, ModuleWeaver.Stopwatch_GetTimestampMethod),
+            Instruction.Create(OpCodes.Stloc, startTimestampVariable)
+        ]));
         return startTimestampVariable;
     }
 

@@ -1,12 +1,11 @@
-﻿namespace ExampleAssembly
-{
-    using BenchmarkDotNet.Running;
+﻿namespace ExampleAssembly;
 
-    public class Program
+using BenchmarkDotNet.Running;
+
+public class Program
+{
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
-        {
-            var summary = BenchmarkRunner.Run<StopwatchVsTimestamp>();
-        }
+        var summary = BenchmarkRunner.Run<StopwatchVsTimestamp>();
     }
 }

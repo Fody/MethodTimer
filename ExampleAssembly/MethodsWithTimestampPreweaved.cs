@@ -7,12 +7,12 @@
 
     public class MethodsWithTimestampPreweaved
     {
-        private long _startTimestamp = default;
-        private long _endTimestamp;
-        private long _elapsed;
-        private TimeSpan _elapsedTimeSpan;
-        private int _state = 0;
-        private string methodTimerMessage;
+        long _startTimestamp = 0;
+        long _endTimestamp;
+        long _elapsed;
+        TimeSpan _elapsedTimeSpan;
+        int _state = 0;
+        string methodTimerMessage;
 
         public async Task AsyncMethod()
         {
@@ -31,13 +31,13 @@
             }
         }
 
-        private void StopMethodTimerStopwatch()
+        void StopMethodTimerStopwatch()
         {
             if (_state == -2 && _startTimestamp != 0)
             {
                 _endTimestamp = Stopwatch.GetTimestamp();
                 _elapsed = _endTimestamp - _startTimestamp;
-                _elapsedTimeSpan = new TimeSpan((long)(MethodTimerHelper.TimestampToTicks * (double)_elapsed));
+                _elapsedTimeSpan = new TimeSpan((long)(MethodTimerHelper.TimestampToTicks * _elapsed));
                 methodTimerMessage = null;
                 MethodTimeLogger.Log(MethodBase.GetCurrentMethod(), (long)_elapsedTimeSpan.TotalMilliseconds, methodTimerMessage);
             }

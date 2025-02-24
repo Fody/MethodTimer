@@ -51,7 +51,7 @@ public class TestClassWithTimestamp
                 endTimestamp = Stopwatch.GetTimestamp();
 
                 elapsed = endTimestamp - startTimestamp;
-                elapsedTimeSpan = new TimeSpan((long)(MethodTimerHelper.TimestampToTicks * elapsed));
+                elapsedTimeSpan = new((long)(MethodTimerHelper.TimestampToTicks * elapsed));
             }
         }
     }

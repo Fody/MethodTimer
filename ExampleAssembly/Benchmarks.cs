@@ -5,8 +5,8 @@
     [MemoryDiagnoser]
     public class StopwatchVsTimestamp
     {
-        private TestClassWithStopwatch _testClassWithStopwatch = new TestClassWithStopwatch();
-        private TestClassWithTimestamp _testClassWithTimestamp = new TestClassWithTimestamp();
+        TestClassWithStopwatch _testClassWithStopwatch = new();
+        TestClassWithTimestamp _testClassWithTimestamp = new();
 
         public StopwatchVsTimestamp()
         {

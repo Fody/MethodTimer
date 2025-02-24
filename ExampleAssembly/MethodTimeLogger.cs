@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Reflection;
 
 public static class MethodTimeLogger
@@ -19,9 +18,4 @@ public static class MethodTimeLogger
             Messages.Add(message);
         }
     }
-}
-
-internal static class MethodTimerHelper
-{
-    internal static readonly double TimestampToTicks = TimeSpan.TicksPerSecond / (double)Stopwatch.Frequency;
 }

@@ -21,7 +21,9 @@ public class WithInterceptorAndFormattingTests
 #if NETCOREAPP2_1
             , runPeVerify: false
 #endif
-        ); var methodTimeLogger = testResult.Assembly.GetType("MethodTimeLogger");
+        ); 
+        
+        var methodTimeLogger = testResult.Assembly.GetType("MethodTimeLogger");
         methodBaseField = methodTimeLogger.GetField("MethodBase");
         messagesField = methodTimeLogger.GetField("Messages");
     }

@@ -3,108 +3,63 @@ using Mono.Cecil.Cil;
 
 public partial class ModuleWeaver
 {
-    public void InjectStopwatchType()
+    public void InjectMethodTimerHelper()
     {
+        //.class private auto ansi abstract sealed beforefieldinit MethodTimerHelper
+
+        //    extends[System.Runtime] System.Object
+        //    {
+        // // Fields
+        // .field assembly static initonly float64 TimestampToTicks
+
+        //    // Methods
+        //    .method private hidebysig specialname rtspecialname static
+        //        void .cctor() cil managed
+        //    {
+        //  // Method begins at RVA 0x20e9
+        //  // Header size: 1
+        //  // Code size: 22 (0x16)
+        //  .maxstack 8
+
+        //  // TimestampToTicks = (double)TimeSpan.TicksPerSecond / (double)Stopwatch.Frequency;
+        //  IL_0000: ldc.r8 10000000
+        //  IL_0009: ldsfld int64 [System.Runtime]
+        //        System.Diagnostics.Stopwatch::Frequency
+        //        IL_000e: conv.r8
+        //        IL_000f: div
+        //        IL_0010: stsfld float64 MethodTimerHelper::TimestampToTicks
+        //        // }
+        //        IL_0015: ret
+        //    } // end of method MethodTimerHelper::.cctor
+
+        //} // end of class MethodTimerHelper
+
         var type = new TypeDefinition(
             "MethodTimer",
-            "Stopwatch",
-            TypeAttributes.BeforeFieldInit | TypeAttributes.AnsiClass | TypeAttributes.AutoClass,
+            "MethodTimerHelper",
+            TypeAttributes.Sealed | TypeAttributes.AnsiClass | TypeAttributes.AutoClass | TypeAttributes.Abstract | TypeAttributes.NotPublic,
             TypeSystem.ObjectReference);
         ModuleDefinition.Types.Add(type);
 
-        var startTicks = new FieldDefinition("startTicks", FieldAttributes.Private, TypeSystem.Int64Reference);
-        type.Fields.Add(startTicks);
+        var timestampToTicksField = new FieldDefinition("TimestampToTicks",
+            FieldAttributes.Assembly | FieldAttributes.Static | FieldAttributes.InitOnly,
+            TypeSystem.DoubleReference);
+        type.Fields.Add(timestampToTicksField);
 
-        var stopped = new FieldDefinition("stopped", FieldAttributes.Private, TypeSystem.BooleanReference);
-        type.Fields.Add(stopped);
-
-        var elapsedTicks = new FieldDefinition("elapsedTicks", FieldAttributes.Private, TypeSystem.Int64Reference);
-        type.Fields.Add(elapsedTicks);
-
-        var currentTicks = new MethodDefinition(
-            "CurrentTicks",
-            MethodAttributes.HideBySig | MethodAttributes.Private | MethodAttributes.Static,
-            TypeSystem.Int64Reference)
-        {
-            Body =
-            {
-                InitLocals = true
-            }
-        };
-        type.Methods.Add(currentTicks);
-        var timeVariable = new VariableDefinition(DateTimeType);
-        currentTicks.Body.Variables.Add(timeVariable);
-        currentTicks.Body.Add(
-            Instruction.Create(OpCodes.Call, UtcNowMethod),
-            Instruction.Create(OpCodes.Stloc, timeVariable),
-            Instruction.Create(OpCodes.Ldloca_S, timeVariable),
-            Instruction.Create(OpCodes.Call, GetTicksMethod),
-            Instruction.Create(OpCodes.Ret));
-
-        var constructor = new MethodDefinition(
-            ".ctor",
-            MethodAttributes.RTSpecialName | MethodAttributes.SpecialName | MethodAttributes.HideBySig | MethodAttributes.Public,
+        var staticConstructor = new MethodDefinition(".cctor",
+            MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName | MethodAttributes.Static,
             TypeSystem.VoidReference);
-        type.Methods.Add(constructor);
-        constructor.Body.Add(
-            Instruction.Create(OpCodes.Ldarg_0),
-            Instruction.Create(OpCodes.Call, currentTicks),
-            Instruction.Create(OpCodes.Stfld, startTicks),
-            Instruction.Create(OpCodes.Ldarg_0),
-            Instruction.Create(OpCodes.Call, ObjectConstructorMethod),
-            Instruction.Create(OpCodes.Ret));
-
-        var startNew = new MethodDefinition(
-            "StartNew",
-            MethodAttributes.HideBySig | MethodAttributes.Public | MethodAttributes.Static,
-            type);
-        type.Methods.Add(startNew);
-        startNew.Body.Add(
-            Instruction.Create(OpCodes.Newobj, constructor),
-            Instruction.Create(OpCodes.Ret));
-
-        var stop = new MethodDefinition(
-            "Stop",
-            MethodAttributes.HideBySig | MethodAttributes.Public,
-            TypeSystem.VoidReference);
-        type.Methods.Add(stop);
-        var stopReturn = Instruction.Create(OpCodes.Ret);
-        stop.Body.Add(
-            Instruction.Create(OpCodes.Ldarg_0),
-            Instruction.Create(OpCodes.Ldfld, stopped),
-            Instruction.Create(OpCodes.Brtrue, stopReturn),
-            Instruction.Create(OpCodes.Ldarg_0),
-            Instruction.Create(OpCodes.Ldc_I4_1),
-            Instruction.Create(OpCodes.Stfld, stopped),
-            Instruction.Create(OpCodes.Ldarg_0),
-            Instruction.Create(OpCodes.Ldc_I4_0),
-            Instruction.Create(OpCodes.Conv_I8),
-            Instruction.Create(OpCodes.Call, currentTicks),
-            Instruction.Create(OpCodes.Ldarg_0),
-            Instruction.Create(OpCodes.Ldfld, startTicks),
-            Instruction.Create(OpCodes.Sub),
-            Instruction.Create(OpCodes.Call, MaxMethod),
-            Instruction.Create(OpCodes.Stfld, elapsedTicks),
-            stopReturn);
-
-        var elapsedMilliseconds = new MethodDefinition(
-            "GetElapsedMilliseconds",
-            MethodAttributes.HideBySig | MethodAttributes.Public,
-            TypeSystem.Int64Reference);
-        type.Methods.Add(elapsedMilliseconds);
-        elapsedMilliseconds.Body.Add(
-            Instruction.Create(OpCodes.Ldarg_0),
-            Instruction.Create(OpCodes.Call, stop),
-            Instruction.Create(OpCodes.Ldarg_0),
-            Instruction.Create(OpCodes.Ldfld, elapsedTicks),
-            Instruction.Create(OpCodes.Ldc_I4, 10000),
-            Instruction.Create(OpCodes.Conv_I8),
+        staticConstructor.Body.Add(
+            // Note: it's a const (10000000)
+            Instruction.Create(OpCodes.Ldc_R8, 10000000d),
+            Instruction.Create(OpCodes.Ldsfld, Stopwatch_GetFrequencyField),
+            Instruction.Create(OpCodes.Conv_R8),
             Instruction.Create(OpCodes.Div),
+            Instruction.Create(OpCodes.Stsfld, timestampToTicksField),
             Instruction.Create(OpCodes.Ret));
 
-        ElapsedMilliseconds = elapsedMilliseconds;
-        StopMethod = stop;
-        StopwatchType = type;
-        StartNewMethod = startNew;
+        type.Methods.Add(staticConstructor);
+
+        MethodTimerHelper_TimestampToTicks = timestampToTicksField;
     }
 }

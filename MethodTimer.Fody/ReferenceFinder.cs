@@ -1,23 +1,21 @@
+using System.Linq;
 using Fody;
 using Mono.Cecil;
 
 public partial class ModuleWeaver
 {
     public MethodReference TraceWriteLineMethod;
-    public MethodReference StartNewMethod;
-    public MethodReference StopMethod;
     public TypeReference StopwatchType;
     public MethodReference StringFormatWithArray;
     public MethodReference ConcatMethod;
-    public MethodReference IsRunning;
-    public MethodReference Elapsed;
-    public MethodReference ElapsedMilliseconds;
     public MethodReference GetMethodFromHandle;
-    public MethodReference ObjectConstructorMethod;
-    public MethodReference MaxMethod;
-    public MethodReference GetTicksMethod;
-    public MethodReference UtcNowMethod;
-    public TypeReference DateTimeType;
+    public MethodReference Stopwatch_GetTimestampMethod;
+    public FieldReference Stopwatch_GetFrequencyField;
+    public MethodReference TimeSpan_ConstructorMethod;
+    public MethodReference TimeSpan_TotalMillisecondsMethod;
+    public FieldDefinition MethodTimerHelper_TimestampToTicks;
+    public TypeReference TimeSpanType;
+    public TypeReference BooleanType;
     public MethodReference Int64ToString;
 
     public void FindReferences()
@@ -33,16 +31,13 @@ public partial class ModuleWeaver
         var writeLine = traceType.Method("WriteLine", "String");
         TraceWriteLineMethod = ModuleDefinition.ImportReference(writeLine);
 
-        var objectConstructor = TypeSystem.ObjectDefinition.Method(".ctor");
-        ObjectConstructorMethod = ModuleDefinition.ImportReference(objectConstructor);
+        var timeSpanDefinition = FindTypeDefinition("System.TimeSpan");
+        TimeSpanType = ModuleDefinition.ImportReference(timeSpanDefinition);
+        var timeSpanConstructor = timeSpanDefinition.Method(".ctor","Int64");
+        TimeSpan_ConstructorMethod = ModuleDefinition.ImportReference(timeSpanConstructor);
 
-        var mathType = FindTypeDefinition("System.Math");
-        MaxMethod = ModuleDefinition.ImportReference(mathType.Method("Max", "Int64", "Int64"));
-
-        var dateTimeType = FindTypeDefinition("System.DateTime");
-        DateTimeType = ModuleDefinition.ImportReference(dateTimeType);
-        UtcNowMethod = ModuleDefinition.ImportReference(dateTimeType.Method("get_UtcNow"));
-        GetTicksMethod = ModuleDefinition.ImportReference(dateTimeType.Method("get_Ticks"));
+        var timeSpanTotalMilliseconds = timeSpanDefinition.Method("get_TotalMilliseconds");
+        TimeSpan_TotalMillisecondsMethod = ModuleDefinition.ImportReference(timeSpanTotalMilliseconds);
 
         var methodBaseType = FindTypeDefinition("System.Reflection.MethodBase");
         var methodBase = methodBaseType.Method("GetMethodFromHandle", "RuntimeMethodHandle", "RuntimeTypeHandle");
@@ -56,19 +51,19 @@ public partial class ModuleWeaver
         var concatMethod = TypeSystem.StringDefinition.Method("Concat", "String", "String", "String");
         ConcatMethod = ModuleDefinition.ImportReference(concatMethod);
 
-        if (TryFindTypeDefinition("System.Diagnostics.Stopwatch", out var stopwatchType))
+        var stopwatchType = FindTypeDefinition("System.Diagnostics.Stopwatch");
+        StopwatchType = ModuleDefinition.ImportReference(stopwatchType);
+        if (StopwatchType is null)
         {
-            StopwatchType = ModuleDefinition.ImportReference(stopwatchType);
-            StartNewMethod = ModuleDefinition.ImportReference(stopwatchType.Method("StartNew"));
-            StopMethod = ModuleDefinition.ImportReference(stopwatchType.Method("Stop"));
-            Elapsed = ModuleDefinition.ImportReference(stopwatchType.Method("get_Elapsed"));
-            ElapsedMilliseconds = ModuleDefinition.ImportReference(stopwatchType.Method("get_ElapsedMilliseconds"));
-            IsRunning = ModuleDefinition.ImportReference(stopwatchType.Method("get_IsRunning"));
+            throw new WeavingException("Could not find 'System.Diagnostics.Stopwatch', this seems to be an unsupported platform.");
         }
-        else
-        {
-            // Note: injected stopwatch is not supported for TimeSpan elapsed, should we error or add?
-            InjectStopwatchType();
-        }
+
+        var stopwatch_GetTimestampMethod = stopwatchType.Method("GetTimestamp");
+        Stopwatch_GetTimestampMethod = ModuleDefinition.ImportReference(stopwatch_GetTimestampMethod);
+
+        var stopwatch_GetFrequencyField = stopwatchType.Fields.First(x => x.Name == "Frequency");
+        Stopwatch_GetFrequencyField = ModuleDefinition.ImportReference(stopwatch_GetFrequencyField);
+
+        InjectMethodTimerHelper();
     }
 }

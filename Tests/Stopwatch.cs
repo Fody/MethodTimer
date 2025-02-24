@@ -1,6 +1,6 @@
 using System;
 
-class Stopwatch
+struct Stopwatch
 {
     long startTicks;
     long elapsedTicks;
@@ -22,6 +22,8 @@ class Stopwatch
         }
     }
 
+    public bool GetIsRunning() => !stopped;
+
     static long CurrentTicks() =>
         DateTime.UtcNow.Ticks;
 
@@ -29,5 +31,11 @@ class Stopwatch
     {
         Stop();
         return elapsedTicks / 10000;
+    }
+
+    public TimeSpan GetElapsed()
+    {
+        Stop();
+        return new(elapsedTicks);
     }
 }

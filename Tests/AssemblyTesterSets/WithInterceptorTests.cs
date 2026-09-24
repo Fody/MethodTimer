@@ -1,11 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Fody;
-using Xunit;
 
+// tests share static state and capture Trace output
+[NotInParallel]
 public class WithInterceptorTests
 {
     static FieldInfo methodBaseField;
@@ -27,8 +28,8 @@ public class WithInterceptorTests
         messagesField = methodTimeLogger.GetField("Messages");
     }
 
-    [Fact]
-    public void ClassWithExpressionBodiedMember()
+    [Test]
+    public async Task ClassWithExpressionBodiedMember()
     {
         ClearMessage();
         var type = testResult.Assembly.GetType("ClassWithExpressionBodiedMember");
@@ -36,22 +37,22 @@ public class WithInterceptorTests
         instance.Method();
         var methodBases = GetMethodInfoField();
         var methodBase = methodBases.First();
-        Assert.Equal("get_FooBar", methodBase.Name);
-        Assert.Equal(methodBase.DeclaringType, type);
+        await Assert.That(methodBase.Name).IsEqualTo("get_FooBar");
+        await Assert.That(type).IsEqualTo(methodBase.DeclaringType);
     }
 
-    [Fact]
-    public void ClassWithMethod()
+    [Test]
+    public async Task ClassWithMethod()
     {
         ClearMessage();
         var type = testResult.Assembly.GetType("ClassWithMethod");
         var instance = (dynamic) Activator.CreateInstance(type);
         instance.Method();
         var methodBases = GetMethodInfoField();
-        Assert.Single(methodBases);
+        await Assert.That(methodBases).HasSingleItem();
         var methodBase = methodBases.First();
-        Assert.Equal("Method", methodBase.Name);
-        Assert.Equal(methodBase.DeclaringType, type);
+        await Assert.That(methodBase.Name).IsEqualTo("Method");
+        await Assert.That(type).IsEqualTo(methodBase.DeclaringType);
     }
 
     static void ClearMessage()
@@ -66,8 +67,8 @@ public class WithInterceptorTests
     List<string> GetMessagesField() =>
         (List<string>)messagesField.GetValue(null);
 
-    [Fact]
-    public void GenericClassWithMethod()
+    [Test]
+    public async Task GenericClassWithMethod()
     {
         ClearMessage();
         var type = testResult.Assembly.GetType("GenericClassWithMethod`1[[System.String, mscorlib]]");
@@ -75,14 +76,15 @@ public class WithInterceptorTests
         instance.Method();
 
         var methodBases = GetMethodInfoField();
-        Assert.Single(methodBases);
+        await Assert.That(methodBases).HasSingleItem();
         var methodBase = methodBases.First();
-        Assert.Equal("Method", methodBase.Name);
-        Assert.StartsWith("GenericClassWithMethod`1", methodBase.DeclaringType.Name);
+        await Assert.That(methodBase.Name).IsEqualTo("Method");
+        await Assert.That(methodBase.DeclaringType.Name).StartsWith("GenericClassWithMethod`1");
     }
 
-    [Fact(Skip = "todo")]
-    public void ClassWithAsyncMethod()
+    [Test]
+    [Skip("todo")]
+    public async Task ClassWithAsyncMethod()
     {
         ClearMessage();
         var type = testResult.Assembly.GetType("ClassWithAsyncMethod");
@@ -94,13 +96,13 @@ public class WithInterceptorTests
         });
 
         var methodBases = GetMethodInfoField();
-        Assert.Single(methodBases);
+        await Assert.That(methodBases).HasSingleItem();
         var methodBase = methodBases.First();
-        Assert.Equal("MethodWithAwaitAsync", methodBase.Name);
+        await Assert.That(methodBase.Name).IsEqualTo("MethodWithAwaitAsync");
     }
 
-    [Fact]
-    public void ClassWithGenericAsyncMethod()
+    [Test]
+    public async Task ClassWithGenericAsyncMethod()
     {
         ClearMessage();
         var type = testResult.Assembly.GetType("ClassWithAsyncMethod");
@@ -112,12 +114,12 @@ public class WithInterceptorTests
         });
 
         var methodBases = GetMethodInfoField();
-        Assert.Single(methodBases);
+        await Assert.That(methodBases).HasSingleItem();
         var methodBase = methodBases.First();
-        Assert.Equal("GenericMethodAsync", methodBase.Name);
+        await Assert.That(methodBase.Name).IsEqualTo("GenericMethodAsync");
     }
 
-    [Fact]
+    [Test]
     public async Task ClassWithAsyncMethodThatThrowsException()
     {
         ClearMessage();
@@ -142,10 +144,10 @@ public class WithInterceptorTests
                               where x.Name.Equals("MethodWithAwaitAndExceptionAsync")
                               select x).ToList();
 
-        Assert.Single(allMethodBases);
+        await Assert.That(allMethodBases).HasSingleItem();
     }
 
-    [Fact]
+    [Test]
     public async Task ClassWithAsyncMethodWithExceptionAsync()
     {
         ClearMessage();
@@ -170,13 +172,13 @@ public class WithInterceptorTests
                               where x.Name.Equals("MethodWithAwaitAndExceptionAsync")
                               select x).ToList();
 
-        Assert.Single(allMethodBases);
+        await Assert.That(allMethodBases).HasSingleItem();
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public void ClassWithAsyncMethodWithFastPath(bool recurse)
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
+    public async Task ClassWithAsyncMethodWithFastPath(bool recurse)
     {
         ClearMessage();
         var type = testResult.Assembly.GetType("ClassWithAsyncMethod");
@@ -190,37 +192,37 @@ public class WithInterceptorTests
         var methodBases = GetMethodInfoField();
 
         // Interceptor can't deal with 2 test cases
-        //Assert.Equal(recurse ? 2 : 1, methodBases.Count);
+        //await Assert.That(methodBases.Count).IsEqualTo(recurse ? 2 : 1);
 
         var methodBase = methodBases.Last();
-        Assert.Equal("MethodWithFastPathAsync", methodBase.Name);
+        await Assert.That(methodBase.Name).IsEqualTo("MethodWithFastPathAsync");
     }
 
-    [Fact]
-    public void LocalInstanceMethod()
+    [Test]
+    public async Task LocalInstanceMethod()
     {
         ClearMessage();
         var type = testResult.Assembly.GetType("ClassWithLocalMethods");
         var instance = (dynamic) Activator.CreateInstance(type);
         instance.MethodWithLocalInstanceMethod();
         var methodBases = GetMethodInfoField();
-        Assert.Single(methodBases);
+        await Assert.That(methodBases).HasSingleItem();
         var methodBase = methodBases.First();
-        Assert.Contains("LocalInstanceMethodToTime", methodBase.Name);
-        Assert.Equal(methodBase.DeclaringType, type);
+        await Assert.That(methodBase.Name).Contains("LocalInstanceMethodToTime");
+        await Assert.That(type).IsEqualTo(methodBase.DeclaringType);
     }
 
-    [Fact]
-    public void LocalStaticMethod()
+    [Test]
+    public async Task LocalStaticMethod()
     {
         ClearMessage();
         var type = testResult.Assembly.GetType("ClassWithLocalMethods");
         var instance = (dynamic) Activator.CreateInstance(type);
         instance.MethodWithLocalStaticMethod();
         var methodBases = GetMethodInfoField();
-        Assert.Single(methodBases);
+        await Assert.That(methodBases).HasSingleItem();
         var methodBase = methodBases.First();
-        Assert.Contains("LocalStaticMethodToTime", methodBase.Name);
-        Assert.Equal(methodBase.DeclaringType, type);
+        await Assert.That(methodBase.Name).Contains("LocalStaticMethodToTime");
+        await Assert.That(type).IsEqualTo(methodBase.DeclaringType);
     }
 }

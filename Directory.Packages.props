@@ -1,0 +1,16 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
+    <PackageVersion Include="Fody" Version="6.9.3" />
+    <PackageVersion Include="FodyHelpers" Version="6.9.3" />
+    <PackageVersion Include="FodyPackaging" Version="6.9.3" />
+    <!-- the TUnit metapackage is not used since it brings in a Mono.Cecil that conflicts with the Cecil used by Fody -->
+    <PackageVersion Include="TUnit.Core" Version="1.69.0" />
+    <PackageVersion Include="TUnit.Assertions" Version="1.69.0" />
+    <PackageVersion Include="TUnit.Engine" Version="1.69.0" />
+    <PackageVersion Include="Verify.TUnit" Version="31.28.0" />
+  </ItemGroup>
+</Project>

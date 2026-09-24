@@ -1,11 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Fody;
-using Xunit;
 
+// tests share static state and capture Trace output
+[NotInParallel]
 public class VBNetAssemblyWithInterceptorTests
 {
     static string assembly = "VBNetAssemblyWithInterceptor";
@@ -40,8 +41,8 @@ public class VBNetAssemblyWithInterceptorTests
     List<string> GetMessagesField() =>
         (List<string>)messagesField.GetValue(null);
 
-    [Fact]
-    public void ClassWithAsyncMethod()
+    [Test]
+    public async Task ClassWithAsyncMethod()
     {
         ClearMessage();
         var type = testResult.Assembly.GetType($"{assembly}.ClassWithAsyncMethod");
@@ -53,8 +54,8 @@ public class VBNetAssemblyWithInterceptorTests
         });
 
         var methodBases = GetMethodInfoField();
-        Assert.Single(methodBases);
+        await Assert.That(methodBases).HasSingleItem();
         var methodBase = methodBases.First();
-        Assert.Equal("MethodWithAwaitAsync", methodBase.Name);
+        await Assert.That(methodBase.Name).IsEqualTo("MethodWithAwaitAsync");
     }
 }

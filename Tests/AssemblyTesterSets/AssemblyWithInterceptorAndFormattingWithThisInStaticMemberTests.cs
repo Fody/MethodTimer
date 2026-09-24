@@ -1,14 +1,15 @@
-﻿using System.Linq;
+using System.Linq;
 using Fody;
-using Xunit;
 
+// tests share static state and capture Trace output
+[NotInParallel]
 public class AssemblyWithInterceptorAndFormattingWithThisInStaticMemberTests
 {
-    [Fact]
-    public void RaisesErrorForThisInStaticMember()
+    [Test]
+    public async Task RaisesErrorForThisInStaticMember()
     {
         var weavingTask = new ModuleWeaver();
         var testResult = weavingTask.ExecuteTestRun("AssemblyWithInterceptorAndFormattingWithThisInStaticMember.dll");
-        Assert.Equal("Could not process 'System.Void ClassWithMethod::Method(System.String,System.Int32)' because the format uses 'this' in a static context.", testResult.Errors.Single().Text);
+        await Assert.That(testResult.Errors.Single().Text).IsEqualTo("Could not process 'System.Void ClassWithMethod::Method(System.String,System.Int32)' because the format uses 'this' in a static context.");
     }
 }

@@ -1,12 +1,11 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Xunit;
 
 public partial class WithoutInterceptorTests
 {
-    [Fact]
-    public void MethodWithEmptyAsync()
+    [Test]
+    public async Task MethodWithEmptyAsync()
     {
         var type = testResult.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
@@ -16,12 +15,12 @@ public partial class WithoutInterceptorTests
             task.Wait();
         });
 
-        Assert.Single(message);
-        Assert.StartsWith("ClassWithAsyncMethod.MethodWithEmptyAsync ", message.First());
+        await Assert.That(message).HasSingleItem();
+        await Assert.That(message.First()).StartsWith("ClassWithAsyncMethod.MethodWithEmptyAsync ");
     }
 
-    [Fact]
-    public void ClassWithAsyncMethod()
+    [Test]
+    public async Task ClassWithAsyncMethod()
     {
         var type = testResult.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
@@ -31,12 +30,12 @@ public partial class WithoutInterceptorTests
             task.Wait();
         });
 
-        Assert.Single(message);
-        Assert.StartsWith("ClassWithAsyncMethod.MethodWithAwaitAsync ", message.First());
+        await Assert.That(message).HasSingleItem();
+        await Assert.That(message.First()).StartsWith("ClassWithAsyncMethod.MethodWithAwaitAsync ");
     }
 
-    [Fact]
-    public void ClassWithAsyncMethodThatThrowsException()
+    [Test]
+    public async Task ClassWithAsyncMethodThatThrowsException()
     {
         var type = testResult.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
@@ -53,11 +52,11 @@ public partial class WithoutInterceptorTests
             }
         });
 
-        Assert.Single(message);
-        Assert.StartsWith("ClassWithAsyncMethod.MethodWithAwaitAndExceptionAsync ", message.First());
+        await Assert.That(message).HasSingleItem();
+        await Assert.That(message.First()).StartsWith("ClassWithAsyncMethod.MethodWithAwaitAndExceptionAsync ");
     }
 
-    [Fact]
+    [Test]
     public async Task ClassWithGenericTaskWithoutMessageAsyncMethod()
     {
         var type = testResult.Assembly.GetType("ClassWithGenericResultAsyncMethod");
@@ -68,14 +67,14 @@ public partial class WithoutInterceptorTests
             await task;
         });
 
-        Assert.Single(message);
-        Assert.StartsWith("ClassWithGenericResultAsyncMethod.DoSomethingWithoutMessageAsync", message.First());
+        await Assert.That(message).HasSingleItem();
+        await Assert.That(message.First()).StartsWith("ClassWithGenericResultAsyncMethod.DoSomethingWithoutMessageAsync");
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public void ClassWithAsyncMethodWithFastPath(bool recurse)
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
+    public async Task ClassWithAsyncMethodWithFastPath(bool recurse)
     {
         var type = testResult.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
@@ -85,12 +84,12 @@ public partial class WithoutInterceptorTests
             task.Wait();
         });
 
-        Assert.Equal(recurse ? 2 : 1, message.Count);
-        Assert.StartsWith("ClassWithAsyncMethod.MethodWithFastPathAsync ", message.First());
+        await Assert.That(message.Count).IsEqualTo(recurse ? 2 : 1);
+        await Assert.That(message.First()).StartsWith("ClassWithAsyncMethod.MethodWithFastPathAsync ");
     }
 
-    [Fact]
-    public void ClassWithExceptionAsyncMethod()
+    [Test]
+    public async Task ClassWithExceptionAsyncMethod()
     {
         var type = testResult.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
@@ -100,12 +99,12 @@ public partial class WithoutInterceptorTests
             task.Wait();
         });
 
-        Assert.Single(message);
-        Assert.StartsWith("ClassWithAsyncMethod.ComplexMethodWithAwaitAsync ", message.First());
+        await Assert.That(message).HasSingleItem();
+        await Assert.That(message.First()).StartsWith("ClassWithAsyncMethod.ComplexMethodWithAwaitAsync ");
     }
 
-    [Fact]
-    public void ClassWithFastComplexAsyncMethod()
+    [Test]
+    public async Task ClassWithFastComplexAsyncMethod()
     {
         var type = testResult.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
@@ -115,12 +114,12 @@ public partial class WithoutInterceptorTests
             task.Wait();
         });
 
-        Assert.Single(message);
-        Assert.StartsWith("ClassWithAsyncMethod.ComplexMethodWithAwaitAsync ", message.First());
+        await Assert.That(message).HasSingleItem();
+        await Assert.That(message.First()).StartsWith("ClassWithAsyncMethod.ComplexMethodWithAwaitAsync ");
     }
 
-    [Fact]
-    public void ClassWithMediumComplexAsyncMethod()
+    [Test]
+    public async Task ClassWithMediumComplexAsyncMethod()
     {
         var type = testResult.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
@@ -130,12 +129,12 @@ public partial class WithoutInterceptorTests
             task.Wait();
         });
 
-        Assert.Single(message);
-        Assert.StartsWith("ClassWithAsyncMethod.ComplexMethodWithAwaitAsync ", message.First());
+        await Assert.That(message).HasSingleItem();
+        await Assert.That(message.First()).StartsWith("ClassWithAsyncMethod.ComplexMethodWithAwaitAsync ");
     }
 
-    [Fact]
-    public void ClassWithSlowComplexAsyncMethod()
+    [Test]
+    public async Task ClassWithSlowComplexAsyncMethod()
     {
         var type = testResult.Assembly.GetType("ClassWithAsyncMethod");
         var instance = (dynamic)Activator.CreateInstance(type);
@@ -145,7 +144,7 @@ public partial class WithoutInterceptorTests
             task.Wait();
         });
 
-        Assert.Single(message);
-        Assert.StartsWith("ClassWithAsyncMethod.ComplexMethodWithAwaitAsync ", message.First());
+        await Assert.That(message).HasSingleItem();
+        await Assert.That(message.First()).StartsWith("ClassWithAsyncMethod.ComplexMethodWithAwaitAsync ");
     }
 }

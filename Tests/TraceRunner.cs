@@ -29,7 +29,9 @@ public class TraceRunner
         {
             Trace.Listeners.Add(myTraceListener);
             await action();
-            Thread.Sleep(100);
+            // yield rather than block: without a synchronization context the caller continues inline inside SetResult,
+            // and the weaved timing code runs after SetResult returns
+            await Task.Delay(100);
         }
         finally
         {

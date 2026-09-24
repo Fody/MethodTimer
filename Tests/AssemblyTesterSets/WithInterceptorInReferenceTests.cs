@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Fody;
-using Xunit;
 
+// tests share static state and capture Trace output
+[NotInParallel]
 public class WithInterceptorInReferenceTests
 {
     static FieldInfo methodBaseField;
@@ -21,17 +22,17 @@ public class WithInterceptorInReferenceTests
         methodBaseField = typeof(AssemblyToReference.MethodTimeLogger).GetField("MethodBase");
     }
 
-    [Fact]
-    public void ClassWithMethod()
+    [Test]
+    public async Task ClassWithMethod()
     {
         ClearMessage();
         var instance = testResult.GetInstance("ClassWithMethod");
         instance.Method();
         var methodBases = GetMethodInfoField();
-        Assert.Single(methodBases);
+        await Assert.That(methodBases).HasSingleItem();
         var methodBase = methodBases.First();
-        Assert.Equal("Method", methodBase.Name);
-        Assert.Equal(methodBase.DeclaringType, instance.GetType());
+        await Assert.That(methodBase.Name).IsEqualTo("Method");
+        await Assert.That((object) instance.GetType()).IsEqualTo(methodBase.DeclaringType);
     }
 
     static void ClearMessage() =>

@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using Fody;
-using Xunit;
 
+// tests share static state and capture Trace output
+[NotInParallel]
 public class WithNopInterceptorTests
 {
     static TestResult testResult;
@@ -12,14 +13,14 @@ public class WithNopInterceptorTests
         testResult = weavingTask.ExecuteTestRun("AssemblyWithNopInterceptor.dll");
     }
 
-    [Fact]
-    public void AssertAttributeIsRemoved()
+    [Test]
+    public async Task AssertAttributeIsRemoved()
     {
         var type = testResult.Assembly.GetType("TimeAttribute");
-        Assert.Null(type);
+        await Assert.That(type).IsNull();
     }
 
-    [Fact]
+    [Test]
     public void ClassWithMethod()
     {
         var type = testResult.Assembly.GetType("ClassWithMethod");

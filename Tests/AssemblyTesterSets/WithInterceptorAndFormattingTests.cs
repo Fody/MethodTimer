@@ -1,11 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Fody;
-using Xunit;
 
+// tests share static state and capture Trace output
+[NotInParallel]
 public class WithInterceptorAndFormattingTests
 {
     static FieldInfo methodBaseField;
@@ -28,8 +29,8 @@ public class WithInterceptorAndFormattingTests
         messagesField = methodTimeLogger.GetField("Messages");
     }
 
-    [Fact]
-    public void ClassWithMethod()
+    [Test]
+    public async Task ClassWithMethod()
     {
         ClearMessage();
 
@@ -38,21 +39,21 @@ public class WithInterceptorAndFormattingTests
         instance.Method("123", 42);
 
         var methodBases = GetMethodInfoField();
-        Assert.Single(methodBases);
+        await Assert.That(methodBases).HasSingleItem();
 
         var methodBase = methodBases.First();
-        Assert.Equal("Method", methodBase.Name);
-        Assert.Equal(methodBase.DeclaringType, type);
+        await Assert.That(methodBase.Name).IsEqualTo("Method");
+        await Assert.That(type).IsEqualTo(methodBase.DeclaringType);
 
         var messages = GetMessagesField();
-        Assert.Single(messages);
+        await Assert.That(messages).HasSingleItem();
 
         var message = messages.First();
-        Assert.Equal("File name '123' with id '42'", message);
+        await Assert.That(message).IsEqualTo("File name '123' with id '42'");
     }
 
-    [Fact]
-    public void ClassWithMethodWithoutFormatting()
+    [Test]
+    public async Task ClassWithMethodWithoutFormatting()
     {
         ClearMessage();
 
@@ -61,18 +62,18 @@ public class WithInterceptorAndFormattingTests
         instance.MethodWithoutFormatting("123", 42);
 
         var methodBases = GetMethodInfoField();
-        Assert.Single(methodBases);
+        await Assert.That(methodBases).HasSingleItem();
 
         var methodBase = methodBases.First();
-        Assert.Equal("MethodWithoutFormatting", methodBase.Name);
-        Assert.Equal(methodBase.DeclaringType, type);
+        await Assert.That(methodBase.Name).IsEqualTo("MethodWithoutFormatting");
+        await Assert.That(type).IsEqualTo(methodBase.DeclaringType);
 
         var messages = GetMessagesField();
-        Assert.Empty(messages);
+        await Assert.That(messages).IsEmpty();
     }
 
-    [Fact]
-    public void ClassWithAsyncMethod()
+    [Test]
+    public async Task ClassWithAsyncMethod()
     {
         ClearMessage();
 
@@ -85,20 +86,20 @@ public class WithInterceptorAndFormattingTests
         });
 
         var methodBases = GetMethodInfoField();
-        Assert.Single(methodBases);
+        await Assert.That(methodBases).HasSingleItem();
 
         var methodBase = methodBases.First();
-        Assert.Equal("MethodWithAwaitAsync", methodBase.Name);
+        await Assert.That(methodBase.Name).IsEqualTo("MethodWithAwaitAsync");
 
         var messages = GetMessagesField();
-        Assert.Single(messages);
+        await Assert.That(messages).HasSingleItem();
 
         var message = messages.First();
-        Assert.Equal("File name '123' with id '42'", message);
+        await Assert.That(message).IsEqualTo("File name '123' with id '42'");
     }
 
-    [Fact]
-    public void ClassWithAsyncWithoutFormattingMethod()
+    [Test]
+    public async Task ClassWithAsyncWithoutFormattingMethod()
     {
         ClearMessage();
 
@@ -111,19 +112,19 @@ public class WithInterceptorAndFormattingTests
         });
 
         var methodBases = GetMethodInfoField();
-        Assert.Single(methodBases);
+        await Assert.That(methodBases).HasSingleItem();
 
         var methodBase = methodBases.First();
-        Assert.Equal("MethodWithAwaitWithoutFormattingAsync", methodBase.Name);
+        await Assert.That(methodBase.Name).IsEqualTo("MethodWithAwaitWithoutFormattingAsync");
 
         var messages = GetMessagesField();
-        Assert.Empty(messages);
+        await Assert.That(messages).IsEmpty();
     }
 
     // Note: in DEBUG because this only needs to run against optimized libraries
 #if !DEBUG
-    [Fact]
-    public void ClassWithAsyncMethodWithUnusedParameters()
+    [Test]
+    public async Task ClassWithAsyncMethodWithUnusedParameters()
     {
         ClearMessage();
 
@@ -136,12 +137,12 @@ public class WithInterceptorAndFormattingTests
         });
 
         var error = testResult.Errors.First();
-        Assert.Equal("Parameter 'fileName' is not available on the async state machine. Probably it has been optimized away by the compiler. Please update the format so it excludes this parameter.", error.Text);
+        await Assert.That(error.Text).IsEqualTo("Parameter 'fileName' is not available on the async state machine. Probably it has been optimized away by the compiler. Please update the format so it excludes this parameter.");
     }
 #endif
 
-    [Fact]
-    public void ClassWithAsyncMethodThatThrowsException()
+    [Test]
+    public async Task ClassWithAsyncMethodThatThrowsException()
     {
         ClearMessage();
 
@@ -162,19 +163,19 @@ public class WithInterceptorAndFormattingTests
 
         var methodBases = GetMethodInfoField();
         var methodBase = methodBases.Last();
-        Assert.Equal("MethodWithAwaitAndExceptionAsync", methodBase.Name);
+        await Assert.That(methodBase.Name).IsEqualTo("MethodWithAwaitAndExceptionAsync");
 
         var messages = GetMessagesField();
-        Assert.Single(messages);
+        await Assert.That(messages).HasSingleItem();
 
         var message = messages.First();
-        Assert.Equal("File name '123' with id '42'", message);
+        await Assert.That(message).IsEqualTo("File name '123' with id '42'");
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public void ClassWithAsyncMethodWithFastPath(bool recurse)
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
+    public async Task ClassWithAsyncMethodWithFastPath(bool recurse)
     {
         ClearMessage();
 
@@ -189,20 +190,20 @@ public class WithInterceptorAndFormattingTests
         var methodBases = GetMethodInfoField();
 
         // Interceptor can't deal with 2 test cases
-        //Assert.Equal(recurse ? 2 : 1, methodBases.Count);
+        //await Assert.That(methodBases.Count).IsEqualTo(recurse ? 2 : 1);
 
         var methodBase = methodBases.Last();
-        Assert.Equal("MethodWithFastPathAsync", methodBase.Name);
+        await Assert.That(methodBase.Name).IsEqualTo("MethodWithFastPathAsync");
 
         var messages = GetMessagesField();
-        Assert.Equal(recurse ? 2 : 1, messages.Count);
+        await Assert.That(messages.Count).IsEqualTo(recurse ? 2 : 1);
 
         var message = messages.First();
-        Assert.Equal("File name '123' with id '42'", message);
+        await Assert.That(message).IsEqualTo("File name '123' with id '42'");
     }
 
-    [Fact]
-    public void ClassWithGenericAsyncMethod()
+    [Test]
+    public async Task ClassWithGenericAsyncMethod()
     {
         ClearMessage();
 
@@ -216,13 +217,13 @@ public class WithInterceptorAndFormattingTests
 
         var methodBases = GetMethodInfoField();
         var methodBase = methodBases.Last();
-        Assert.Equal("MethodWithGenericResultAsync", methodBase.Name);
+        await Assert.That(methodBase.Name).IsEqualTo("MethodWithGenericResultAsync");
 
         var messages = GetMessagesField();
-        Assert.Single(messages);
+        await Assert.That(messages).HasSingleItem();
 
         var message = messages.First();
-        Assert.Equal("some message", message);
+        await Assert.That(message).IsEqualTo("some message");
     }
 
     static void ClearMessage()

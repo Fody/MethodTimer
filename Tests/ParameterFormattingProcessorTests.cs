@@ -1,42 +1,41 @@
-﻿using Xunit;
 
 public class ParameterFormattingProcessorTests
 {
-    [Theory]
-    [InlineData(null, "")]
-    [InlineData("", "")]
-    public void ParseEmptyFormatting(string input, string expectedOutput)
+    [Test]
+    [Arguments(null, "")]
+    [Arguments("", "")]
+    public async Task ParseEmptyFormatting(string input, string expectedOutput)
     {
         var processor = new ParameterFormattingProcessor();
 
         var info = processor.ParseParameterFormatting(input);
 
-        Assert.NotNull(info);
-        Assert.Equal(expectedOutput, info.Format);
+        await Assert.That(info).IsNotNull();
+        await Assert.That(info.Format).IsEqualTo(expectedOutput);
     }
 
-    [Fact]
-    public void ParseSimpleFormatting()
+    [Test]
+    public async Task ParseSimpleFormatting()
     {
         var processor = new ParameterFormattingProcessor();
 
         var info = processor.ParseParameterFormatting("This is a {fileName}");
 
-        Assert.NotNull(info);
+        await Assert.That(info).IsNotNull();
 
-        Assert.Equal("This is a {0}", info.Format);
-        Assert.Equal("fileName", info.ParameterNames[0]);
+        await Assert.That(info.Format).IsEqualTo("This is a {0}");
+        await Assert.That(info.ParameterNames[0]).IsEqualTo("fileName");
     }
 
-    [Fact]
-    public void ParseComplexFormatting()
+    [Test]
+    public async Task ParseComplexFormatting()
     {
         var processor = new ParameterFormattingProcessor();
 
         var info = processor.ParseParameterFormatting("This is a {fileName} test with id = '{id}' and {fileName} but don't replace fileName");
 
-        Assert.Equal("This is a {0} test with id = '{1}' and {0} but don't replace fileName", info.Format);
-        Assert.Equal("fileName", info.ParameterNames[0]);
-        Assert.Equal("id", info.ParameterNames[1]);
+        await Assert.That(info.Format).IsEqualTo("This is a {0} test with id = '{1}' and {0} but don't replace fileName");
+        await Assert.That(info.ParameterNames[0]).IsEqualTo("fileName");
+        await Assert.That(info.ParameterNames[1]).IsEqualTo("id");
     }
 }

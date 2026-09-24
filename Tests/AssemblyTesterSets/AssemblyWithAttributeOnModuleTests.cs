@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Fody;
-using Xunit;
 
+// tests share static state and capture Trace output
+[NotInParallel]
 public class AssemblyWithAttributeOnModuleTests
 {
     static TestResult testResult;
@@ -19,20 +20,20 @@ public class AssemblyWithAttributeOnModuleTests
         );
     }
 
-    [Fact]
-    public void ClassWithNoAttribute()
+    [Test]
+    public async Task ClassWithNoAttribute()
     {
         var message = TraceRunner.Capture(() =>
         {
             var instance = testResult.GetInstance("ClassWithNoAttribute");
             instance.Method();
         });
-        Assert.Single(message);
-        Assert.StartsWith("ClassWithNoAttribute.Method ", message.First());
+        await Assert.That(message).HasSingleItem();
+        await Assert.That(message.First()).StartsWith("ClassWithNoAttribute.Method ");
     }
 
-    [Fact]
-    public void ClassWithAsyncMethod()
+    [Test]
+    public async Task ClassWithAsyncMethod()
     {
         var instance = testResult.GetInstance("ClassWithCompilerGeneratedTypes");
         var message = TraceRunner.Capture(() =>
@@ -41,12 +42,12 @@ public class AssemblyWithAttributeOnModuleTests
             task.Wait();
         });
 
-        Assert.Single(message);
-        Assert.StartsWith("ClassWithCompilerGeneratedTypes.AsyncMethod ", message.First());
+        await Assert.That(message).HasSingleItem();
+        await Assert.That(message.First()).StartsWith("ClassWithCompilerGeneratedTypes.AsyncMethod ");
     }
 
-    [Fact]
-    public void ClassWithYieldMethod()
+    [Test]
+    public async Task ClassWithYieldMethod()
     {
         var instance = testResult.GetInstance("ClassWithCompilerGeneratedTypes");
         var message = TraceRunner.Capture(() =>
@@ -55,8 +56,8 @@ public class AssemblyWithAttributeOnModuleTests
             task.ToList();
         });
 
-        Assert.Empty(message);
+        await Assert.That(message).IsEmpty();
         //TODO: support yield
-        //Assert.True(message.First().StartsWith("ClassWithCompilerGeneratedTypes.YieldMethod "));
+        //await Assert.That(message.First().StartsWith("ClassWithCompilerGeneratedTypes.YieldMethod ")).IsTrue();
     }
 }

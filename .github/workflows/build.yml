@@ -28,9 +28,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      # The tests target net6.0, which the runner image does not have.
       - name: Set up .NET
         uses: actions/setup-dotnet@v6
         with:
+          dotnet-version: 6.0.x
           global-json-file: global.json
 
       # Keyed on everything that decides the package graph. restore-keys lets a changed graph start

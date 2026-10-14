@@ -186,7 +186,7 @@ public partial class AsyncMethodProcessor
     {
         // There are 2 locations where the stopwatch logic should be injected:
         // 1: just before the ::SetException
-        // 2: end of the method (which is not executed after calling ::SetException) or just after SetResult
+        // 2: end of the method (which is not executed after calling ::SetException) or just before SetResult
 
         var stopStopwatchMethodReference = new MethodReference(stopStopwatchMethod.Name, stopStopwatchMethod.ReturnType, stateMachineTypeReference)
         {
@@ -233,8 +233,9 @@ public partial class AsyncMethodProcessor
         {
             if (body.Instructions[i].Operand is MethodReference {Name: "SetResult"})
             {
-                // Next index, we want this to appear *after* the SetResult call
-                endInstruction = body.Instructions[i + 1];
+                // Insert directly before the SetResult call, so the log has happened by the time awaiters resume.
+                // The injected call is stack neutral, and the state is already -2 at this point.
+                endInstruction = body.Instructions[i];
                 break;
             }
         }

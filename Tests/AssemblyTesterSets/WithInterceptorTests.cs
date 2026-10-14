@@ -83,7 +83,6 @@ public class WithInterceptorTests
     }
 
     [Test]
-    [Skip("todo")]
     public async Task ClassWithAsyncMethod()
     {
         ClearMessage();
